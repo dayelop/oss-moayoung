@@ -11,20 +11,24 @@
       width: 70px;
       height: 70px;
       border-style: none;
-      box-shadow: 0 0 2px 1px #999;
+      box-shadow: 0 0 5px 1px #999;
       border-radius: 50%;
       font-size: 30px;
+      line-height: 230%;
       margin: 0px 5px;
       @media only screen and (max-width: $xs-max) {
         margin: 0px 2px;
       }
       &:hover {
-        box-shadow: 0 0 6px 1px #555;
+        background-color: #0071e3;
       }
       cursor: pointer;
       &.fa-phone {
-        background: red;
-        color: #fff;
+        background: #fff;
+        color: red;
+        &:hover {
+          background-color: #000;
+        }
         &.green {
           background: green;
         }
