@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <meta name="description" content="@@description"/>
         <meta name="keywords" content="@@keywords"/>
-        <title>@@title</title>
+        <title>모아영</title> <!--title-->
         <meta property="og:title" content="@@title" />
         <meta property="og:description" content="@@description">
         <meta property="og:image" content="@@image">
@@ -84,7 +84,7 @@
                                             <span class="close fas fa-times" v-on:click="toogleEmoji"></span>
                                         </div>
                                         <form class="msger-inputarea" v-on:submit.prevent="sendMessage">
-                                            <textarea v-model="message" type="text" class="msger-input" placeholder="내용을 입력하세요"
+                                            <textarea v-model="message" type="text" class="msger-input" placeholder="내용을 입력하세요."
                                             @paste="addfilebypast"
                                             @keydown.enter.exact.prevent
                                             @keyup.enter.exact="sendMessage"></textarea>
@@ -235,18 +235,18 @@
         <div id="create-room" v-bind:class="{'show': showDialog}"> <!-- 방 만드는 창 -->
             <div class="create-room-inner">
                 <form v-on:submit.prevent="createRoom">
-                    <div class="title">{{title}}</div> <!-- Video Chat -->
-                    <div class="message" data-lang="createaroom">Create a room</div>
+                    <div class="title" style="text-align: center;">모아영</div> <!-- Video Chat --> <!-- {{title}} -->
+                    <!-- <div class="message" data-lang="통화방 이름을 입력하고, 통화를 시작해보세요 ❕">통화방 이름을 입력하고, 통화를 시작해보세요 ❕</div> -->
+                    <div class="message" style="text-align: center;">통화방 이름을 입력하고,<br> 통화를 시작해보세요 ❕</div>
                     <div class="room-input"> <!-- 방 이름 쓰는 칸 -->
-                        <input autofocus type="text"  
-                        :placeholder="[[roomNameLabel]]" 
+                        <input autofocus type="text" 
                         v-model="roomName"
                         @keydown.enter.exact.prevent
                         @keyup.enter.exact="createRoom">
                         <button type="button" v-on:click="setRandomName" class="fas fa-random"></button>
                     </div>
                     <div class="button-area"> <!-- 방 만들기 버튼 -->
-                        <button type="submit" data-lang="create" class="button">Create</button>
+                        <button type="submit" data-lang="생성" class="button" >Create</button>
                     </div>
                     <div class="bottomlinks">
                         <span class="imprint" v-show="imprint">
