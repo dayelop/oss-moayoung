@@ -35,8 +35,9 @@
                             <div class="welcome-inner">
                                 <span class="close fas fa-times" v-on:click="close"></span> <!-- welcome.ts에서 close 함수 -->
                                 <div class="invite row" v-bind:class="{'show': showInvite}"> <!-- elements > welcome.ts-->
-                                    <div class="col-xs-12 invite-header">{{inviteotherwithlink}}:</div> <!-- elements > welcome.ts / translator.ts -> "Invite other with this link" 딱 방 만들면 나오는 알림창 -->
-                                    <div class="col-xs-12 invite-content">
+                                   <!-- <div class="col-xs-12 invite-header">{{inviteotherwithlink}}:</div>--> <!-- elements > welcome.ts / translator.ts -> "Invite other with this link" 딱 방 만들면 나오는 알림창 -->
+                                   <div class="col-xs-12 invite-header">아래의 링크로 초대해보세요 😎</div> 
+                                   <div class="col-xs-12 invite-content">
                                         <input v-model="link" readonly type="text" id="invite-link-welcome"><button v-bind:class="{'fa-copy': !copied, 'fa-check': copied}" v-on:click="copy" class="fas"></button>
                                     </div>
                                 </div>
@@ -67,7 +68,7 @@
                             <div tab="chat" class="col-xs-3" data-lang="채팅">Chat</div>
                             <div tab="partner" class="col-xs-3" data-lang="참여자">Participant</div>
                             <div tab="settings" class="col-xs-3" data-lang="설정">Setting</div>
-                            <div tab="Subtitle" class="col-xs-3" data-lang="자막">Subtitle</div>
+                            <div tab="subtitle" class="col-xs-3" data-lang="자막">Subtitle</div>
                         </div>
                         <div class="tabs-content"> <!-- tab 하나 하나 -->
                             <div id="tab-chat">
@@ -83,8 +84,7 @@
                                             <span class="close fas fa-times" v-on:click="toogleEmoji"></span>
                                         </div>
                                         <form class="msger-inputarea" v-on:submit.prevent="sendMessage">
-                                            <textarea v-model="message" type="text" class="msger-input" 
-                                            :placeholder="[[yourmessage]]"
+                                            <textarea v-model="message" type="text" class="msger-input" placeholder="내용을 입력하세요"
                                             @paste="addfilebypast"
                                             @keydown.enter.exact.prevent
                                             @keyup.enter.exact="sendMessage"></textarea>
@@ -99,7 +99,8 @@
                             </div>
                             <div id="tab-partner"> <!-- participant 창  -->
                                 <div id="invite" class="row">
-                                    <div class="col-xs-12 invite-header">{{inviteotherwithlink}}:</div>
+                                    <!-- <div class="col-xs-12 invite-header">{{inviteotherwithlink}}:</div> -->
+                                    <div class="col-xs-12 invite-header">아래의 링크로 초대해보세요 😎</div>
                                     <div class="col-xs-12 invite-content">
                                         <input v-model="link" readonly type="text" id="invite-link"><button v-bind:class="{'fa-copy': !copied, 'fa-check': copied}" v-on:click="copy" class="fas"></button>
                                     </div>
@@ -113,13 +114,15 @@
                             <div id="tab-settings"> <!-- 설정창 : 이름, 마이크 .. 등-->
                                 <div id="userinfo"> <!-- 이름 설정 -->
                                     <div class="row">
-                                        <label class="col-xs-6" >{{namelabel}}:</label>
+                                        <!-- <label class="col-xs-6" >{{namelabel}}:</label> -->
+                                        <label class="col-xs-6" >이름</label>
                                         <input class="col-xs-6" v-model="name" @blur="changeUserinfo" placeholder="..." >
                                     </div>
                                 </div>
                                 <div id="devices"> <!-- 마이크 설정 -->
                                     <div class="row">
-                                        <label class="col-xs-6" >{{microphonelabel}}:</label>
+                                        <!-- <label class="col-xs-6" >{{microphonelabel}}:</label> -->
+                                        <label class="col-xs-6" >마이크</label>
                                         <select class="col-xs-6" v-model="audio" @change="onChange()">
                                             <option v-for="(option, index) in audiooptions" :key="index" v-bind:value="index">
                                             {{ option }}
@@ -127,7 +130,8 @@
                                         </select>
                                     </div>
                                     <div class="row"> <!-- 비디오 설정 -->
-                                        <label class="col-xs-6" >{{videolabel}}:</label>
+                                        <!-- <label class="col-xs-6" >{{videolabel}}:</label> -->
+                                        <label class="col-xs-6" >비디오</label>
                                         <select class="col-xs-6" v-model="video" @change="onChange()">
                                             <option v-for="(option, index) in videooptions" :key="index" v-bind:value="index">
                                             {{ option }}
@@ -135,7 +139,8 @@
                                         </select>
                                     </div> 
                                     <div class="row sound" v-bind:class="{'allowed': soundAllowed}" > <!-- 스피커 설정 -->
-                                        <label class="col-xs-6" >{{speakerlabel}}:</label>
+                                        <!-- <label class="col-xs-6" >{{speakerlabel}}:</label> -->
+                                        <label class="col-xs-6" >스피커</label>
                                         <select class="col-xs-6" v-model="sound" @change="onChange()">
                                             <option v-for="(option, index) in soundoptions" :key="index" v-bind:value="index">
                                             {{ option }}
@@ -184,7 +189,7 @@
                                     </div>
                                 </div>
                                 <!-- 링크 두개 : Build your own video chat, report bug--> 
-                           <!--     <div id="linkarea"> 
+                                <!--     <div id="linkarea"> 
                                     <div class="row"> 
                                         <a target="_blank" href="https://github.com/vgiselbrecht/chat#own-installation">
                                             <span class="fas fa-plus-circle"></span>
@@ -209,6 +214,12 @@
                                         <a v-bind:href="gdpr" target="_blank" data-lang="privacy">Privacy</a>
                                     </div>
                                 </div>--><!-- version 표시 -->
+                                
+                            </div>
+                            <div id="tab-subtitle">
+                                <div>
+                                    <h1>자막칸 !!!</h1>
+                                </div>
                             </div>
                         </div>
                     </div>
