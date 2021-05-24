@@ -6,15 +6,10 @@
 
 @font-face {
   font-family: 'Font Awesome 5 Brands';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-5Medium.woff')
+    format('woff');
+  font-weight: normal;
   font-style: normal;
-  font-weight: 400;
-  font-display: $fa-font-display;
-  src: url('#{$fa-font-path}/fa-brands-400.eot');
-  src: url('#{$fa-font-path}/fa-brands-400.eot?#iefix') format('embedded-opentype'),
-  url('#{$fa-font-path}/fa-brands-400.woff2') format('woff2'),
-  url('#{$fa-font-path}/fa-brands-400.woff') format('woff'),
-  url('#{$fa-font-path}/fa-brands-400.ttf') format('truetype'),
-  url('#{$fa-font-path}/fa-brands-400.svg#fontawesome') format('svg');
 }
 
 .fab {
