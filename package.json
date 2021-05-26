@@ -14,12 +14,12 @@
     "css-loader": "^5.0.1",
     "emoji-picker-element": "^1.4.0",
     "file-loader": "^6.2.0",
-    "grunt": "1.4.1",
+    "grunt": "~1.0.3",
     "grunt-contrib-clean": "~2.0.0",
     "grunt-contrib-watch": "~1.1.0",
     "grunt-replace": "^1.0.1",
     "grunt-webpack": "^4.0.2",
-    "lodash": "4.17.21",
+    "lodash": ">=4.17.19",
     "sass": "^1.32.0",
     "sass-loader": "^10.1.0",
     "style-loader": "^2.0.0",
@@ -29,9 +29,6 @@
     "webpack": "^5.11.1"
   },
   "dependencies": {
-    "@tensorflow/tfjs-node": "3.6.1",
-    "canvas": "2.8.0",
-    "face-api.js": "0.22.2",
     "ngrok": "4.0.1"
   }
 }
