@@ -43,10 +43,13 @@
         background: #fff;
         color: red;
         &:hover {
-          background-color: #000;
+          background-color: red;
         }
         &.green {
-          background: green;
+          color: green;
+          &:hover {
+            background-color: green;
+          }
         }
       }
       &.screen {
