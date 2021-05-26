@@ -23,6 +23,22 @@
         background-color: #0071e3;
       }
       cursor: pointer;
+      &.fa-microphone {
+        background: #0071e3;
+        color: #fff;
+        &.fa-microphone-slash {
+          color: $footer-button-color;
+          background: $footer-button-background;
+        }
+      }
+      &.fa-video {
+        background: #0071e3;
+        color: #fff;
+        &.fa-video-slash {
+          color: $footer-button-color;
+          background: $footer-button-background;
+        }
+      }
       &.fa-phone {
         background: #fff;
         color: red;
