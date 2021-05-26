@@ -18,8 +18,76 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
         <script src="assets/bundle.js?v=@@version"></script> 
+        <script src="../src/assets/js/SwitchState.js"></script>
+        <script>
+            function keyevent() {
+                var isCtrl = false;  
+
+                document.onkeyup=function(e) {  
+                    if(e.which == 17) isCtrl=false;  
+                }
+
+                document.onkeydown=function(e) {  
+                    if(e.which == 17) isCtrl=true;
+
+                    if(e.which == 77 && isCtrl == true) {  
+                        //mic
+                        console.log("mic");
+                        return false;
+                    }
+
+                    if(e.which == 67 && isCtrl == true) {  
+                        //cam
+                        console.log("cam");
+                        return false;
+                    }
+
+                    if(e.which == 83 && isCtrl == true) {  
+                        //share
+                        console.log("share");
+                        return false;
+                    }
+
+                    if(e.which == 79 && isCtrl == true) {  
+                        //option
+                        console.log("option");
+                        return false;
+                    }
+
+                    if(e.which == 69 && isCtrl == true) {  
+                        //exit
+                        console.log("exit");
+                        return false;
+                    }
+
+                    if(e.which == 70 && isCtrl == true) {  
+                        //face 
+                        console.log("face");
+                        return false;
+                    }
+
+                    if(e.which == 84 && isCtrl == true) {  
+                        //subtitle
+                        console.log("subtitle");
+                        return false;
+                    }
+
+                    if(e.which == 76 && isCtrl == true) {  
+                        //lib
+                        console.log("lib");
+                        return false;
+                    }
+
+                    if(e.which == 65 && isCtrl == true) {  
+                        //alarm
+                        console.log("alarm");
+                        return false;
+                    }
+                }
+            }
+        </script>
     </head>
-    <body>
+    <body onload="keyevent()"> <!--고침-->
         <div class="container maincontainer">
             <div class="mainrow">
                 <div class="" id="main" style="display: none;">
@@ -44,7 +112,7 @@
                                 <div class="setname row" v-bind:class="{'show': showSetName}">
                                     <div class="col-xs-12 setname-header">{{yournamelabel}}:</div> <!-- elements > welcome.ts / 처음 들어왔을 때 이름 설정-->
                                     <div class="col-xs-12 setname-content">
-                                        <input v-model="name" @blur="changeUserinfo" autofocus placeholder="..." @keydown.enter.exact.prevent @keyup.enter.exact="close">
+                                        <input v-model="name" @blur="changeUserinfo" autofocus placeholder="..."  @keydown.enter.exact.prevent @keyup.enter.exact="close" > <!-- 여기 고침-->
                                     </div>
                                 </div>
                                 <button v-bind:class="{'show': showSetName}" v-on:click="close" type="submit" data-lang="starting" class="button starting">Starting</button>
@@ -68,7 +136,7 @@
                             <div tab="chat" class="col-xs-3" data-lang="채팅">Chat</div>
                             <div tab="partner" class="col-xs-3" data-lang="참여자">Participant</div>
                             <div tab="settings" class="col-xs-3" data-lang="설정">Setting</div>
-                            <div tab="subtitle" class="col-xs-3" data-lang="자막">Subtitle</div>
+                            <div tab="subtitle" class="col-xs-3" data-lang="자막" id="testTitle">Subtitle</div>
                         </div>
                         <div class="tabs-content"> <!-- tab 하나 하나 -->
                             <div id="tab-chat">
@@ -162,28 +230,28 @@
                                     <div class="switchbox">
                                         <h4>얼굴 벗어남 감지</h4>
                                         <label class="switch"> <!-- 영화 ***-->
-                                            <input type="checkbox">
+                                            <input type="checkbox" id="faceDetect">
                                             <span class="slider round"></span>
                                         </label>
                                    </div>
                                    <div class="switchbox">
                                        <h4>자막 추출</h4>
                                         <label class="switch"> <!-- 영화 ***-->
-                                            <input type="checkbox">
+                                            <input type="checkbox" id="subtitleExtract">
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
                                     <div class="switchbox">
                                         <h4>발화자 입 확대</h4>
                                         <label class="switch"> <!-- 영화 ***-->
-                                            <input type="checkbox">
+                                            <input type="checkbox" id="libMagnify">
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
                                     <div class="switchbox">
                                         <h4>참여자 음성 알림</h4>
                                         <label class="switch"> <!-- 영화 ***-->
-                                            <input type="checkbox">
+                                            <input type="checkbox" id="participantAlarm">
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
