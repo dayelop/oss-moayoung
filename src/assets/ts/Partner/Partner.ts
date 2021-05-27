@@ -19,6 +19,7 @@ export class Partner implements IPartner {
   screenSharing: boolean;
   listener: boolean;
   videoElement: HTMLElement;
+  lipcanvas: HTMLCanvasElement;
   connection: RTCPeerConnection;
   dataChannel: any;
   devices: Devices;

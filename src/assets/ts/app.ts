@@ -375,23 +375,39 @@ export class App {
   addPartner(partnerId: number) {
     var cla = this;
     if (partnerId in app.partners) {
-      this.partners[partnerId].closeConnection();
-      delete this.partners[partnerId];
+        this.partners[partnerId].closeConnection();
+        delete this.partners[partnerId];
     }
     this.partners[partnerId] = null;
-    this.partners[partnerId] = new Partner(
-      partnerId,
-      this.exchange,
-      this.devices,
-      this.textchat,
-      this.videogrid,
-      this.partnerOnConnected,
-      this.partnerOnConnectionClosed,
-      this.partnerOnConnectionLosed
-    );
+    this.partners[partnerId] = new Partner(partnerId, this.exchange, this.devices, this.textchat, this.videogrid, this.partnerOnConnected, this.partnerOnConnectionClosed, this.partnerOnConnectionLosed);
     this.setStreamToPartner(this.partners[partnerId], true);
     this.videogrid.recalculateLayout();
-  }
+
+    app.partners[partnerId].videoElement.addEventListener("playing", () => {
+        Promise.all([
+            //모델 불러오기
+            faceapi.nets.tinyFaceDetector.loadFromUri("/models"),
+            faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+            faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
+            faceapi.nets.faceExpressionNet.loadFromUri("/models"),
+        ]).then(() => {
+            console.log("파트너 얼굴 인식 시작");
+
+            setInterval(async () => {
+                const detections = await faceapi
+                    .detectAllFaces(app.partners[partnerId].videoElement, new faceapi.TinyFaceDetectorOptions())
+                    .withFaceLandmarks()
+                    if (detections[0] !== undefined) {
+                        //console.log(detections);
+                        if (detections[0].alignedRect.box.x < 10) {
+                                console.log("파트너 얼굴이 왼쪽으로 벗어남");
+                        }
+                    }
+            }, 100);
+        });
+
+    })
+}
 
   partnerOnConnected(partner: IPartner) {
     app.setStreamToPartner(partner);

@@ -14,6 +14,7 @@ export interface IPartner{
     screenSharing: boolean;
     listener: boolean;
     videoElement: HTMLElement;
+    lipcanvas: HTMLCanvasElement;
     connection: RTCPeerConnection;
     exchange: IExchange;
     devices: Devices;
