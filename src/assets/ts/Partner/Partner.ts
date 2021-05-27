@@ -9,6 +9,7 @@ import { Videogrid } from '../Elements/Videogrid';
 import { Video } from '../Elements/Video';
 import { PartnerListElement } from '../Elements/PartnerListElement';
 import { TTS } from '../Utils/Sounds';
+import * as faceapi from "face-api.js";
 
 export class Partner implements IPartner {
   id: number;
