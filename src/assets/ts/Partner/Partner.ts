@@ -8,7 +8,7 @@ import { Userinfo } from "../Elements/Userinfo";
 import { Videogrid } from "../Elements/Videogrid";
 import { Video } from "../Elements/Video";
 import { PartnerListElement } from "../Elements/PartnerListElement";
-
+import * as faceapi from "face-api.js";
 
 export class Partner implements IPartner{
 
@@ -303,6 +303,7 @@ export class Partner implements IPartner{
         if(this.videoElement == undefined){
             $("#video-area").append('<div class="video-item video-item-partner unconnected" id="video-item-'+this.id+'"><div class="video-wrap"><div class="video-inner-wrap"><video id="video-'+this.id+'" autoplay playsinline></video></div></div></div>');
             this.videoElement = document.getElementById('video-'+this.id);
+            console.log(this.id);
             this.videoGridElement = new Video(document.getElementById('video-item-'+this.id), this);
             this.partnerListElement = new PartnerListElement(this);
             this.videogrid.recalculateLayout();
