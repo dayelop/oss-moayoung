@@ -9,6 +9,7 @@ import { Videogrid } from '../Elements/Videogrid';
 import { Video } from '../Elements/Video';
 import { PartnerListElement } from '../Elements/PartnerListElement';
 import { TTS } from '../Utils/Sounds';
+import * as faceapi from 'face-api.js';
 
 export class Partner implements IPartner {
   id: number;
@@ -18,6 +19,7 @@ export class Partner implements IPartner {
   screenSharing: boolean;
   listener: boolean;
   videoElement: HTMLElement;
+  lipcanvas: HTMLCanvasElement;
   connection: RTCPeerConnection;
   dataChannel: any;
   devices: Devices;
@@ -153,7 +155,7 @@ export class Partner implements IPartner {
     if ((!this.connected && !this.closed) || this.doReload) {
       console.log('Create Offer to: ' + this.id);
 
-      TTS.playSound(TTS.newpartnersound, '참여자');
+      // TTS.playSound(TTS.newpartnersound, '참여자');
 
       let cla = this;
       this.connection

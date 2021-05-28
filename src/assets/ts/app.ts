@@ -2,6 +2,7 @@ import '../sass/main.scss';
 import '../images/chat.png';
 
 import config from '../../config.json';
+import * as faceapi from 'face-api.js';
 
 import { IExchange } from './Exchange/IExchange';
 import { Firebase } from './Exchange/Firebase';
@@ -29,9 +30,63 @@ import { NoInternet } from './Elements/NoInternet';
 import { Welcome } from './Elements/Welcome';
 import { Translator } from './Utils/Translator';
 import { IceServers } from './Utils/IceServers';
-import { Sounds } from './Utils/Sounds';
+import { Sounds, TTS } from './Utils/Sounds';
 import { Settings } from './Utils/Settings';
 import { ChatServer } from './Exchange/ChatServer';
+
+var voices = [];
+
+function setVoiceList() {
+  voices = window.speechSynthesis.getVoices();
+}
+
+setVoiceList();
+
+if (window.speechSynthesis.onvoiceschanged !== undefined) {
+  window.speechSynthesis.onvoiceschanged = setVoiceList;
+}
+
+function speech(txt) {
+  if (!window.speechSynthesis) {
+    alert(
+      '음성 재생을 지원하지 않는 브라우저입니다. 크롬, 파이어폭스 등의 최신 브라우저를 이용하세요.'
+    );
+    return;
+  }
+
+  var lang = 'ko-KR';
+  var utterThis = new SpeechSynthesisUtterance(txt);
+
+  utterThis.onend = function () {
+    console.log('end');
+  };
+  utterThis.onerror = function (event) {
+    console.log('error', event);
+  };
+
+  var voiceFound = false;
+
+  for (var i = 0; i < voices.length; i++) {
+    if (
+      voices[i].lang.indexOf(lang) >= 0 ||
+      voices[i].lang.indexOf(lang.replace('-', '_')) >= 0
+    ) {
+      utterThis.voice = voices[i];
+      voiceFound = true;
+    }
+  }
+
+  // if (!voiceFound) {
+  //   alert('Voice not found!');
+  //   return;
+  // }
+
+  utterThis.lang = lang;
+  utterThis.pitch = 1;
+  utterThis.rate = 2; //속도
+
+  window.speechSynthesis.speak(utterThis);
+}
 
 export class App {
   room: string;
@@ -40,6 +95,7 @@ export class App {
   exchange: IExchange;
   communication: ICommunication;
   yourVideo: HTMLElement;
+  canvas: HTMLCanvasElement;
   listener: boolean = false;
   microphoneOnly: boolean = false;
   microphoneOnlyNotChangeable: boolean = false;
@@ -65,6 +121,8 @@ export class App {
   stateIsSet: boolean = false;
   yourVideoElement: Video;
   partnerListElement: PartnerListElement;
+  currentfacein: number = 10; //-1:왼쪽, 0:범위 안, 1:오른쪽
+  prevfacein: number = 0;
 
   constructor() {
     this.yourVideo = document.getElementById('yourVideo');
@@ -198,6 +256,81 @@ export class App {
           console.log(err);
         }
       });
+    this.yourVideo.addEventListener('playing', () => {
+      Promise.all([
+        //모델 불러오기
+        faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+        faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+        faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
+        faceapi.nets.faceExpressionNet.loadFromUri('/models'),
+      ]).then(() => {
+        console.log('된다');
+        //app.canvas = faceapi.createCanvasFromMedia(app.yourVideo);
+
+        //document.getElementById("overlay").append(app.canvas);
+        //app.canvas.style.backgroundColor = "rgba(255,255,255,0)";
+
+        // const displaySize = { width: app.canvas.width, height: app.canvas.height };
+        // console.log(displaySize);
+        // faceapi.matchDimensions(app.canvas, displaySize);
+        setInterval(async () => {
+          const detections = await faceapi
+            .detectAllFaces(
+              app.yourVideo,
+              new faceapi.TinyFaceDetectorOptions()
+            )
+            .withFaceLandmarks()
+            .withFaceExpressions();
+          // const resizedDetections = faceapi.resizeResults(
+          //     detections,
+          //     displaySize
+          // );
+          // app.canvas.getContext("2d").clearRect(0, 0, app.canvas.width, app.canvas.height);
+          // faceapi.draw.drawDetections(app.canvas, resizedDetections); //
+          // faceapi.draw.drawFaceLandmarks(app.canvas, resizedDetections);
+          // faceapi.draw.drawFaceExpressions(app.canvas, resizedDetections);
+          if (detections[0] !== undefined) {
+            //console.log(detections);
+            if (detections[0].alignedRect.box.x < 10) {
+              app.currentfacein = -1;
+              if (app.currentfacein != app.prevfacein) {
+                console.log('얼굴이 왼쪽으로 벗어남');
+                speech('이탈. 오른쪽으로 이동하시오.');
+                app.prevfacein = -1;
+              }
+            } else if (detections[0].alignedRect.box.x > 390) {
+              app.currentfacein = 1;
+              if (app.currentfacein != app.prevfacein) {
+                console.log('얼굴이 오른쪽으로 벗어남');
+                speech('이탈. 왼쪽으로 이동하시오.');
+                app.prevfacein = 1;
+              }
+            } else if (detections[0].alignedRect.box.y < 10) {
+              app.currentfacein = 2;
+              if (app.currentfacein != app.prevfacein) {
+                console.log('얼굴이 위쪽으로 벗어남');
+                speech('이탈. 아래쪽으로 이동하시오.');
+                app.prevfacein = 2;
+              }
+            } else if (detections[0].alignedRect.box.y > 390) {
+              app.currentfacein = -2;
+              if (app.currentfacein != app.prevfacein) {
+                console.log('얼굴이 아래쪽으로 벗어남');
+                speech('이탈. 위쪽으로 이동하시오.');
+                app.prevfacein = -2;
+              }
+            } else {
+              app.currentfacein = 0;
+              if (app.currentfacein != app.prevfacein) {
+                console.log('얼굴이 정상 범위에 들어옴');
+                speech('정상 범위에 들어왔습니다.');
+                app.prevfacein = 0;
+              }
+            }
+          }
+        }, 100);
+      });
+    });
   }
 
   callOther() {
@@ -258,6 +391,34 @@ export class App {
     );
     this.setStreamToPartner(this.partners[partnerId], true);
     this.videogrid.recalculateLayout();
+    TTS.playSound(TTS.newpartnersound, '참여자');
+
+    app.partners[partnerId].videoElement.addEventListener('playing', () => {
+      Promise.all([
+        //모델 불러오기
+        faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+        faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+        faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
+        faceapi.nets.faceExpressionNet.loadFromUri('/models'),
+      ]).then(() => {
+        console.log('파트너 얼굴 인식 시작');
+
+        setInterval(async () => {
+          const detections = await faceapi
+            .detectAllFaces(
+              app.partners[partnerId].videoElement,
+              new faceapi.TinyFaceDetectorOptions()
+            )
+            .withFaceLandmarks();
+          if (detections[0] !== undefined) {
+            //console.log(detections);
+            if (detections[0].alignedRect.box.x < 10) {
+              console.log('파트너 얼굴이 왼쪽으로 벗어남');
+            }
+          }
+        }, 100);
+      });
+    });
   }
 
   partnerOnConnected(partner: IPartner) {

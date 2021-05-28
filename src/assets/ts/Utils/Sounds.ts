@@ -55,7 +55,7 @@ function speech(txt) {
 
   utterThis.lang = lang;
   utterThis.pitch = 1;
-  utterThis.rate = 2; //속도
+  utterThis.rate = 1.25; //속도
 
   window.speechSynthesis.speak(utterThis);
 }
