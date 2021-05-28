@@ -32,6 +32,7 @@ export class Partner implements IPartner {
   onConnectedEvent: (partner: IPartner) => void;
   onConnectionClosedEvent: (partner: IPartner) => void;
   onConnectionLosedEvent: (partner: IPartner) => void;
+  participantAlarm: HTMLElement; 
 
   doReload: boolean = false;
   closed: boolean = false;
@@ -68,6 +69,7 @@ export class Partner implements IPartner {
     this.addVideoElement();
     this.videogrid.recalculateLayout();
 
+    this.participantAlarm = document.getElementById('participantAlarm');
     var communication = new WebRTC(this);
     communication.addOnaddtrackEvent(this.onAddTrack);
     communication.addOnicecandidateEvent(this.onIceCandidate);
@@ -268,8 +270,11 @@ export class Partner implements IPartner {
     this.closed = true;
     this.connection.close();
     console.log('Connection closed to: ' + this.id);
-
-    TTS.playSound(TTS.hangoutsound, this.name);
+    
+    if($(this.participantAlarm).prop('checked') == true) 
+    {
+      TTS.playSound(TTS.hangoutsound, this.name);
+    }
 
     this.videoElement = null;
     $('#video-item-' + this.id).remove();

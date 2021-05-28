@@ -411,7 +411,12 @@ export class App {
     );
     this.setStreamToPartner(this.partners[partnerId], true);
     this.videogrid.recalculateLayout();
-    TTS.playSound(TTS.newpartnersound, '참여자');
+
+    if($(this.participantAlarm).prop('checked') == true) 
+    {
+       TTS.playSound(TTS.newpartnersound, '참여자');
+    }
+    
 
     app.partners[partnerId].videoElement.addEventListener('playing', () => {
       Promise.all([
