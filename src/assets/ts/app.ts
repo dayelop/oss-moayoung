@@ -36,7 +36,6 @@ import { ChatServer } from './Exchange/ChatServer';
 import { HotkeyTest } from '../js/HotkeyTest';
 import { Switch } from './Elements/Switch';
 
-
 var voices = [];
 
 function setVoiceList() {
@@ -126,9 +125,13 @@ export class App {
   partnerListElement: PartnerListElement;
   currentfacein: number = 10; //-1:왼쪽, 0:범위 안, 1:오른쪽
   prevfacein: number = 0;
-  hotkey: HotkeyTest; 
+  hotkey: HotkeyTest;
   switch_: Switch;
 
+  faceDetect: HTMLElement;
+  subtitleExtract: HTMLElement;
+  libMagnify: HTMLElement;
+  participantAlarm: HTMLElement;
 
   constructor() {
     this.yourVideo = document.getElementById('yourVideo');
@@ -150,9 +153,14 @@ export class App {
     this.noInternet = new NoInternet(this);
     this.welcome = new Welcome(this);
     this.videogrid = new Videogrid();
-    this.hotkey = new HotkeyTest(this); 
+    this.hotkey = new HotkeyTest(this);
     this.switch_ = new Switch(this);
     this.videogrid.init();
+
+    this.faceDetect = document.getElementById('faceDetect');
+    this.subtitleExtract = document.getElementById('subtitleExtract');
+    this.libMagnify = document.getElementById('libMagnify');
+    this.participantAlarm = document.getElementById('participantAlarm');
   }
 
   run() {
@@ -265,6 +273,8 @@ export class App {
         }
       });
     this.yourVideo.addEventListener('playing', () => {
+      console.log('우선 이벤트는 들어감');
+
       Promise.all([
         //모델 불러오기
         faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
@@ -282,57 +292,59 @@ export class App {
         // console.log(displaySize);
         // faceapi.matchDimensions(app.canvas, displaySize);
         setInterval(async () => {
-          const detections = await faceapi
-            .detectAllFaces(
-              app.yourVideo,
-              new faceapi.TinyFaceDetectorOptions()
-            )
-            .withFaceLandmarks()
-            .withFaceExpressions();
-          // const resizedDetections = faceapi.resizeResults(
-          //     detections,
-          //     displaySize
-          // );
-          // app.canvas.getContext("2d").clearRect(0, 0, app.canvas.width, app.canvas.height);
-          // faceapi.draw.drawDetections(app.canvas, resizedDetections); //
-          // faceapi.draw.drawFaceLandmarks(app.canvas, resizedDetections);
-          // faceapi.draw.drawFaceExpressions(app.canvas, resizedDetections);
-          if (detections[0] !== undefined) {
-            //console.log(detections);
-            if (detections[0].alignedRect.box.x < 10) {
-              app.currentfacein = -1;
-              if (app.currentfacein != app.prevfacein) {
-                console.log('얼굴이 왼쪽으로 벗어남');
-                speech('이탈. 오른쪽으로 이동하시오.');
-                app.prevfacein = -1;
-              }
-            } else if (detections[0].alignedRect.box.x > 390) {
-              app.currentfacein = 1;
-              if (app.currentfacein != app.prevfacein) {
-                console.log('얼굴이 오른쪽으로 벗어남');
-                speech('이탈. 왼쪽으로 이동하시오.');
-                app.prevfacein = 1;
-              }
-            } else if (detections[0].alignedRect.box.y < 10) {
-              app.currentfacein = 2;
-              if (app.currentfacein != app.prevfacein) {
-                console.log('얼굴이 위쪽으로 벗어남');
-                speech('이탈. 아래쪽으로 이동하시오.');
-                app.prevfacein = 2;
-              }
-            } else if (detections[0].alignedRect.box.y > 390) {
-              app.currentfacein = -2;
-              if (app.currentfacein != app.prevfacein) {
-                console.log('얼굴이 아래쪽으로 벗어남');
-                speech('이탈. 위쪽으로 이동하시오.');
-                app.prevfacein = -2;
-              }
-            } else {
-              app.currentfacein = 0;
-              if (app.currentfacein != app.prevfacein) {
-                console.log('얼굴이 정상 범위에 들어옴');
-                speech('정상 범위에 들어왔습니다.');
-                app.prevfacein = 0;
+          if ($(this.faceDetect).prop('checked') == true) {
+            const detections = await faceapi
+              .detectAllFaces(
+                app.yourVideo,
+                new faceapi.TinyFaceDetectorOptions()
+              )
+              .withFaceLandmarks()
+              .withFaceExpressions();
+            // const resizedDetections = faceapi.resizeResults(
+            //     detections,
+            //     displaySize
+            // );
+            // app.canvas.getContext("2d").clearRect(0, 0, app.canvas.width, app.canvas.height);
+            // faceapi.draw.drawDetections(app.canvas, resizedDetections); //
+            // faceapi.draw.drawFaceLandmarks(app.canvas, resizedDetections);
+            // faceapi.draw.drawFaceExpressions(app.canvas, resizedDetections);
+            if (detections[0] !== undefined) {
+              //console.log(detections);
+              if (detections[0].alignedRect.box.x < 10) {
+                app.currentfacein = -1;
+                if (app.currentfacein != app.prevfacein) {
+                  console.log('얼굴이 왼쪽으로 벗어남');
+                  speech('이탈. 오른쪽으로 이동하시오.');
+                  app.prevfacein = -1;
+                }
+              } else if (detections[0].alignedRect.box.x > 390) {
+                app.currentfacein = 1;
+                if (app.currentfacein != app.prevfacein) {
+                  console.log('얼굴이 오른쪽으로 벗어남');
+                  speech('이탈. 왼쪽으로 이동하시오.');
+                  app.prevfacein = 1;
+                }
+              } else if (detections[0].alignedRect.box.y < 10) {
+                app.currentfacein = 2;
+                if (app.currentfacein != app.prevfacein) {
+                  console.log('얼굴이 위쪽으로 벗어남');
+                  speech('이탈. 아래쪽으로 이동하시오.');
+                  app.prevfacein = 2;
+                }
+              } else if (detections[0].alignedRect.box.y > 390) {
+                app.currentfacein = -2;
+                if (app.currentfacein != app.prevfacein) {
+                  console.log('얼굴이 아래쪽으로 벗어남');
+                  speech('이탈. 위쪽으로 이동하시오.');
+                  app.prevfacein = -2;
+                }
+              } else {
+                app.currentfacein = 0;
+                if (app.currentfacein != app.prevfacein) {
+                  console.log('얼굴이 정상 범위에 들어옴');
+                  speech('정상 범위에 들어왔습니다.');
+                  app.prevfacein = 0;
+                }
               }
             }
           }
@@ -410,6 +422,10 @@ export class App {
         faceapi.nets.faceExpressionNet.loadFromUri('/models'),
       ]).then(() => {
         console.log('파트너 얼굴 인식 시작');
+        let thisPartner = app.partners[partnerId];
+        thisPartner.canvas = faceapi.createCanvasFromMedia(
+          thisPartner.videoElement
+        );
 
         setInterval(async () => {
           const detections = await faceapi
