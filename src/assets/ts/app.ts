@@ -33,6 +33,9 @@ import { IceServers } from './Utils/IceServers';
 import { Sounds, TTS } from './Utils/Sounds';
 import { Settings } from './Utils/Settings';
 import { ChatServer } from './Exchange/ChatServer';
+import { HotkeyTest } from '../js/HotkeyTest';
+import { Switch } from './Elements/Switch';
+
 
 var voices = [];
 
@@ -123,6 +126,9 @@ export class App {
   partnerListElement: PartnerListElement;
   currentfacein: number = 10; //-1:왼쪽, 0:범위 안, 1:오른쪽
   prevfacein: number = 0;
+  hotkey: HotkeyTest; 
+  switch_: Switch;
+
 
   constructor() {
     this.yourVideo = document.getElementById('yourVideo');
@@ -144,6 +150,8 @@ export class App {
     this.noInternet = new NoInternet(this);
     this.welcome = new Welcome(this);
     this.videogrid = new Videogrid();
+    this.hotkey = new HotkeyTest(this); 
+    this.switch_ = new Switch(this);
     this.videogrid.init();
   }
 
