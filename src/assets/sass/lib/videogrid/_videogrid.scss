@@ -1,127 +1,142 @@
 #video-area {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    align-items: center;
-    .video-item {
-        width: var(--width);
-        height: var(--height);
-        .video-wrap{
-            background: $video-background;
-            margin: 4px;
-            width: calc(var(--width) - 8px);
-            height: calc(var(--height) - 8px);
-            box-shadow: 0 0 4px 1px #000;
-            position: relative;
-            .video-inner-wrap{
-                overflow: hidden;
-                video{
-                    width: calc(100% + 2px);
-                    height: calc(100% + 2px);
-                    margin: -1px;
-                }
-            }
-            .video-info-wrap{
-                position: absolute;
-                top: 0;
-                *{
-                    border-radius: 0;
-                }
-                &.cammeraoff{
-                    background: $video-background;
-                }
-                .video-name{
-                    position: absolute;
-                    bottom: 0;
-                    left: 0;
-                    height: auto;
-                    text-align: center;
-                    color: #fff;
-                    background: rgba(0,0,0,0.2);
-                    padding: 3px 0px;
-                    border-radius: 0 0 5px 5px;
-                    .microphone, 
-                    .camera,
-                    .screen,
-                    .listener{
-                        display: inline;
-                        margin-left: 5px;
-                        &.on{
-                            display: none;
-                        }
-                    }
-                }
-                .expand {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    padding: 1px 3px;
-                    border-radius: 5px 0px 0px 0px;
-                    color: #fff;
-                    //background: rgba(0,0,0,0.2);
-                    width: auto;
-                    height: auto;
-                    cursor: pointer;
-                }
-                .connect{
-                    display: none;
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    width: 70px;
-                    height: 60px;
-                    margin-left: -35px;
-                    margin-top: -30px;
-                    color: #fff;
-                    text-align: center;
-                    text-shadow: 0px 0px 5px black;
-                    *{
-                        width: auto;
-                        height: auto;
-                    }
-                    .fas{
-                        font-size: 30px;
-                        animation:spin 4s linear infinite;
-                    }
-                    .text{
-                        font-size: 16px;
-                        line-height: 40px;
-                    }
-                }
-            }
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+  .video-item {
+    width: var(--width);
+    height: var(--height);
+    .video-wrap {
+      background: $video-background;
+      margin: 4px;
+      width: calc(var(--width) - 8px);
+      height: calc(var(--height) - 8px);
+      box-shadow: 0 0 4px 1px #000;
+      position: relative;
+      .video-inner-wrap {
+        overflow: hidden;
+        video {
+          width: calc(100% + 2px);
+          height: calc(100% + 2px);
+          margin: -1px;
         }
-        &.unconnected{
-            .video-wrap .video-info-wrap .connect{
-                display: block;
-            }
-        }
+      }
+      .video-info-wrap {
+        position: absolute;
+        top: 0;
         * {
-            height: 100%;
-            width: 100%;
-            border-radius: 5px;
+          border-radius: 0;
         }
-    }
-    &.yoursmall{
-        #yourVideoArea:not(.big) {
-            max-width: 150px;
-            @media only screen and (max-width: $xs-max) { 
-                max-width: 80px;
+        &.cammeraoff {
+          background: $video-background;
+        }
+        .video-name {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          height: auto;
+          text-align: center;
+          color: #fff;
+          background: rgba(0, 0, 0, 0.2);
+          padding: 3px 0px;
+          border-radius: 0 0 5px 5px;
+          .microphone,
+          .camera,
+          .screen,
+          .listener {
+            display: inline;
+            margin-left: 5px;
+            &.on {
+              display: none;
             }
+          }
+        }
+        .expand {
+          position: absolute;
+          top: 0;
+          left: 0;
+          padding: 1px 3px;
+          border-radius: 5px 0px 0px 0px;
+          color: #fff;
+          //background: rgba(0,0,0,0.2);
+          width: auto;
+          height: auto;
+          cursor: pointer;
+        }
+        .connect {
+          display: none;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 70px;
+          height: 60px;
+          margin-left: -35px;
+          margin-top: -30px;
+          color: #fff;
+          text-align: center;
+          text-shadow: 0px 0px 5px black;
+          * {
             width: auto;
             height: auto;
-            position: absolute;
-            right: 8px;
-            top: 0;
-            z-index: 10;
-            .video-wrap{
-                height: 100%;
-                width: 100%;
-                .video-inner-wrap video{
-                    width: calc(100% + 8px);
-                    height: calc(100% + 8px);
-                    margin: -4px;
-                }
-            }
+          }
+          .fas {
+            font-size: 30px;
+            animation: spin 4s linear infinite;
+          }
+          .text {
+            font-size: 16px;
+            line-height: 40px;
+          }
         }
+      }
+    }
+    &.unconnected {
+      .video-wrap .video-info-wrap .connect {
+        display: block;
+      }
+    }
+    * {
+      height: 100%;
+      width: 100%;
+      border-radius: 5px;
     }
   }
+  &.yoursmall {
+    #yourVideoArea:not(.big) {
+      max-width: 150px;
+      @media only screen and (max-width: $xs-max) {
+        max-width: 80px;
+      }
+      width: auto;
+      height: auto;
+      position: absolute;
+      right: 8px;
+      top: 0;
+      z-index: 10;
+      .video-wrap {
+        height: 100%;
+        width: 100%;
+        .video-inner-wrap video {
+          width: calc(100% + 8px);
+          height: calc(100% + 8px);
+          margin: -4px;
+        }
+      }
+    }
+  }
+}
+#mydiv {
+  position: absolute;
+  z-index: 9;
+  background-color: #f1f1f1;
+  text-align: center;
+  border: 1px solid #d3d3d3;
+}
+
+#mydivheader {
+  padding: 10px;
+  cursor: move;
+  z-index: 10;
+  background-color: #2196f3;
+  color: #fff;
+}
