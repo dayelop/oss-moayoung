@@ -50,6 +50,14 @@
               display: none;
             }
           }
+          input {
+            display: inline;
+            margin-left: 5px;
+            //border-radius: 1px;
+            //padding: 1px;
+            width: 15px; //13
+            height: 15px;
+          }
         }
         .expand {
           position: absolute;

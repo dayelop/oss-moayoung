@@ -401,17 +401,13 @@ export class App {
     }
     
 
-    if ($(this.libMagnify).prop('checked') == true && app.firstlipdiv) {
-      $('#video-area').append(
+    if (app.firstlipdiv) {
+      $('#lips-area').append(
         '<div id="mydiv"><div id="mydivheader">Click here to move</div><div id="lip-area" style="margin:0px"></div></div>'
       );
       app.firstlipdiv = false;
-    } else if ($(this.libMagnify).prop('checked') == false) {
-      $('#video-area').remove(
-        '<div id="mydiv"><div id="mydivheader">Click here to move</div><div id="lip-area" style="margin:0px"></div></div>'
-      );
-      app.firstlipdiv = true;
-    }
+    } 
+
     dragElement(document.getElementById('mydiv'));
     function dragElement(elmnt) {
       var pos1 = 0,
@@ -471,7 +467,9 @@ export class App {
         thisPartner.lipcanvas = faceapi.createCanvasFromMedia(
           thisPartner.videoElement
         );
-        document.getElementById('lip-area').append(thisPartner.lipcanvas);
+        thisPartner.lipcanvas.id = thisPartner.id;
+        thisPartner.lipcanvas.style.display = "none";
+        document.getElementById('lip-area').append(thisPartner.lipcanvas); //여기
         thisPartner.lipcanvas.width = 300;
         thisPartner.lipcanvas.height = 200;
 
