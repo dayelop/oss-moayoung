@@ -18,6 +18,42 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
         <script src="assets/bundle.js?v=@@version"></script> 
+        <script>
+            var prevRadio = null;
+
+            function check(input)
+            {
+                var lips_area = document.getElementById("lips-area");
+
+                if(input.checked == true)
+                {
+                    lips_area.style.display = "inline";
+                }
+                else {
+                    lips_area.style.display = "none";
+                }
+            }
+
+            function libSelect()
+            {
+                var checked_id = $(":input:radio[name=lipDetecting]:checked").val();//1
+
+                var canvas_ = document.getElementById(`${checked_id}`);//1
+
+                canvas_.style.display = "inline";//1
+
+                if(prevRadio == null)
+                {
+                    prevRadio = canvas_;
+                }
+                else if(prevRadio != canvas_) 
+                {
+                    prevRadio.style.display = "none";
+                    prevRadio = canvas_;
+                }
+            }
+
+        </script>
     </head>
     <body id="hotkey">
         <div class="container maincontainer">
@@ -50,6 +86,9 @@
                                 <button v-bind:class="{'show': showSetName}" v-on:click="close" type="submit" data-lang="starting" class="button starting">Starting</button>
                                 <div class="row"></div>
                             </div>
+                        </div>
+                        <div id="lips-area">
+                            
                         </div>
                     </div>
                     <div class="row center-xs" id="footer">
@@ -176,7 +215,7 @@
                                     <div class="switchbox">
                                         <h4>발화자 입 확대</h4>
                                         <label class="switch"> <!-- 영화 ***-->
-                                            <input type="checkbox" id="libMagnify" checked>
+                                            <input type="checkbox" id="libMagnify" onclick="check(this)" checked>
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
