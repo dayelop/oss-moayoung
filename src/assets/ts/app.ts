@@ -133,6 +133,8 @@ export class App {
   libMagnify: HTMLElement;
   participantAlarm: HTMLElement;
 
+  firstlipdiv: boolean = true;
+
   constructor() {
     this.yourVideo = document.getElementById('yourVideo');
     this.yourVideoElement = new Video(
@@ -273,8 +275,6 @@ export class App {
         }
       });
     this.yourVideo.addEventListener('playing', () => {
-      console.log('우선 이벤트는 들어감');
-
       Promise.all([
         //모델 불러오기
         faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
@@ -283,14 +283,6 @@ export class App {
         faceapi.nets.faceExpressionNet.loadFromUri('/models'),
       ]).then(() => {
         console.log('된다');
-        //app.canvas = faceapi.createCanvasFromMedia(app.yourVideo);
-
-        //document.getElementById("overlay").append(app.canvas);
-        //app.canvas.style.backgroundColor = "rgba(255,255,255,0)";
-
-        // const displaySize = { width: app.canvas.width, height: app.canvas.height };
-        // console.log(displaySize);
-        // faceapi.matchDimensions(app.canvas, displaySize);
         setInterval(async () => {
           if ($(this.faceDetect).prop('checked') == true) {
             const detections = await faceapi
@@ -298,18 +290,9 @@ export class App {
                 app.yourVideo,
                 new faceapi.TinyFaceDetectorOptions()
               )
-              .withFaceLandmarks()
-              .withFaceExpressions();
-            // const resizedDetections = faceapi.resizeResults(
-            //     detections,
-            //     displaySize
-            // );
-            // app.canvas.getContext("2d").clearRect(0, 0, app.canvas.width, app.canvas.height);
-            // faceapi.draw.drawDetections(app.canvas, resizedDetections); //
-            // faceapi.draw.drawFaceLandmarks(app.canvas, resizedDetections);
-            // faceapi.draw.drawFaceExpressions(app.canvas, resizedDetections);
+              .withFaceLandmarks();
+
             if (detections[0] !== undefined) {
-              //console.log(detections);
               if (detections[0].alignedRect.box.x < 10) {
                 app.currentfacein = -1;
                 if (app.currentfacein != app.prevfacein) {
@@ -413,6 +396,62 @@ export class App {
     this.videogrid.recalculateLayout();
     TTS.playSound(TTS.newpartnersound, '참여자');
 
+    if ($(this.libMagnify).prop('checked') == true && app.firstlipdiv) {
+      $('#video-area').append(
+        '<div id="mydiv"><div id="mydivheader">Click here to move</div><div id="lip-area" style="margin:0px"></div></div>'
+      );
+      app.firstlipdiv = false;
+    } else if ($(this.libMagnify).prop('checked') == false) {
+      $('#video-area').remove(
+        '<div id="mydiv"><div id="mydivheader">Click here to move</div><div id="lip-area" style="margin:0px"></div></div>'
+      );
+      app.firstlipdiv = true;
+    }
+    dragElement(document.getElementById('mydiv'));
+    function dragElement(elmnt) {
+      var pos1 = 0,
+        pos2 = 0,
+        pos3 = 0,
+        pos4 = 0;
+      if (document.getElementById(elmnt.id + 'header')) {
+        /* if present, the header is where you move the DIV from:*/
+        document.getElementById(elmnt.id + 'header').onmousedown =
+          dragMouseDown;
+      } else {
+        /* otherwise, move the DIV from anywhere inside the DIV:*/
+        elmnt.onmousedown = dragMouseDown;
+      }
+
+      function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // get the mouse cursor position at startup:
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        // call a function whenever the cursor moves:
+        document.onmousemove = elementDrag;
+      }
+
+      function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // calculate the new cursor position:
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        // set the element's new position:
+        elmnt.style.top = elmnt.offsetTop - pos2 + 'px';
+        elmnt.style.left = elmnt.offsetLeft - pos1 + 'px';
+      }
+
+      function closeDragElement() {
+        /* stop moving when mouse button is released:*/
+        document.onmouseup = null;
+        document.onmousemove = null;
+      }
+    }
     app.partners[partnerId].videoElement.addEventListener('playing', () => {
       Promise.all([
         //모델 불러오기
@@ -423,9 +462,13 @@ export class App {
       ]).then(() => {
         console.log('파트너 얼굴 인식 시작');
         let thisPartner = app.partners[partnerId];
-        thisPartner.canvas = faceapi.createCanvasFromMedia(
+
+        thisPartner.lipcanvas = faceapi.createCanvasFromMedia(
           thisPartner.videoElement
         );
+        document.getElementById('lip-area').append(thisPartner.lipcanvas);
+        thisPartner.lipcanvas.width = 300;
+        thisPartner.lipcanvas.height = 200;
 
         setInterval(async () => {
           const detections = await faceapi
@@ -434,11 +477,28 @@ export class App {
               new faceapi.TinyFaceDetectorOptions()
             )
             .withFaceLandmarks();
+
           if (detections[0] !== undefined) {
-            //console.log(detections);
-            if (detections[0].alignedRect.box.x < 10) {
-              console.log('파트너 얼굴이 왼쪽으로 벗어남');
-            }
+            let lipwidth =
+              detections[0].landmarks.positions[55].x -
+              detections[0].landmarks.positions[49].x;
+            let lipheight =
+              detections[0].landmarks.positions[58].y -
+              detections[0].landmarks.positions[51].y;
+
+            thisPartner.lipcanvas
+              .getContext('2d')
+              .drawImage(
+                thisPartner.videoElement,
+                detections[0].landmarks.positions[49].x - 30,
+                detections[0].landmarks.positions[51].y - 10,
+                lipwidth + 60,
+                lipheight + 20,
+                0,
+                0,
+                300,
+                200
+              );
           }
         }, 100);
       });
