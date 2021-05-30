@@ -1,0 +1,12 @@
+body {
+  overflow: hidden;
+}
+
+#tab-subtitle {
+  overflow: auto;
+  padding: 0px 15px 15px;
+
+  .subtitles {
+    white-space: pre-wrap;
+  }
+}
