@@ -1,237 +1,446 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <link rel="icon" type="image/png" href="assets/chat.png">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <meta name="description" content="@@description"/>
-        <meta name="keywords" content="@@keywords"/>
-        <title>모아영</title> <!--title-->
-        <meta property="og:title" content="@@title" />
-        <meta property="og:description" content="@@description">
-        <meta property="og:image" content="@@image">
-        <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="crossorigin="anonymous"></script>   
-        <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-auth.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-analytics.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
-        <script src="assets/bundle.js?v=@@version"></script> 
-    </head>
-    <body id="hotkey">
-        <div class="container maincontainer">
-            <div class="mainrow">
-                <div class="" id="main" style="display: none;">
-                    <div id="video-area">
-                        <div class="video-item" id="yourVideoArea">
-                            <div class="video-wrap"> <!-- Video.ts -->
-                                <div class="video-inner-wrap"> <!-- Video.ts -->
-                                    <video id="yourVideo" autoplay muted playsinline></video> <!-- 비디오 -->
-                                </div>
-                            </div>
-                        </div>
-                        <div id="welcome" class="welcome-messages" v-bind:class="{'open': open}"> <!-- elements > welcome.ts--> <!-- #welcome -->
-                            <div class="welcome-inner">
-                                <span class="close fas fa-times" v-on:click="close"></span> <!-- welcome.ts에서 close 함수 -->
-                                <div class="invite row" v-bind:class="{'show': showInvite}"> <!-- elements > welcome.ts-->
-                                   <!-- <div class="col-xs-12 invite-header">{{inviteotherwithlink}}:</div>--> <!-- elements > welcome.ts / translator.ts -> "Invite other with this link" 딱 방 만들면 나오는 알림창 -->
-                                   <div class="col-xs-12 invite-header">아래의 링크로 초대해보세요 😎</div> 
-                                   <div class="col-xs-12 invite-content">
-                                        <input v-model="link" readonly type="text" id="invite-link-welcome"><button v-bind:class="{'fa-copy': !copied, 'fa-check': copied}" v-on:click="copy" class="fas"></button>
-                                    </div>
-                                </div>
-                                <div class="setname row" v-bind:class="{'show': showSetName}">
-                                    <div class="col-xs-12 setname-header">{{yournamelabel}}:</div> <!-- elements > welcome.ts / 처음 들어왔을 때 이름 설정-->
-                                    <div class="col-xs-12 setname-content">
-                                        <input v-model="name" @blur="changeUserinfo" autofocus placeholder="..."  @keydown.enter.exact.prevent @keyup.enter.exact="close" > 
-                                    </div>
-                                </div>
-                                <button v-bind:class="{'show': showSetName}" v-on:click="close" type="submit" data-lang="starting" class="button starting">Starting</button>
-                                <div class="row"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row center-xs" id="footer">
-                        <div class="col-xs-12" id="controls"> <!-- 마이크, 카메라, 화면 공유, 채팅창, 통화 시작 버튼 --> <!-- controls.ts #controls--> <!-- css : 속성 -->
-                            <span v-on:click="toogleMicrophone" v-bind:class="{'fa-microphone': microphoneOn, 'fa-microphone-slash': !microphoneOn}" class="microphone fas fa-microphone"></span>
-                            <span v-on:click="toogleCamera" v-bind:class="{'fa-video': cameraOn, 'fa-video-slash': !cameraOn}" class="camera fas fa-video"></span>
-                            <span v-on:click="toogleScreen" v-bind:class="{'screenon': screenOn, 'disabled': screenSharingNotAllowed}" class="screen fas fa-desktop"></span>
-                            <span v-on:click="toogleOption" v-bind:class="{'optionon': optionOn, 'newMessage': hasNewMessage}" class="option fas fa-bars"></span>
-                            <span v-on:click="toogleOption" v-bind:class="{'optiononclose': optionOn}" class="optionclose fas fa-times"></span>
-                            <span v-on:click="hangOut"  v-bind:class="{'green': hangouted}" class="hangup fas fa-phone"></span>
-                        </div>
-                    </div>
-                </div><div id="sidebar"> <!-- option창 눌렀을 때 옆에 뜨는 창 -->
-                    <div class="tabs">
-                        <div class="tabs-header row">
-                            <div tab="chat" class="col-xs-3" data-lang="채팅">Chat</div>
-                            <div tab="partner" class="col-xs-3" data-lang="참여자">Participant</div>
-                            <div tab="settings" class="col-xs-3" data-lang="설정">Setting</div>
-                            <div tab="subtitle" class="col-xs-3" data-lang="자막" id="testTitle">Subtitle</div>
-                        </div>
-                        <div class="tabs-content"> <!-- tab 하나 하나 -->
-                            <div id="tab-chat">
-                                <div id="textchat"> <!-- 채팅창 TextChat.ts #textchat-->
-                                    <div class="msger">                              
-                                        <div class="msger-chat">
-                                        </div>
-                                        <div class="msger-extrainfo" v-bind:class="{'hidden': !extrainfoVisible}">
-                                            <span v-html="extrainfo"></span>
-                                            <span class="close fas fa-times" v-on:click="closeExtra"></span>
-                                        </div>
-                                        <div class="msger-emoji-area" v-bind:class="{'hidden': !emojiVisible}">
-                                            <span class="close fas fa-times" v-on:click="toogleEmoji"></span>
-                                        </div>
-                                        <form class="msger-inputarea" v-on:submit.prevent="sendMessage">
-                                            <textarea v-model="message" type="text" class="msger-input" placeholder="내용을 입력하세요."
-                                            @paste="addfilebypast"
-                                            @keydown.enter.exact.prevent
-                                            @keyup.enter.exact="sendMessage"></textarea>
-                                            <label class="msger-emoji fas fa-grin-alt" @click="toogleEmoji"></label>
-                                            <label class="msger-imgupload fas fa-file-image">
-                                                <input type="file"  accept="image/*" @change="addfile">
-                                            </label>
-                                            <button type="submit" class="msger-send-btn fas fa-paper-plane"></button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="tab-partner"> <!-- participant 창  -->
-                                <div id="invite" class="row">
-                                    <!-- <div class="col-xs-12 invite-header">{{inviteotherwithlink}}:</div> -->
-                                    <div class="col-xs-12 invite-header">아래의 링크로 초대해보세요 😎</div>
-                                    <div class="col-xs-12 invite-content">
-                                        <input v-model="link" readonly type="text" id="invite-link"><button v-bind:class="{'fa-copy': !copied, 'fa-check': copied}" v-on:click="copy" class="fas"></button>
-                                    </div>
-                                </div>
-                                <div id="partnerlist">
-                                    <ul>
-                                        
-                                    </ul>
-                                </div>
-                            </div>
-                            <div id="tab-settings"> <!-- 설정창 : 이름, 마이크 .. 등-->
-                                <div id="userinfo"> <!-- 이름 설정 -->
-                                    <div class="row">
-                                        <!-- <label class="col-xs-6" >{{namelabel}}:</label> -->
-                                        <label class="col-xs-6" >이름</label>
-                                        <input class="col-xs-6" v-model="name" @blur="changeUserinfo" placeholder="..." >
-                                    </div>
-                                </div>
-                                <div id="devices"> <!-- 마이크 설정 -->
-                                    <div class="row">
-                                        <!-- <label class="col-xs-6" >{{microphonelabel}}:</label> -->
-                                        <label class="col-xs-6" >마이크</label>
-                                        <select class="col-xs-6" v-model="audio" @change="onChange()">
-                                            <option v-for="(option, index) in audiooptions" :key="index" v-bind:value="index">
-                                            {{ option }}
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="row"> <!-- 비디오 설정 -->
-                                        <!-- <label class="col-xs-6" >{{videolabel}}:</label> -->
-                                        <label class="col-xs-6" >비디오</label>
-                                        <select class="col-xs-6" v-model="video" @change="onChange()">
-                                            <option v-for="(option, index) in videooptions" :key="index" v-bind:value="index">
-                                            {{ option }}
-                                            </option>
-                                        </select>
-                                    </div> 
-                                    <div class="row sound" v-bind:class="{'allowed': soundAllowed}" > <!-- 스피커 설정 -->
-                                        <!-- <label class="col-xs-6" >{{speakerlabel}}:</label> -->
-                                        <label class="col-xs-6" >스피커</label>
-                                        <select class="col-xs-6" v-model="sound" @change="onChange()">
-                                            <option v-for="(option, index) in soundoptions" :key="index" v-bind:value="index">
-                                            {{ option }}
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div id="configuration" v-if="soundEffectsEnabled"> <!-- 모르겠음 -->
-                                    <div class="row" v-if="soundEffectsEnabled">
-                                        <label class="col-xs-6" >{{soundeffectsLabel}}:</label>
-                                        <input type="checkbox" v-model="soundEffectsOn" @change="toogleSoundEffects">
-                                    </div>
-                                </div>
-                                <div id="settingSwitch"> <!-- 편의 기능 제어 -->
-                                    <div class="settingTitle">
-                                        <h2>편의 기능 제어</h2>
-                                    </div>
-
-                                    <div class="switchbox">
-                                        <h4>얼굴 벗어남 감지</h4>
-                                        <label class="switch"> <!-- 영화 ***-->
-                                            <input type="checkbox" id="faceDetect" checked>
-                                            <span class="slider round"></span>
-                                        </label>
-                                   </div>
-                                   <div class="switchbox">
-                                       <h4>자막 추출</h4>
-                                        <label class="switch"> <!-- 영화 ***-->
-                                            <input type="checkbox" id="subtitleExtract" checked>
-                                            <span class="slider round"></span>
-                                        </label>
-                                    </div>
-                                    <div class="switchbox">
-                                        <h4>발화자 입 확대</h4>
-                                        <label class="switch"> <!-- 영화 ***-->
-                                            <input type="checkbox" id="libMagnify" checked>
-                                            <span class="slider round"></span>
-                                        </label>
-                                    </div>
-                                    <div class="switchbox">
-                                        <h4>참여자 음성 알림</h4>
-                                        <label class="switch"> <!-- 영화 ***-->
-                                            <input type="checkbox" id="participantAlarm" checked>
-                                            <span class="slider round"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="tab-subtitle">
-                                <div>
-                                    <h1>자막칸 !!!</h1>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="assets/chat.png" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="description" content="@@description" />
+    <meta name="keywords" content="@@keywords" />
+    <title>모아영</title>
+    <!--title-->
+    <meta property="og:title" content="@@title" />
+    <meta property="og:description" content="@@description" />
+    <meta property="og:image" content="@@image" />
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.min.js"
+      integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-analytics.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <script src="assets/bundle.js?v=@@version"></script>
+    <script src="../src/assets/js/annyang.js"></script>
+    <script type="module" src="../src/assets/js/subtitles.js"></script>
+  </head>
+  <body id="hotkey">
+    <div class="container maincontainer">
+      <div class="mainrow">
+        <div class="" id="main" style="display: none">
+          <div id="video-area">
+            <div class="video-item" id="yourVideoArea">
+              <div class="video-wrap">
+                <!-- Video.ts -->
+                <div class="video-inner-wrap">
+                  <!-- Video.ts -->
+                  <video id="yourVideo" autoplay muted playsinline></video>
+                  <!-- 비디오 -->
                 </div>
-                <div id="clickbackground"></div>
+              </div>
             </div>
+            <div
+              id="welcome"
+              class="welcome-messages"
+              v-bind:class="{'open': open}"
+            >
+              <!-- elements > welcome.ts-->
+              <!-- #welcome -->
+              <div class="welcome-inner">
+                <span class="close fas fa-times" v-on:click="close"></span>
+                <!-- welcome.ts에서 close 함수 -->
+                <div class="invite row" v-bind:class="{'show': showInvite}">
+                  <!-- elements > welcome.ts-->
+                  <!-- <div class="col-xs-12 invite-header">{{inviteotherwithlink}}:</div>-->
+                  <!-- elements > welcome.ts / translator.ts -> "Invite other with this link" 딱 방 만들면 나오는 알림창 -->
+                  <div class="col-xs-12 invite-header">
+                    아래의 링크로 초대해보세요 😎
+                  </div>
+                  <div class="col-xs-12 invite-content">
+                    <input
+                      v-model="link"
+                      readonly
+                      type="text"
+                      id="invite-link-welcome"
+                    /><button
+                      v-bind:class="{'fa-copy': !copied, 'fa-check': copied}"
+                      v-on:click="copy"
+                      class="fas"
+                    ></button>
+                  </div>
+                </div>
+                <div class="setname row" v-bind:class="{'show': showSetName}">
+                  <div class="col-xs-12 setname-header">{{yournamelabel}}:</div>
+                  <!-- elements > welcome.ts / 처음 들어왔을 때 이름 설정-->
+                  <div class="col-xs-12 setname-content">
+                    <input
+                      v-model="name"
+                      @blur="changeUserinfo"
+                      autofocus
+                      placeholder="..."
+                      @keydown.enter.exact.prevent
+                      @keyup.enter.exact="close"
+                    />
+                  </div>
+                </div>
+                <button
+                  v-bind:class="{'show': showSetName}"
+                  v-on:click="close"
+                  type="submit"
+                  data-lang="starting"
+                  class="button starting"
+                >
+                  Starting
+                </button>
+                <div class="row"></div>
+              </div>
+            </div>
+          </div>
+          <div class="row center-xs" id="footer">
+            <div class="col-xs-12" id="controls">
+              <!-- 마이크, 카메라, 화면 공유, 채팅창, 통화 시작 버튼 -->
+              <!-- controls.ts #controls-->
+              <!-- css : 속성 -->
+              <span
+                v-on:click="toogleMicrophone"
+                v-bind:class="{'fa-microphone': microphoneOn, 'fa-microphone-slash': !microphoneOn}"
+                class="microphone fas fa-microphone"
+              ></span>
+              <span
+                v-on:click="toogleCamera"
+                v-bind:class="{'fa-video': cameraOn, 'fa-video-slash': !cameraOn}"
+                class="camera fas fa-video"
+              ></span>
+              <span
+                v-on:click="toogleScreen"
+                v-bind:class="{'screenon': screenOn, 'disabled': screenSharingNotAllowed}"
+                class="screen fas fa-desktop"
+              ></span>
+              <span
+                v-on:click="toogleOption"
+                v-bind:class="{'optionon': optionOn, 'newMessage': hasNewMessage}"
+                class="option fas fa-bars"
+              ></span>
+              <span
+                v-on:click="toogleOption"
+                v-bind:class="{'optiononclose': optionOn}"
+                class="optionclose fas fa-times"
+              ></span>
+              <span
+                v-on:click="hangOut"
+                v-bind:class="{'green': hangouted}"
+                class="hangup fas fa-phone"
+              ></span>
+            </div>
+          </div>
         </div>
-        <div id="lightbox" v-on:dblclick="closeLightbox" v-bind:class="{'open': !closed}"> <!-- 모르겠음 아마도 얼굴 조그맣게 나오는 창?-->
-            <img id="lightboxImageElement"  :src="src" v-bind:class="{'active': mode == 'image'}">
-            <video id="lightboxVideoElement" controls autoplay :src="src" v-bind:class="{'active': mode == 'video'}"></video>
-            <span class="close fas fa-times" v-on:click="closeLightbox"></span>
-        </div>
-        <div id="create-room" v-bind:class="{'show': showDialog}"> <!-- 방 만드는 창 -->
-            <div class="create-room-inner">
-                <form v-on:submit.prevent="createRoom">
-                    <div class="title" style="text-align: center;">모아영</div> <!-- Video Chat --> <!-- {{title}} -->
-                    <!-- <div class="message" data-lang="통화방 이름을 입력하고, 통화를 시작해보세요 ❕">통화방 이름을 입력하고, 통화를 시작해보세요 ❕</div> -->
-                    <div class="message" style="text-align: center;">통화방 이름을 입력하고,<br> 통화를 시작해보세요 ❕</div>
-                    <div class="room-input"> <!-- 방 이름 쓰는 칸 -->
-                        <input autofocus type="text" 
-                        v-model="roomName"
+        <div id="sidebar">
+          <!-- option창 눌렀을 때 옆에 뜨는 창 -->
+          <div class="tabs">
+            <div class="tabs-header row">
+              <div tab="chat" class="col-xs-3" data-lang="채팅">Chat</div>
+              <div tab="partner" class="col-xs-3" data-lang="참여자">
+                Participant
+              </div>
+              <div tab="settings" class="col-xs-3" data-lang="설정">
+                Setting
+              </div>
+              <div
+                tab="subtitle"
+                class="col-xs-3"
+                data-lang="자막"
+                id="testTitle"
+              >
+                Subtitle
+              </div>
+            </div>
+            <div class="tabs-content">
+              <!-- tab 하나 하나 -->
+              <div id="tab-chat">
+                <div id="textchat">
+                  <!-- 채팅창 TextChat.ts #textchat-->
+                  <div class="msger">
+                    <div class="msger-chat"></div>
+                    <div
+                      class="msger-extrainfo"
+                      v-bind:class="{'hidden': !extrainfoVisible}"
+                    >
+                      <span v-html="extrainfo"></span>
+                      <span
+                        class="close fas fa-times"
+                        v-on:click="closeExtra"
+                      ></span>
+                    </div>
+                    <div
+                      class="msger-emoji-area"
+                      v-bind:class="{'hidden': !emojiVisible}"
+                    >
+                      <span
+                        class="close fas fa-times"
+                        v-on:click="toogleEmoji"
+                      ></span>
+                    </div>
+                    <form
+                      class="msger-inputarea"
+                      v-on:submit.prevent="sendMessage"
+                    >
+                      <textarea
+                        v-model="message"
+                        type="text"
+                        class="msger-input"
+                        placeholder="내용을 입력하세요."
+                        style="font-family: 'S-CoreDream-5Medium'"
+                        @paste="addfilebypast"
                         @keydown.enter.exact.prevent
-                        @keyup.enter.exact="createRoom">
-                        <button type="button" v-on:click="setRandomName" class="fas fa-random"></button>
-                    </div>
-                    <div class="button-area"> <!-- 방 만들기 버튼 -->
-                        <button type="submit" data-lang="생성" class="button" >Create</button>
-                    </div>
-                    <div class="bottomlinks">
-                        <span class="imprint" v-show="imprint">
-                            <a v-bind:href="imprint" target="_blank" data-lang="imprint">Imprint</a>
-                        </span>
-                        <span v-show="imprint && gdpr"> | </span>
-                        <span class="gdpr" v-show="gdpr">
-                            <a v-bind:href="gdpr" target="_blank" data-lang="privacy">Privacy</a>
-                        </span>
-                    </div>
-                </form>
+                        @keyup.enter.exact="sendMessage"
+                      ></textarea>
+                      <label
+                        class="msger-emoji fas fa-grin-alt"
+                        @click="toogleEmoji"
+                      ></label>
+                      <label class="msger-imgupload fas fa-file-image">
+                        <input type="file" accept="image/*" @change="addfile" />
+                      </label>
+                      <button
+                        type="submit"
+                        class="msger-send-btn fas fa-paper-plane"
+                      ></button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div id="tab-partner">
+                <!-- participant 창  -->
+                <div id="invite" class="row">
+                  <!-- <div class="col-xs-12 invite-header">{{inviteotherwithlink}}:</div> -->
+                  <div class="col-xs-12 invite-header">
+                    아래의 링크로 초대해보세요 😎
+                  </div>
+                  <div class="col-xs-12 invite-content">
+                    <input
+                      v-model="link"
+                      readonly
+                      type="text"
+                      id="invite-link"
+                    /><button
+                      v-bind:class="{'fa-copy': !copied, 'fa-check': copied}"
+                      v-on:click="copy"
+                      class="fas"
+                    ></button>
+                  </div>
+                </div>
+                <div id="partnerlist">
+                  <ul></ul>
+                </div>
+              </div>
+              <div id="tab-settings">
+                <!-- 설정창 : 이름, 마이크 .. 등-->
+                <div id="userinfo">
+                  <!-- 이름 설정 -->
+                  <div class="row">
+                    <!-- <label class="col-xs-6" >{{namelabel}}:</label> -->
+                    <label class="col-xs-6">이름</label>
+                    <input
+                      class="col-xs-6"
+                      v-model="name"
+                      @blur="changeUserinfo"
+                      placeholder="..."
+                    />
+                  </div>
+                </div>
+                <div id="devices">
+                  <!-- 마이크 설정 -->
+                  <div class="row">
+                    <!-- <label class="col-xs-6" >{{microphonelabel}}:</label> -->
+                    <label class="col-xs-6">마이크</label>
+                    <select
+                      class="col-xs-6"
+                      v-model="audio"
+                      @change="onChange()"
+                    >
+                      <option
+                        v-for="(option, index) in audiooptions"
+                        :key="index"
+                        v-bind:value="index"
+                      >
+                        {{ option }}
+                      </option>
+                    </select>
+                  </div>
+                  <div class="row">
+                    <!-- 비디오 설정 -->
+                    <!-- <label class="col-xs-6" >{{videolabel}}:</label> -->
+                    <label class="col-xs-6">비디오</label>
+                    <select
+                      class="col-xs-6"
+                      v-model="video"
+                      @change="onChange()"
+                    >
+                      <option
+                        v-for="(option, index) in videooptions"
+                        :key="index"
+                        v-bind:value="index"
+                      >
+                        {{ option }}
+                      </option>
+                    </select>
+                  </div>
+                  <div
+                    class="row sound"
+                    v-bind:class="{'allowed': soundAllowed}"
+                  >
+                    <!-- 스피커 설정 -->
+                    <!-- <label class="col-xs-6" >{{speakerlabel}}:</label> -->
+                    <label class="col-xs-6">스피커</label>
+                    <select
+                      class="col-xs-6"
+                      v-model="sound"
+                      @change="onChange()"
+                    >
+                      <option
+                        v-for="(option, index) in soundoptions"
+                        :key="index"
+                        v-bind:value="index"
+                      >
+                        {{ option }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div id="configuration" v-if="soundEffectsEnabled">
+                  <!-- 모르겠음 -->
+                  <div class="row" v-if="soundEffectsEnabled">
+                    <label class="col-xs-6">{{soundeffectsLabel}}:</label>
+                    <input
+                      type="checkbox"
+                      v-model="soundEffectsOn"
+                      @change="toogleSoundEffects"
+                    />
+                  </div>
+                </div>
+                <div id="settingSwitch">
+                  <!-- 편의 기능 제어 -->
+                  <div class="settingTitle">
+                    <h2>편의 기능 제어</h2>
+                  </div>
+
+                  <div class="switchbox">
+                    <h4>얼굴 벗어남 감지</h4>
+                    <label class="switch">
+                      <!-- 영화 ***-->
+                      <input type="checkbox" id="faceDetect" checked />
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                  <div class="switchbox">
+                    <h4>자막 추출</h4>
+                    <label class="switch">
+                      <!-- 영화 ***-->
+                      <input type="checkbox" id="subtitleExtract" checked />
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                  <div class="switchbox">
+                    <h4>발화자 입 확대</h4>
+                    <label class="switch">
+                      <!-- 영화 ***-->
+                      <input type="checkbox" id="libMagnify" checked />
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                  <div class="switchbox">
+                    <h4>참여자 음성 알림</h4>
+                    <label class="switch">
+                      <!-- 영화 ***-->
+                      <input type="checkbox" id="participantAlarm" checked />
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div id="tab-subtitle">
+                <p class="subtitles"></p>
+              </div>
             </div>
+          </div>
         </div>
-      </body>
+        <div id="clickbackground"></div>
+      </div>
+    </div>
+    <div
+      id="lightbox"
+      v-on:dblclick="closeLightbox"
+      v-bind:class="{'open': !closed}"
+    >
+      <!-- 모르겠음 아마도 얼굴 조그맣게 나오는 창?-->
+      <img
+        id="lightboxImageElement"
+        :src="src"
+        v-bind:class="{'active': mode == 'image'}"
+      />
+      <video
+        id="lightboxVideoElement"
+        controls
+        autoplay
+        :src="src"
+        v-bind:class="{'active': mode == 'video'}"
+      ></video>
+      <span class="close fas fa-times" v-on:click="closeLightbox"></span>
+    </div>
+    <div id="create-room" v-bind:class="{'show': showDialog}">
+      <!-- 방 만드는 창 -->
+      <div class="create-room-inner">
+        <form v-on:submit.prevent="createRoom">
+          <div class="title" style="text-align: center">모아영</div>
+          <!-- Video Chat -->
+          <!-- {{title}} -->
+          <!-- <div class="message" data-lang="통화방 이름을 입력하고, 통화를 시작해보세요 ❕">통화방 이름을 입력하고, 통화를 시작해보세요 ❕</div> -->
+          <div class="message" style="text-align: center">
+            통화방 이름을 입력하고,<br />
+            통화를 시작해보세요 ❕
+          </div>
+          <div class="room-input">
+            <!-- 방 이름 쓰는 칸 -->
+            <input
+              autofocus
+              type="text"
+              v-model="roomName"
+              @keydown.enter.exact.prevent
+              @keyup.enter.exact="createRoom"
+            />
+            <button
+              type="button"
+              v-on:click="setRandomName"
+              class="fas fa-random"
+            ></button>
+          </div>
+          <div class="button-area">
+            <!-- 방 만들기 버튼 -->
+            <button type="submit" data-lang="생성" class="button">
+              Create
+            </button>
+          </div>
+          <div class="bottomlinks">
+            <span class="imprint" v-show="imprint">
+              <a v-bind:href="imprint" target="_blank" data-lang="imprint"
+                >Imprint</a
+              >
+            </span>
+            <span v-show="imprint && gdpr"> | </span>
+            <span class="gdpr" v-show="gdpr">
+              <a v-bind:href="gdpr" target="_blank" data-lang="privacy"
+                >Privacy</a
+              >
+            </span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
 </html>
