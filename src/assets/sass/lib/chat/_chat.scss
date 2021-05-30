@@ -117,14 +117,12 @@
 
   .msger-inputarea {
     display: flex;
-    padding: 10px;
     border-top: 1px solid $active-color;
-    background: #eee;
     max-width: 100%;
     box-sizing: border-box;
   }
   .msger-inputarea * {
-    padding: 10px;
+    padding: 15px 10px 10px;
     border: none;
     font-size: 1em;
     &:focus {
@@ -133,11 +131,12 @@
   }
   .msger-input {
     flex: 1;
-    height: 15px;
+    height: 25px;
     resize: none;
     line-height: 1.2;
   }
   .msger-send-btn {
+    padding: 10px;
     background: $active-color;
     color: #fff;
     font-weight: bold;
@@ -215,6 +214,7 @@
     color: #555;
     transition: color 0.3s ease-in-out;
     cursor: pointer;
+    align-self: center;
     &:hover {
       color: #000;
     }
@@ -225,6 +225,9 @@
       overflow: hidden;
       position: absolute;
       z-index: -1;
+    }
+    &.msger-imgupload {
+      padding: 10px;
     }
     &.msger-emoji {
       padding: 10px 2px;
