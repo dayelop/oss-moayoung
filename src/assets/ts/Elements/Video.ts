@@ -7,12 +7,14 @@ export class Video{
 
     element: HTMLElement;
     partner: IPartner;
+    myVideo: HTMLElement;//
 
     videoVueObject: any;
 
     constructor(element: HTMLElement, partner: IPartner){
         this.element = element;
         this.partner = partner;
+        this.myVideo = document.getElementById('yourVideoArea');
         this.addCodeToVideoElement();
         this.setVueElement();
     }
@@ -25,6 +27,7 @@ export class Video{
                 <span v-bind:class="{'on': !muted || listener}" class="microphone fas fa-microphone-slash"></span> 
                 <span v-bind:class="{'on': !cameraOff || listener}" class="camera fas fa-video-slash"></span>
                 <span v-bind:class="{'on': !screenSharing}" class="screen fas fa-desktop"></span>
+                ${this.element === this.myVideo ? '' : `<input type="radio" name="lipDetecting" value="${this.partner.id}" onclick="libSelect()">`}
                 </div>
                 <div v-on:click="expand" v-bind:class="{'fa-compress-arrows-alt': expanded, 'fa-expand-arrows-alt': !expanded}" class="expand fas"></div>
                 <div class="connect">
