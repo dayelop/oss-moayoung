@@ -27,7 +27,19 @@ export class Video{
                 <span v-bind:class="{'on': !muted || listener}" class="microphone fas fa-microphone-slash"></span> 
                 <span v-bind:class="{'on': !cameraOff || listener}" class="camera fas fa-video-slash"></span>
                 <span v-bind:class="{'on': !screenSharing}" class="screen fas fa-desktop"></span>
-                ${this.element === this.myVideo ? '' : `<input type="radio" name="lipDetecting" value="${this.partner.id}" onclick="libSelect()">`}
+                ${this.element === this.myVideo ? '' : `<div class="onoffswitch">
+                <input type="radio" name="lipDetecting" class="onoffswitch-checkbox" id="${this.partner.id + 12}" value="${this.partner.id}" onclick="libSelect()">
+                <label class="onoffswitch-label" for="${this.partner.id + 12}">
+                    <div class="onoffswitch-inner">
+                        <div class="onoffswitch-active">
+                            <div class="onoffswitch-switch">확대</div>
+                        </div>
+                        <div class="onoffswitch-inactive">
+                            <div class="onoffswitch-switch">꺼짐</div>
+                        </div>
+                    </div>
+                </label>
+            </div>`}
                 </div>
                 <div v-on:click="expand" v-bind:class="{'fa-compress-arrows-alt': expanded, 'fa-expand-arrows-alt': !expanded}" class="expand fas"></div>
                 <div class="connect">

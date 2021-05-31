@@ -278,6 +278,7 @@ export class Partner implements IPartner {
 
     this.videoElement = null;
     $('#video-item-' + this.id).remove();
+    $(`#${this.id}`).remove(); //여기 고침 영화 
     this.onConnectionLosedEvent(this);
     this.partnerListElement.partnerListElementVueObject.connected = false;
     this.videogrid.recalculateLayout();
