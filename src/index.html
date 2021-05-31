@@ -172,13 +172,10 @@
           <!-- option창 눌렀을 때 옆에 뜨는 창 -->
           <div class="tabs">
             <div class="tabs-header row">
-              <div tab="chat" class="col-xs-3" data-lang="채팅">Chat</div>
               <div tab="partner" class="col-xs-3" data-lang="참여자">
                 Participant
               </div>
-              <div tab="settings" class="col-xs-3" data-lang="설정">
-                Setting
-              </div>
+              <div tab="chat" class="col-xs-3" data-lang="채팅">Chat</div>
               <div
                 tab="subtitle"
                 class="col-xs-3"
@@ -187,9 +184,36 @@
               >
                 Subtitle
               </div>
+              <div tab="settings" class="col-xs-3" data-lang="설정">
+                Setting
+              </div>
             </div>
             <div class="tabs-content">
               <!-- tab 하나 하나 -->
+              <div id="tab-partner">
+                <!-- participant 창  -->
+                <div id="invite" class="row">
+                  <!-- <div class="col-xs-12 invite-header">{{inviteotherwithlink}}:</div> -->
+                  <div class="col-xs-12 invite-header">
+                    아래의 링크로 초대해보세요 😎
+                  </div>
+                  <div class="col-xs-12 invite-content">
+                    <input
+                      v-model="link"
+                      readonly
+                      type="text"
+                      id="invite-link"
+                    /><button
+                      v-bind:class="{'fa-copy': !copied, 'fa-check': copied}"
+                      v-on:click="copy"
+                      class="fas"
+                    ></button>
+                  </div>
+                </div>
+                <div id="partnerlist">
+                  <ul></ul>
+                </div>
+              </div>
               <div id="tab-chat">
                 <div id="textchat">
                   <!-- 채팅창 TextChat.ts #textchat-->
@@ -243,29 +267,8 @@
                   </div>
                 </div>
               </div>
-              <div id="tab-partner">
-                <!-- participant 창  -->
-                <div id="invite" class="row">
-                  <!-- <div class="col-xs-12 invite-header">{{inviteotherwithlink}}:</div> -->
-                  <div class="col-xs-12 invite-header">
-                    아래의 링크로 초대해보세요 😎
-                  </div>
-                  <div class="col-xs-12 invite-content">
-                    <input
-                      v-model="link"
-                      readonly
-                      type="text"
-                      id="invite-link"
-                    /><button
-                      v-bind:class="{'fa-copy': !copied, 'fa-check': copied}"
-                      v-on:click="copy"
-                      class="fas"
-                    ></button>
-                  </div>
-                </div>
-                <div id="partnerlist">
-                  <ul></ul>
-                </div>
+              <div id="tab-subtitle">
+                <p class="subtitles"></p>
               </div>
               <div id="tab-settings">
                 <!-- 설정창 : 이름, 마이크 .. 등-->
@@ -392,9 +395,6 @@
                     </label>
                   </div>
                 </div>
-              </div>
-              <div id="tab-subtitle">
-                <p class="subtitles"></p>
               </div>
             </div>
           </div>
