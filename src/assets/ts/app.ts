@@ -179,6 +179,9 @@ export class App {
   openConnection(newRoom: boolean = false) {
     if (!this.closed) {
       console.log('Id: ' + this.yourId + ' Room: ' + this.room);
+
+      this.subtitleExtracttion();
+
       document.title = this.room + ' | ' + document.title;
       this.welcome.openDialog(newRoom, this.yourName ? false : true);
 
@@ -199,6 +202,39 @@ export class App {
       }, 1000);
       app.jsEvents();
     }
+  }
+
+  subtitleExtracttion() {
+    const annyang = require('annyang');
+
+    annyang.setLanguage('ko');
+    annyang.start({ autoRestart: true, continuous: true });
+
+    var recognition = annyang.getSpeechRecognizer();
+    var final_transcript = '';
+    var final = '';
+
+    recognition.interimResults = true;
+
+    recognition.onresult = function (event) {
+      final_transcript = '';
+
+      for (var i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          final_transcript += event.results[i][0].transcript;
+          annyang.trigger(final_transcript);
+        }
+      }
+
+      if (final_transcript) {
+        final += `[${this.yourName}] ${final_transcript.trim()}\n`;
+        final.replace(/\n/g, '<br/>');
+
+        $(function () {
+          $('.subtitles').text(final);
+        });
+      }
+    };
   }
 
   addExchange() {
@@ -395,18 +431,16 @@ export class App {
     this.setStreamToPartner(this.partners[partnerId], true);
     this.videogrid.recalculateLayout();
 
-    if($(this.participantAlarm).prop('checked') == true) 
-    {
-       TTS.playSound(TTS.newpartnersound, '참여자');
+    if ($(this.participantAlarm).prop('checked') == true) {
+      TTS.playSound(TTS.newpartnersound, '참여자');
     }
-    
 
     if (app.firstlipdiv) {
       $('#lips-area').append(
         '<div id="mydiv"><div id="mydivheader">Click here to move</div><div id="lip-area" style="margin:0px"></div></div>'
       );
       app.firstlipdiv = false;
-    } 
+    }
 
     dragElement(document.getElementById('mydiv'));
     function dragElement(elmnt) {
@@ -468,7 +502,7 @@ export class App {
           thisPartner.videoElement
         );
         thisPartner.lipcanvas.id = thisPartner.id;
-        thisPartner.lipcanvas.style.display = "none";
+        thisPartner.lipcanvas.style.display = 'none';
         document.getElementById('lip-area').append(thisPartner.lipcanvas); //여기
         thisPartner.lipcanvas.width = 300;
         thisPartner.lipcanvas.height = 200;
