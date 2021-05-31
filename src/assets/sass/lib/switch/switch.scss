@@ -20,6 +20,11 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    p {
+      margin-left: 3px;
+      font-size: 18px;
+      font-weight: bold;
+    }
   }
 
   /* Hide default HTML checkbox */
