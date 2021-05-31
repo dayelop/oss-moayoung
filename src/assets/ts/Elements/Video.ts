@@ -35,7 +35,21 @@ export class Video{
                             <div class="onoffswitch-switch">확대</div>
                         </div>
                         <div class="onoffswitch-inactive">
-                            <div class="onoffswitch-switch">꺼짐</div>
+                            <div class="onoffswitch-switch">확대</div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            
+            <div class="onoffswitch">
+                <input type="checkbox" name="subtitle" class="onoffswitch-checkbox" id="${this.partner.id + 21}">
+                <label class="onoffswitch-label" for="${this.partner.id + 21}">
+                    <div class="onoffswitch-inner">
+                        <div class="onoffswitch-active">
+                            <div class="onoffswitch-switch">자막</div>
+                        </div>
+                        <div class="onoffswitch-inactive">
+                            <div class="onoffswitch-switch">자막</div>
                         </div>
                     </div>
                 </label>
