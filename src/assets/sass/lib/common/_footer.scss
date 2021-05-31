@@ -44,11 +44,13 @@
         color: red;
         &:hover {
           background-color: red;
+          color: white;
         }
         &.green {
           color: green;
           &:hover {
             background-color: green;
+            color: white;
           }
         }
       }
