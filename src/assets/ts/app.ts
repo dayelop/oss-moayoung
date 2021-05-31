@@ -97,7 +97,6 @@ export class App {
   exchange: IExchange;
   communication: ICommunication;
   yourVideo: HTMLElement;
-  canvas: HTMLCanvasElement;
   listener: boolean = false;
   microphoneOnly: boolean = false;
   microphoneOnlyNotChangeable: boolean = false;
@@ -134,6 +133,7 @@ export class App {
   participantAlarm: HTMLElement;
 
   firstlipdiv: boolean = true;
+  fisrtfacedetection: boolean = true;
 
   constructor() {
     this.yourVideo = document.getElementById('yourVideo');
@@ -227,7 +227,7 @@ export class App {
       }
 
       if (final_transcript) {
-        final += `[${this.yourName}] ${final_transcript.trim()}\n`;
+        final += `[${this.yourName}] ${final_transcript.trim()}\n\n`;
         final.replace(/\n/g, '<br/>');
 
         $(function () {
@@ -314,55 +314,60 @@ export class App {
       Promise.all([
         //모델 불러오기
         faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-        faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-        faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
-        faceapi.nets.faceExpressionNet.loadFromUri('/models'),
       ]).then(() => {
         console.log('된다');
         setInterval(async () => {
           if ($(this.faceDetect).prop('checked') == true) {
-            const detections = await faceapi
-              .detectAllFaces(
-                app.yourVideo,
-                new faceapi.TinyFaceDetectorOptions()
-              )
-              .withFaceLandmarks();
+            const detections = await faceapi.detectAllFaces(
+              app.yourVideo,
+              new faceapi.TinyFaceDetectorOptions()
+            );
 
             if (detections[0] !== undefined) {
-              if (detections[0].alignedRect.box.x < 10) {
-                app.currentfacein = -1;
-                if (app.currentfacein != app.prevfacein) {
-                  console.log('얼굴이 왼쪽으로 벗어남');
-                  speech('이탈. 오른쪽으로 이동하시오.');
-                  app.prevfacein = -1;
-                }
-              } else if (detections[0].alignedRect.box.x > 390) {
-                app.currentfacein = 1;
-                if (app.currentfacein != app.prevfacein) {
-                  console.log('얼굴이 오른쪽으로 벗어남');
-                  speech('이탈. 왼쪽으로 이동하시오.');
-                  app.prevfacein = 1;
-                }
-              } else if (detections[0].alignedRect.box.y < 10) {
-                app.currentfacein = 2;
-                if (app.currentfacein != app.prevfacein) {
-                  console.log('얼굴이 위쪽으로 벗어남');
-                  speech('이탈. 아래쪽으로 이동하시오.');
-                  app.prevfacein = 2;
-                }
-              } else if (detections[0].alignedRect.box.y > 390) {
-                app.currentfacein = -2;
-                if (app.currentfacein != app.prevfacein) {
-                  console.log('얼굴이 아래쪽으로 벗어남');
-                  speech('이탈. 위쪽으로 이동하시오.');
-                  app.prevfacein = -2;
-                }
+              if (app.fisrtfacedetection) {
+                speech('얼굴 인식이 시작되었습니다.');
+                app.fisrtfacedetection = false;
               } else {
-                app.currentfacein = 0;
-                if (app.currentfacein != app.prevfacein) {
-                  console.log('얼굴이 정상 범위에 들어옴');
-                  speech('정상 범위에 들어왔습니다.');
-                  app.prevfacein = 0;
+                if (detections[0].box.x < 5) {
+                  app.currentfacein = -1;
+                  if (app.currentfacein != app.prevfacein) {
+                    console.log('얼굴이 왼쪽으로 벗어남');
+                    window.speechSynthesis.cancel();
+                    speech('이탈. 오른쪽으로 이동하시오.');
+                    app.prevfacein = -1;
+                  }
+                } else if (detections[0].box.x > 490) {
+                  app.currentfacein = 1;
+                  if (app.currentfacein != app.prevfacein) {
+                    console.log('얼굴이 오른쪽으로 벗어남');
+                    window.speechSynthesis.cancel();
+                    speech('이탈. 왼쪽으로 이동하시오.');
+                    app.prevfacein = 1;
+                  }
+                } else if (detections[0].box.y < 10) {
+                  app.currentfacein = 2;
+                  if (app.currentfacein != app.prevfacein) {
+                    console.log('얼굴이 위쪽으로 벗어남');
+                    window.speechSynthesis.cancel();
+                    speech('이탈. 아래쪽으로 이동하시오.');
+                    app.prevfacein = 2;
+                  }
+                } else if (detections[0].box.y > 340) {
+                  app.currentfacein = -2;
+                  if (app.currentfacein != app.prevfacein) {
+                    console.log('얼굴이 아래쪽으로 벗어남');
+                    window.speechSynthesis.cancel();
+                    speech('이탈. 위쪽으로 이동하시오.');
+                    app.prevfacein = -2;
+                  }
+                } else {
+                  app.currentfacein = 0;
+                  if (app.currentfacein != app.prevfacein) {
+                    console.log('얼굴이 정상 범위에 들어옴');
+                    window.speechSynthesis.cancel();
+                    speech('정상 범위에 들어왔습니다.');
+                    app.prevfacein = 0;
+                  }
                 }
               }
             }
@@ -492,8 +497,7 @@ export class App {
         //모델 불러오기
         faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
         faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-        faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
-        faceapi.nets.faceExpressionNet.loadFromUri('/models'),
+        faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models'),
       ]).then(() => {
         console.log('파트너 얼굴 인식 시작');
         let thisPartner = app.partners[partnerId];
@@ -513,7 +517,7 @@ export class App {
               app.partners[partnerId].videoElement,
               new faceapi.TinyFaceDetectorOptions()
             )
-            .withFaceLandmarks();
+            .withFaceLandmarks(true);
 
           if (detections[0] !== undefined) {
             let lipwidth =

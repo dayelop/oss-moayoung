@@ -9,7 +9,6 @@ import { Videogrid } from '../Elements/Videogrid';
 import { Video } from '../Elements/Video';
 import { PartnerListElement } from '../Elements/PartnerListElement';
 import { TTS } from '../Utils/Sounds';
-import * as faceapi from 'face-api.js';
 
 export class Partner implements IPartner {
   id: number;
@@ -32,7 +31,7 @@ export class Partner implements IPartner {
   onConnectedEvent: (partner: IPartner) => void;
   onConnectionClosedEvent: (partner: IPartner) => void;
   onConnectionLosedEvent: (partner: IPartner) => void;
-  participantAlarm: HTMLElement; 
+  participantAlarm: HTMLElement;
 
   doReload: boolean = false;
   closed: boolean = false;
@@ -270,15 +269,14 @@ export class Partner implements IPartner {
     this.closed = true;
     this.connection.close();
     console.log('Connection closed to: ' + this.id);
-    
-    if($(this.participantAlarm).prop('checked') == true) 
-    {
+
+    if ($(this.participantAlarm).prop('checked') == true) {
       TTS.playSound(TTS.hangoutsound, this.name);
     }
 
     this.videoElement = null;
     $('#video-item-' + this.id).remove();
-    $(`#${this.id}`).remove(); //여기 고침 영화 
+    $(`#${this.id}`).remove(); //여기 고침 영화
     this.onConnectionLosedEvent(this);
     this.partnerListElement.partnerListElementVueObject.connected = false;
     this.videogrid.recalculateLayout();
