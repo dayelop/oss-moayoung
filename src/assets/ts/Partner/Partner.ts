@@ -84,7 +84,7 @@ export class Partner implements IPartner {
 
   getName(): string {
     if (!this.name || this.name === '') {
-      return 'Gast' + this.id.toString();
+      return '모아영';
     }
     return this.name;
   }
