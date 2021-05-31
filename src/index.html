@@ -436,7 +436,7 @@
           <!-- <div class="message" data-lang="통화방 이름을 입력하고, 통화를 시작해보세요 ❕">통화방 이름을 입력하고, 통화를 시작해보세요 ❕</div> -->
           <div class="message" style="text-align: center">
             통화방 이름을 입력하고,<br />
-            통화를 시작해보세요 ❕
+            통화방을 개설해보세요 ❕
           </div>
           <div class="room-input">
             <!-- 방 이름 쓰는 칸 -->
@@ -455,22 +455,9 @@
           </div>
           <div class="button-area">
             <!-- 방 만들기 버튼 -->
-            <button type="submit" data-lang="생성" class="button">
+            <button type="submit" data-lang="통화 시작" class="button">
               Create
             </button>
-          </div>
-          <div class="bottomlinks">
-            <span class="imprint" v-show="imprint">
-              <a v-bind:href="imprint" target="_blank" data-lang="imprint"
-                >Imprint</a
-              >
-            </span>
-            <span v-show="imprint && gdpr"> | </span>
-            <span class="gdpr" v-show="gdpr">
-              <a v-bind:href="gdpr" target="_blank" data-lang="privacy"
-                >Privacy</a
-              >
-            </span>
           </div>
         </form>
       </div>
