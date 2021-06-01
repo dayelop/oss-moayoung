@@ -55,6 +55,16 @@
         }
       }
     </script>
+    <script>
+      function saveAsFile(filename) {
+        var hiddenElement = document.createElement('a');
+        var str = $('.subtitles').text();
+        hiddenElement.href = 'data:attachment/text,' + encodeURI(str);
+        hiddenElement.target = '_blank';
+        hiddenElement.download = filename;
+        hiddenElement.click();
+      }
+    </script>
   </head>
   <body id="hotkey">
     <div class="container maincontainer">
@@ -267,7 +277,13 @@
                 </div>
               </div>
               <div id="tab-subtitle">
-                <button class="subtitle-button" type="button"> 자막 추출 </button>
+                <button
+                  class="subtitle-button"
+                  type="button"
+                  onclick="saveAsFile('자막.txt');"
+                >
+                  자막 파일 다운로드
+                </button>
                 <p class="subtitles"></p>
               </div>
               <div id="tab-settings">
@@ -389,7 +405,7 @@
                     <p>참여자 음성 알림</p>
                     <label class="switch">
                       <!-- 영화 ***-->
-                      <input type="checkbox" id="participantAlarm"/>
+                      <input type="checkbox" id="participantAlarm" />
                       <span class="slider round"></span>
                     </label>
                   </div>
