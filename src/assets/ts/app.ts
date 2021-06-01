@@ -229,30 +229,25 @@ export class App {
       }
 
       if (final_transcript) {
+        console.log('예아~');
         final += `[${app.yourName}] ${final_transcript.trim()}\n\n`;
         final.replace(/\n/g, '<br/>');
 
         var time = new Date();
 
         var timestamp =
-          time.getFullYear() +
-          '.' +
-          time.getMonth() +
-          '.' +
-          time.getDate() +
-          ' ' +
-          time.getHours() +
-          ':' +
-          time.getMinutes() +
-          ':' +
-          time.getSeconds();
+          time.getHours() + ':' + time.getMinutes() + ':' + time.getSeconds();
 
         var text = final_transcript;
         var from = app.yourName;
 
-        db.doc(time.getTime().toString()).set({ timestamp });
-        db.doc(time.getTime().toString()).update({ from });
-        db.doc(time.getTime().toString()).update({ text });
+        if (
+          $(document.getElementById('subtitleExtract')).prop('checked') == true
+        ) {
+          db.doc(time.getTime().toString()).set({ timestamp });
+          db.doc(time.getTime().toString()).update({ from });
+          db.doc(time.getTime().toString()).update({ text });
+        }
       }
     };
   }
@@ -266,12 +261,18 @@ export class App {
         if (change.type === 'added') {
           var data = await db.doc(change.doc.id).get();
 
-          var sub = '[' + data.data().from + '] ' + data.data().text + '\n\n';
+          var sub =
+            '[' +
+            data.data().timestamp +
+            ']' +
+            '[' +
+            data.data().from +
+            '] ' +
+            data.data().text +
+            '\n\n';
           $(function () {
             $('.subtitles').append(sub);
           });
-
-          console.log(sub);
         }
       });
     });
