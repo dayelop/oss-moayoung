@@ -180,12 +180,12 @@ export class App {
     if (!this.closed) {
       console.log('Id: ' + this.yourId + ' Room: ' + this.room);
 
-      this.subtitleExtracttion();
-
       document.title = this.room + ' | ' + document.title;
       this.welcome.openDialog(newRoom, this.yourName ? false : true);
 
       this.addExchange();
+      this.subtitleExtracttion();
+      this.getSubtitle();
 
       this.preloadElements(function () {
         app.readyToCall = true;
@@ -213,6 +213,8 @@ export class App {
     var recognition = annyang.getSpeechRecognizer();
     var final_transcript = '';
     var final = '';
+    var store = app.exchange.firestore;
+    var db = store.collection(this.room);
 
     recognition.interimResults = true;
 
@@ -227,16 +229,53 @@ export class App {
       }
 
       if (final_transcript) {
-        final += `[${this.yourName}] ${final_transcript.trim()}\n\n`;
+        final += `[${app.yourName}] ${final_transcript.trim()}\n\n`;
         final.replace(/\n/g, '<br/>');
 
-        $(function () {
-          $('.subtitles').text(final);
-        });
+        var time = new Date();
+
+        var timestamp =
+          time.getFullYear() +
+          '.' +
+          time.getMonth() +
+          '.' +
+          time.getDate() +
+          ' ' +
+          time.getHours() +
+          ':' +
+          time.getMinutes() +
+          ':' +
+          time.getSeconds();
+
+        var text = final_transcript;
+        var from = app.yourName;
+
+        db.doc(time.getTime().toString()).set({ timestamp });
+        db.doc(time.getTime().toString()).update({ from });
+        db.doc(time.getTime().toString()).update({ text });
       }
     };
   }
 
+  getSubtitle() {
+    var store = app.exchange.firestore;
+    var db = store.collection(this.room);
+
+    db.onSnapshot((snapshot) => {
+      snapshot.docChanges().forEach(async (change) => {
+        if (change.type === 'added') {
+          var data = await db.doc(change.doc.id).get();
+
+          var sub = '[' + data.data().from + '] ' + data.data().text + '\n\n';
+          $(function () {
+            $('.subtitles').append(sub);
+          });
+
+          console.log(sub);
+        }
+      });
+    });
+  }
   addExchange() {
     if (
       Settings.getValue(config, 'exchangeServices.service') == 'chat-server'
