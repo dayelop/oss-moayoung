@@ -237,10 +237,12 @@ export class App {
           ('0' + time.getSeconds()).slice(-2);
 
         var text = final_transcript;
+        var id = app.yourId;
         var from = app.yourName;
 
         db.doc(time.getTime().toString()).set({ timestamp });
         db.doc(time.getTime().toString()).update({ from });
+        db.doc(time.getTime().toString()).update({ id });
         db.doc(time.getTime().toString()).update({ text });
       }
     };
