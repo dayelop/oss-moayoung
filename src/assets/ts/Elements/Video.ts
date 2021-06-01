@@ -42,8 +42,8 @@ export class Video{
             </div>
             
             <div class="onoffswitch">
-                <input type="checkbox" name="subtitle" class="onoffswitch-checkbox" id="${this.partner.id + 21}">
-                <label class="onoffswitch-label" for="${this.partner.id + 21}">
+                <input type="checkbox" name="subtitle" class="onoffswitch-checkbox" id="subtitle-${this.partner.id}" value="${this.partner.id}" onclick="subtitleSelect()">
+                <label class="onoffswitch-label" for="subtitle-${this.partner.id}">
                     <div class="onoffswitch-inner">
                         <div class="onoffswitch-active">
                             <div class="onoffswitch-switch">자막</div>
