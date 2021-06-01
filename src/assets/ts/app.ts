@@ -727,9 +727,12 @@ export class App {
 
   hangOut() {
     if (!this.closed) {
+      history.back();
+
       this.closed = true;
       this.exchange.sendMessage({ closing: this.yourId });
       this.exchange.closeConnection();
+
       for (var id in this.partners) {
         if (this.partners[id]) {
           this.partners[id].closeConnection();
