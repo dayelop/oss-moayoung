@@ -241,13 +241,9 @@ export class App {
         var text = final_transcript;
         var from = app.yourName;
 
-        if (
-          $(document.getElementById('subtitleExtract')).prop('checked') == true
-        ) {
-          db.doc(time.getTime().toString()).set({ timestamp });
-          db.doc(time.getTime().toString()).update({ from });
-          db.doc(time.getTime().toString()).update({ text });
-        }
+        db.doc(time.getTime().toString()).set({ timestamp });
+        db.doc(time.getTime().toString()).update({ from });
+        db.doc(time.getTime().toString()).update({ text });
       }
     };
   }
@@ -258,21 +254,25 @@ export class App {
 
     db.onSnapshot((snapshot) => {
       snapshot.docChanges().forEach(async (change) => {
-        if (change.type === 'added') {
-          var data = await db.doc(change.doc.id).get();
+        if (
+          $(document.getElementById('subtitleExtract')).prop('checked') == true
+        ) {
+          if (change.type === 'added') {
+            var data = await db.doc(change.doc.id).get();
 
-          var sub =
-            '[' +
-            data.data().timestamp +
-            ']' +
-            '[' +
-            data.data().from +
-            '] ' +
-            data.data().text +
-            '\n\n';
-          $(function () {
-            $('.subtitles').append(sub);
-          });
+            var sub =
+              '[' +
+              data.data().timestamp +
+              ']' +
+              '[' +
+              data.data().from +
+              '] ' +
+              data.data().text +
+              '\n\n';
+            $(function () {
+              $('.subtitles').append(sub);
+            });
+          }
         }
       });
     });
