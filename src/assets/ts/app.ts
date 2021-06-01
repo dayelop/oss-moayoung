@@ -211,15 +211,13 @@ export class App {
     annyang.start({ autoRestart: true, continuous: true });
 
     var recognition = annyang.getSpeechRecognizer();
-    var final_transcript = '';
-    var final = '';
     var store = app.exchange.firestore;
     var db = store.collection(this.room);
 
     recognition.interimResults = true;
 
     recognition.onresult = function (event) {
-      final_transcript = '';
+      var final_transcript = '';
 
       for (var i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
@@ -229,14 +227,14 @@ export class App {
       }
 
       if (final_transcript) {
-        console.log('예아~');
-        final += `[${app.yourName}] ${final_transcript.trim()}\n\n`;
-        final.replace(/\n/g, '<br/>');
-
         var time = new Date();
 
         var timestamp =
-          time.getHours() + ':' + time.getMinutes() + ':' + time.getSeconds();
+          ('0' + time.getHours()).slice(-2) +
+          ':' +
+          ('0' + time.getMinutes()).slice(-2) +
+          ':' +
+          ('0' + time.getSeconds()).slice(-2);
 
         var text = final_transcript;
         var from = app.yourName;
@@ -258,17 +256,11 @@ export class App {
           $(document.getElementById('subtitleExtract')).prop('checked') == true
         ) {
           if (change.type === 'added') {
-            var data = await db.doc(change.doc.id).get();
+            var getData = await db.doc(change.doc.id).get();
+            var data = getData.data();
+            var text = data.text.trim();
+            var sub = `[${data.timestamp}][${data.from}] ${text}\n\n`;
 
-            var sub =
-              '[' +
-              data.data().timestamp +
-              ']' +
-              '[' +
-              data.data().from +
-              '] ' +
-              data.data().text +
-              '\n\n';
             $(function () {
               $('.subtitles').append(sub);
             });
@@ -277,6 +269,7 @@ export class App {
       });
     });
   }
+
   addExchange() {
     if (
       Settings.getValue(config, 'exchangeServices.service') == 'chat-server'
