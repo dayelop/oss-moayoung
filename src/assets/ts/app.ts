@@ -240,24 +240,24 @@ export class App {
         var id = app.yourId;
         var from = app.yourName;
 
-        db.doc(time.getTime().toString()).set({ timestamp });
-        db.doc(time.getTime().toString()).update({ from });
-        db.doc(time.getTime().toString()).update({ id });
-        db.doc(time.getTime().toString()).update({ text });
+        if (app.controls.controlsVueObject.microphoneOn) {
+          console.log('데이터가 들어갑니다~');
+          db.doc(time.getTime().toString()).set({ timestamp, from, id, text });
+        }
       }
     };
   }
 
-
   selectSubtitleTarget(id) {
-    var obj_length = document.getElementsByName("subtitle").length;
-    var subtitle_ = <NodeListOf<HTMLInputElement>>document.getElementsByName("subtitle");
- 
-    for (var i=0; i<obj_length; i++) {
-  
-        if ((subtitle_[i].checked == true) && (subtitle_[i].value == id)) {
-            return true;
-        }
+    var obj_length = document.getElementsByName('subtitle').length;
+    var subtitle_ = <NodeListOf<HTMLInputElement>>(
+      document.getElementsByName('subtitle')
+    );
+
+    for (var i = 0; i < obj_length; i++) {
+      if (subtitle_[i].checked == true && subtitle_[i].value == id) {
+        return true;
+      }
     }
     return false;
   }
@@ -268,10 +268,14 @@ export class App {
     var _this = this;
 
     db.onSnapshot((snapshot) => {
-      snapshot.docChanges().forEach(async (change) => {
-        if (
-          $(document.getElementById('subtitleExtract')).prop('checked') == true
-        ) {
+      console.log('읽어오자나~');
+      if (
+        $(document.getElementById('subtitleExtract')).prop('checked') == true &&
+        document.getElementsByName('subtitle').length != 0
+      ) {
+        console.log('if 문 들어감');
+        snapshot.docChanges().forEach(async (change) => {
+          console.log(' 여기서는 두번째로 읽어오는 겁니다');
           if (change.type === 'added') {
             var getData = await db.doc(change.doc.id).get();
             var data = getData.data();
@@ -279,14 +283,13 @@ export class App {
             var sub = `[${data.timestamp}][${data.from}] ${text}\n\n`;
 
             $(function () {
-              if(_this.selectSubtitleTarget(data.data().id)) 
-              {
+              if (_this.selectSubtitleTarget(getData.data().id)) {
                 $('.subtitles').append(sub);
               }
             });
           }
-        }
-      });
+        });
+      }
     });
   }
 
@@ -497,6 +500,8 @@ export class App {
       $('#lips-area').append(
         '<div id="mydiv"><div id="mydivheader">Click here to move</div><div id="lip-area" style="margin:0px"></div></div>'
       );
+      var lips_area = document.getElementById('lips-area');
+      lips_area.style.display = 'none';
       app.firstlipdiv = false;
     }
 
