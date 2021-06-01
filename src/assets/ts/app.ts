@@ -248,9 +248,24 @@ export class App {
     };
   }
 
+
+  selectSubtitleTarget(id) {
+    var obj_length = document.getElementsByName("subtitle").length;
+    var subtitle_ = <NodeListOf<HTMLInputElement>>document.getElementsByName("subtitle");
+ 
+    for (var i=0; i<obj_length; i++) {
+  
+        if ((subtitle_[i].checked == true) && (subtitle_[i].value == id)) {
+            return true;
+        }
+    }
+    return false;
+  }
+
   getSubtitle() {
     var store = app.exchange.firestore;
     var db = store.collection(this.room);
+    var _this = this;
 
     db.onSnapshot((snapshot) => {
       snapshot.docChanges().forEach(async (change) => {
@@ -264,7 +279,10 @@ export class App {
             var sub = `[${data.timestamp}][${data.from}] ${text}\n\n`;
 
             $(function () {
-              $('.subtitles').append(sub);
+              if(_this.selectSubtitleTarget(data.data().id)) 
+              {
+                $('.subtitles').append(sub);
+              }
             });
           }
         }
