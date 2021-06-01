@@ -27,6 +27,8 @@ export class Firebase implements IExchange {
       firebase.analytics();
     }
 
+    this.firestore = firebase.firestore();
+
     firebase
       .auth()
       .signInAnonymously()
