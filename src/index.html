@@ -361,7 +361,6 @@
                   </div>
                 </div>
                 <div id="configuration" v-if="soundEffectsEnabled">
-                  <!-- 모르겠음 -->
                   <div class="row" v-if="soundEffectsEnabled">
                     <label class="col-xs-6">{{soundeffectsLabel}}:</label>
                     <input
@@ -376,7 +375,6 @@
                   <div class="switchbox">
                     <p>얼굴 벗어남 감지</p>
                     <label class="switch">
-                      <!-- 영화 ***-->
                       <input type="checkbox" id="faceDetect" />
                       <span class="slider round"></span>
                     </label>
@@ -384,7 +382,6 @@
                   <div class="switchbox">
                     <p>자막 추출</p>
                     <label class="switch">
-                      <!-- 영화 ***-->
                       <input type="checkbox" id="subtitleExtract" />
                       <span class="slider round"></span>
                     </label>
@@ -392,7 +389,6 @@
                   <div class="switchbox">
                     <p>발화자 입 확대</p>
                     <label class="switch">
-                      <!-- 영화 ***-->
                       <input
                         type="checkbox"
                         id="libMagnify"
@@ -404,7 +400,6 @@
                   <div class="switchbox">
                     <p>참여자 음성 알림</p>
                     <label class="switch">
-                      <!-- 영화 ***-->
                       <input type="checkbox" id="participantAlarm" />
                       <span class="slider round"></span>
                     </label>
@@ -422,7 +417,6 @@
       v-on:dblclick="closeLightbox"
       v-bind:class="{'open': !closed}"
     >
-      <!-- 모르겠음 아마도 얼굴 조그맣게 나오는 창?-->
       <img
         id="lightboxImageElement"
         :src="src"
@@ -439,12 +433,9 @@
     </div>
     <div id="create-room" v-bind:class="{'show': showDialog}">
       <!-- 방 만드는 창 -->
-      <div class="create-room-inner">
-        <form v-on:submit.prevent="createRoom">
+      <div class="create-room-inner" v-bind:class="{'show': showInner}">
+        <form v-on:submit.prevent="openWaitroom">
           <div class="title" style="text-align: center">모아영</div>
-          <!-- Video Chat -->
-          <!-- {{title}} -->
-          <!-- <div class="message" data-lang="통화방 이름을 입력하고, 통화를 시작해보세요 ❕">통화방 이름을 입력하고, 통화를 시작해보세요 ❕</div> -->
           <div class="message" style="text-align: center">
             통화방 이름을 입력하고,<br />
             통화방을 개설해보세요 ❕
@@ -453,6 +444,7 @@
             <!-- 방 이름 쓰는 칸 -->
             <input
               autofocus
+              id="room-name"
               type="text"
               v-model="roomName"
               @keydown.enter.exact.prevent
@@ -465,13 +457,59 @@
             ></button>
           </div>
           <div class="button-area">
-            <!-- 방 만들기 버튼 -->
-            <button type="submit" data-lang="통화 시작" class="button">
+            <button type="submit" data-lang="대기방" class="button" v-on:click="openWaitroom">
               Create
             </button>
           </div>
         </form>
       </div>
+      <!-- 대기방 -->
+      <div id="waitroom" v-bind:class="{'show': showWaitroom}">
+        <div>
+          <form>
+            사용자 이름
+            <input class="name-input"/>
+          </form>
+        </div>
+
+        <div id="waitroomControls">
+          <div class="waitroomVideoDiv" v-bind:class="{'show': cameraOn}"> 
+            <video id="waitroomVideo" autoplay muted playsinline v-bind:class="{'show': cameraOn}" style="width: 800px; height: 700px;"></video>
+          </div>  
+  
+          <div class="waitroomVideoDiv" v-bind:class="{'show': !cameraOn}"> 
+             <div class="cameraOff">
+                <p>camera off</p>
+            </div>
+          </div> 
+
+          <div>
+            <span
+              v-on:click="toogleMicrophone"
+              v-bind:class="{'fa-microphone': microphoneOn, 'fa-microphone-slash': !microphoneOn}"
+              class="microphone fas fa-microphone">
+            </span>
+            <span
+              v-on:click="toogleCamera"
+              v-bind:class="{'fa-video': cameraOn, 'fa-video-slash': !cameraOn}"
+              class="camera fas fa-video">
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <form v-on:submit.prevent="createRoom" style="display: inline-block;">
+            <button style="border-width: 0px; background: transparent; position: fixed; top: 82.5%; right: 20.5%;">
+              <span
+                 v-on:click="openWaitroom"
+                 v-bind:class="{'green': hangouted}"
+                 class="hangup fas fa-phone">
+              </span>
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
+
   </body>
 </html>
