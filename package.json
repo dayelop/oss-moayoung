@@ -14,7 +14,7 @@
     "css-loader": "^5.0.1",
     "emoji-picker-element": "^1.4.0",
     "file-loader": "^6.2.0",
-    "grunt": "1.4.1",
+    "grunt": "^1.4.1",
     "grunt-contrib-clean": "~2.0.0",
     "grunt-contrib-watch": "~1.1.0",
     "grunt-replace": "^2.0.2",
@@ -29,10 +29,15 @@
     "webpack": "^5.11.1"
   },
   "dependencies": {
+    "@tensorflow-models/face-landmarks-detection": "^0.0.3",
+    "@tensorflow/tfjs-backend-wasm": "^2.4.0",
+    "@tensorflow/tfjs-backend-webgl": "^2.4.0",
+    "@tensorflow/tfjs-converter": "^2.4.0",
+    "@tensorflow/tfjs-core": "^2.4.0",
     "@tensorflow/tfjs-node": "3.6.1",
     "annyang": "^2.6.1",
     "canvas": "2.8.0",
-    "face-api.js": "0.22.2",
-    "ngrok": "4.0.1"
+    "ngrok": "4.0.1",
+    "or": "^0.2.0"
   }
 }

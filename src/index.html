@@ -28,32 +28,45 @@
     <script src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
     <script src="assets/bundle.js?v=@@version"></script>
-    <script>
-      var prevRadio = null;
 
-      function check(input) {
-        var lips_area = document.getElementById('lips-area');
+    <script src="https://unpkg.com/@tensorflow/tfjs-core@2.4.0/dist/tf-core.js"></script>
+    <script src="https://unpkg.com/@tensorflow/tfjs-converter@2.4.0/dist/tf-converter.js"></script>
 
-        if (input.checked == true) {
-          lips_area.style.display = 'inline';
-        } else {
-          lips_area.style.display = 'none';
+    <!-- You must explicitly require a TF.js backend if you're not using the tfjs union bundle. -->
+    <script src="https://unpkg.com/@tensorflow/tfjs-backend-webgl@2.4.0/dist/tf-backend-webgl.js"></script>
+    <!-- Alternatively you can use the WASM backend: <script src="https://unpkg.com/@tensorflow/tfjs-backend-wasm@2.4.0/dist/tf-backend-wasm.js"></script> -->
+
+    <!-- Require face-landmarks-detection itself. -->
+    <script
+      src="https://unpkg.com/@tensorflow-models/face-landmarks-detection@0.0.1/dist/face-landmarks-detection.js"
+    >
+
+      <script>
+        var prevRadio = null;
+
+        function check(input) {
+          var lips_area = document.getElementById('lips-area');
+
+          if (input.checked == true) {
+            lips_area.style.display = 'inline';
+          } else {
+            lips_area.style.display = 'none';
+          }
         }
-      }
 
-      function libSelect() {
-        var checked_id = $(':input:radio[name=lipDetecting]:checked').val(); //1
-        var canvas_ = document.getElementById(`${checked_id}`); //1
+        function libSelect() {
+          var checked_id = $(':input:radio[name=lipDetecting]:checked').val(); //1
+          var canvas_ = document.getElementById(`${checked_id}`); //1
 
-        canvas_.style.display = 'inline'; //1
+          canvas_.style.display = 'inline'; //1
 
-        if (prevRadio == null) {
-          prevRadio = canvas_;
-        } else if (prevRadio != canvas_) {
-          prevRadio.style.display = 'none';
-          prevRadio = canvas_;
+          if (prevRadio == null) {
+            prevRadio = canvas_;
+          } else if (prevRadio != canvas_) {
+            prevRadio.style.display = 'none';
+            prevRadio = canvas_;
+          }
         }
-      }
     </script>
     <script>
       function saveAsFile(filename) {
