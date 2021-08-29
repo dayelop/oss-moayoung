@@ -2,7 +2,6 @@ import '../sass/main.scss';
 import '../images/chat.png';
 
 import config from '../../config.json';
-import * as faceapi from 'face-api.js';
 
 import { IExchange } from './Exchange/IExchange';
 import { Firebase } from './Exchange/Firebase';
@@ -35,6 +34,9 @@ import { Settings } from './Utils/Settings';
 import { ChatServer } from './Exchange/ChatServer';
 import { HotkeyTest } from '../js/HotkeyTest';
 import { Switch } from './Elements/Switch';
+
+import * as faceLandmarksDetection from '@tensorflow-models/face-landmarks-detection';
+import * as tf from '@tensorflow/tfjs-core';
 
 var voices = [];
 
@@ -366,70 +368,26 @@ export class App {
           console.log(err);
         }
       });
-    this.yourVideo.addEventListener('playing', () => {
-      Promise.all([
-        //모델 불러오기
-        faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-      ]).then(() => {
-        console.log('된다');
-        setInterval(async () => {
-          if ($(this.faceDetect).prop('checked') == true) {
-            const detections = await faceapi.detectAllFaces(
-              app.yourVideo,
-              new faceapi.TinyFaceDetectorOptions()
-            );
+    this.yourVideo.addEventListener('playing', async () => {
+      const model = await faceLandmarksDetection.load(
+        faceLandmarksDetection.SupportedPackages.mediapipeFacemesh
+      );
 
-            if (detections[0] !== undefined) {
-              if (app.fisrtfacedetection) {
-                speech('얼굴 인식이 시작되었습니다.');
-                app.fisrtfacedetection = false;
-              } else {
-                if (detections[0].box.x < 5) {
-                  app.currentfacein = -1;
-                  if (app.currentfacein != app.prevfacein) {
-                    console.log('얼굴이 왼쪽으로 벗어남');
-                    window.speechSynthesis.cancel();
-                    speech('이탈. 오른쪽으로 이동하시오.');
-                    app.prevfacein = -1;
-                  }
-                } else if (detections[0].box.x > 490) {
-                  app.currentfacein = 1;
-                  if (app.currentfacein != app.prevfacein) {
-                    console.log('얼굴이 오른쪽으로 벗어남');
-                    window.speechSynthesis.cancel();
-                    speech('이탈. 왼쪽으로 이동하시오.');
-                    app.prevfacein = 1;
-                  }
-                } else if (detections[0].box.y < 10) {
-                  app.currentfacein = 2;
-                  if (app.currentfacein != app.prevfacein) {
-                    console.log('얼굴이 위쪽으로 벗어남');
-                    window.speechSynthesis.cancel();
-                    speech('이탈. 아래쪽으로 이동하시오.');
-                    app.prevfacein = 2;
-                  }
-                } else if (detections[0].box.y > 340) {
-                  app.currentfacein = -2;
-                  if (app.currentfacein != app.prevfacein) {
-                    console.log('얼굴이 아래쪽으로 벗어남');
-                    window.speechSynthesis.cancel();
-                    speech('이탈. 위쪽으로 이동하시오.');
-                    app.prevfacein = -2;
-                  }
-                } else {
-                  app.currentfacein = 0;
-                  if (app.currentfacein != app.prevfacein) {
-                    console.log('얼굴이 정상 범위에 들어옴');
-                    window.speechSynthesis.cancel();
-                    speech('정상 범위에 들어왔습니다.');
-                    app.prevfacein = 0;
-                  }
-                }
-              }
-            }
+      setInterval(async () => {
+        if ($(this.faceDetect).prop('checked') == true) {
+          const predictions = await model.estimateFaces({
+            input: app.yourVideo,
+          });
+          if (predictions.length > 0) {
+            console.log(predictions[0]);
+
+            // console.log(predictions[0].mesh[10]);
+            // console.log(predictions[0].mesh[234]);
+            // console.log(predictions[0].mesh[152]);
+            // console.log(predictions[0].mesh[454]);
           }
-        }, 100);
-      });
+        }
+      }, 10);
     });
   }
 
@@ -551,56 +509,52 @@ export class App {
       }
     }
     app.partners[partnerId].videoElement.addEventListener('playing', () => {
-      Promise.all([
-        //모델 불러오기
-        faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-        faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-        faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models'),
-      ]).then(() => {
-        console.log('파트너 얼굴 인식 시작');
-        let thisPartner = app.partners[partnerId];
-
-        thisPartner.lipcanvas = faceapi.createCanvasFromMedia(
-          thisPartner.videoElement
-        );
-        thisPartner.lipcanvas.id = thisPartner.id;
-        thisPartner.lipcanvas.style.display = 'none';
-        document.getElementById('lip-area').append(thisPartner.lipcanvas); //여기
-        thisPartner.lipcanvas.width = 300;
-        thisPartner.lipcanvas.height = 200;
-
-        setInterval(async () => {
-          const detections = await faceapi
-            .detectAllFaces(
-              app.partners[partnerId].videoElement,
-              new faceapi.TinyFaceDetectorOptions()
-            )
-            .withFaceLandmarks(true);
-
-          if (detections[0] !== undefined) {
-            let lipwidth =
-              detections[0].landmarks.positions[55].x -
-              detections[0].landmarks.positions[49].x;
-            let lipheight =
-              detections[0].landmarks.positions[58].y -
-              detections[0].landmarks.positions[51].y;
-
-            thisPartner.lipcanvas
-              .getContext('2d')
-              .drawImage(
-                thisPartner.videoElement,
-                detections[0].landmarks.positions[49].x - 30,
-                detections[0].landmarks.positions[51].y - 10,
-                lipwidth + 60,
-                lipheight + 20,
-                0,
-                0,
-                300,
-                200
-              );
-          }
-        }, 100);
-      });
+      // Promise.all([
+      //   //모델 불러오기
+      //   faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+      //   faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+      //   faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models'),
+      // ]).then(() => {
+      //   console.log('파트너 얼굴 인식 시작');
+      //   let thisPartner = app.partners[partnerId];
+      //   thisPartner.lipcanvas = faceapi.createCanvasFromMedia(
+      //     thisPartner.videoElement
+      //   );
+      //   thisPartner.lipcanvas.id = thisPartner.id;
+      //   thisPartner.lipcanvas.style.display = 'none';
+      //   document.getElementById('lip-area').append(thisPartner.lipcanvas); //여기
+      //   thisPartner.lipcanvas.width = 300;
+      //   thisPartner.lipcanvas.height = 200;
+      //   setInterval(async () => {
+      //     const detections = await faceapi
+      //       .detectAllFaces(
+      //         app.partners[partnerId].videoElement,
+      //         new faceapi.TinyFaceDetectorOptions()
+      //       )
+      //       .withFaceLandmarks(true);
+      //     if (detections[0] !== undefined) {
+      //       let lipwidth =
+      //         detections[0].landmarks.positions[55].x -
+      //         detections[0].landmarks.positions[49].x;
+      //       let lipheight =
+      //         detections[0].landmarks.positions[58].y -
+      //         detections[0].landmarks.positions[51].y;
+      //       thisPartner.lipcanvas
+      //         .getContext('2d')
+      //         .drawImage(
+      //           thisPartner.videoElement,
+      //           detections[0].landmarks.positions[49].x - 30,
+      //           detections[0].landmarks.positions[51].y - 10,
+      //           lipwidth + 60,
+      //           lipheight + 20,
+      //           0,
+      //           0,
+      //           300,
+      //           200
+      //         );
+      //     }
+      //   }, 100);
+      // });
     });
   }
 
