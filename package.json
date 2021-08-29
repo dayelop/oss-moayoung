@@ -37,7 +37,6 @@
     "@tensorflow/tfjs-node": "3.6.1",
     "annyang": "^2.6.1",
     "canvas": "2.8.0",
-    "ngrok": "4.0.1",
-    "or": "^0.2.0"
+    "ngrok": "4.0.1"
   }
 }
