@@ -29,12 +29,9 @@
     "webpack": "^5.11.1"
   },
   "dependencies": {
-    "@tensorflow-models/face-landmarks-detection": "^0.0.3",
-    "@tensorflow/tfjs-backend-wasm": "^2.4.0",
-    "@tensorflow/tfjs-backend-webgl": "^2.4.0",
-    "@tensorflow/tfjs-converter": "^2.4.0",
-    "@tensorflow/tfjs-core": "^2.4.0",
-    "@tensorflow/tfjs-node": "3.6.1",
+    "@mediapipe/camera_utils": "^0.3.1620247984",
+    "@mediapipe/drawing_utils": "^0.3.1620248257",
+    "@mediapipe/face_mesh": "^0.4.1629159166",
     "annyang": "^2.6.1",
     "canvas": "2.8.0",
     "ngrok": "4.0.1"
