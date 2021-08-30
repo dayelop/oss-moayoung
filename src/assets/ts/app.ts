@@ -34,9 +34,21 @@ import { Settings } from './Utils/Settings';
 import { ChatServer } from './Exchange/ChatServer';
 import { HotkeyTest } from '../js/HotkeyTest';
 import { Switch } from './Elements/Switch';
-
-import * as faceLandmarksDetection from '@tensorflow-models/face-landmarks-detection';
-import * as tf from '@tensorflow/tfjs-core';
+import '@mediapipe/face_mesh';
+import '@mediapipe/drawing_utils';
+import '@mediapipe/camera_utils';
+import {
+  FaceMesh,
+  FACEMESH_FACE_OVAL,
+  FACEMESH_LEFT_EYE,
+  FACEMESH_LEFT_EYEBROW,
+  FACEMESH_LIPS,
+  FACEMESH_RIGHT_EYE,
+  FACEMESH_RIGHT_EYEBROW,
+  FACEMESH_TESSELATION,
+} from '@mediapipe/face_mesh';
+import { drawConnectors } from '@mediapipe/drawing_utils';
+import { Camera } from '@mediapipe/camera_utils';
 
 var voices = [];
 
@@ -352,6 +364,38 @@ export class App {
             app.callOther();
           }
         }
+        const videoElement = document.getElementsByClassName(
+          'input_video'
+        )[0] as HTMLVideoElement;
+
+        function onResults(results) {
+          if (
+            $(document.getElementById('faceDetect')).prop('checked') == true
+          ) {
+            console.log(results.multiFaceLandmarks[0][10]);
+          }
+        }
+
+        const faceMesh = new FaceMesh({
+          locateFile: (file) => {
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+          },
+        });
+        faceMesh.setOptions({
+          maxNumFaces: 1,
+          minDetectionConfidence: 0.5,
+          minTrackingConfidence: 0.5,
+        });
+        faceMesh.onResults(onResults);
+
+        const camera = new Camera(videoElement, {
+          onFrame: async () => {
+            await faceMesh.send({ image: videoElement });
+          },
+          width: 1280,
+          height: 720,
+        });
+        camera.start();
       })
       .catch(function (err) {
         if (!app.microphoneOnly) {
@@ -368,27 +412,6 @@ export class App {
           console.log(err);
         }
       });
-    this.yourVideo.addEventListener('playing', async () => {
-      const model = await faceLandmarksDetection.load(
-        faceLandmarksDetection.SupportedPackages.mediapipeFacemesh
-      );
-
-      setInterval(async () => {
-        if ($(this.faceDetect).prop('checked') == true) {
-          const predictions = await model.estimateFaces({
-            input: app.yourVideo,
-          });
-          if (predictions.length > 0) {
-            console.log(predictions[0]);
-
-            // console.log(predictions[0].mesh[10]);
-            // console.log(predictions[0].mesh[234]);
-            // console.log(predictions[0].mesh[152]);
-            // console.log(predictions[0].mesh[454]);
-          }
-        }
-      }, 10);
-    });
   }
 
   callOther() {

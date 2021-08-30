@@ -29,6 +29,9 @@
     "webpack": "^5.11.1"
   },
   "dependencies": {
+    "@mediapipe/camera_utils": "^0.3.1620247984",
+    "@mediapipe/drawing_utils": "^0.3.1620248257",
+    "@mediapipe/face_mesh": "^0.4.1629159166",
     "@tensorflow-models/face-landmarks-detection": "^0.0.3",
     "@tensorflow/tfjs-backend-wasm": "^2.4.0",
     "@tensorflow/tfjs-backend-webgl": "^2.4.0",

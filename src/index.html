@@ -37,36 +37,50 @@
     <!-- Alternatively you can use the WASM backend: <script src="https://unpkg.com/@tensorflow/tfjs-backend-wasm@2.4.0/dist/tf-backend-wasm.js"></script> -->
 
     <!-- Require face-landmarks-detection itself. -->
+    <script src="https://unpkg.com/@tensorflow-models/face-landmarks-detection@0.0.1/dist/face-landmarks-detection.js"></script>
     <script
-      src="https://unpkg.com/@tensorflow-models/face-landmarks-detection@0.0.1/dist/face-landmarks-detection.js"
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"
+      crossorigin="anonymous"
     ></script>
 
-      <script>
-        var prevRadio = null;
+    <script>
+      var prevRadio = null;
 
-        function check(input) {
-          var lips_area = document.getElementById('lips-area');
+      function check(input) {
+        var lips_area = document.getElementById('lips-area');
 
-          if (input.checked == true) {
-            lips_area.style.display = 'inline';
-          } else {
-            lips_area.style.display = 'none';
-          }
+        if (input.checked == true) {
+          lips_area.style.display = 'inline';
+        } else {
+          lips_area.style.display = 'none';
         }
+      }
 
-        function libSelect() {
-          var checked_id = $(':input:radio[name=lipDetecting]:checked').val(); //1
-          var canvas_ = document.getElementById(`${checked_id}`); //1
+      function libSelect() {
+        var checked_id = $(':input:radio[name=lipDetecting]:checked').val(); //1
+        var canvas_ = document.getElementById(`${checked_id}`); //1
 
-          canvas_.style.display = 'inline'; //1
+        canvas_.style.display = 'inline'; //1
 
-          if (prevRadio == null) {
-            prevRadio = canvas_;
-          } else if (prevRadio != canvas_) {
-            prevRadio.style.display = 'none';
-            prevRadio = canvas_;
-          }
+        if (prevRadio == null) {
+          prevRadio = canvas_;
+        } else if (prevRadio != canvas_) {
+          prevRadio.style.display = 'none';
+          prevRadio = canvas_;
         }
+      }
     </script>
     <script>
       function saveAsFile(filename) {
@@ -89,7 +103,13 @@
                 <!-- Video.ts -->
                 <div class="video-inner-wrap">
                   <!-- Video.ts -->
-                  <video id="yourVideo" autoplay muted playsinline></video>
+                  <video
+                    class="input_video"
+                    id="yourVideo"
+                    autoplay
+                    muted
+                    playsinline
+                  ></video>
                   <!-- 비디오 -->
                 </div>
               </div>
