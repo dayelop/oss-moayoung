@@ -366,12 +366,31 @@ export class App {
           'input_video'
         )[0] as HTMLVideoElement;
 
+
         function onResults(results) {
-          if (
-            $(document.getElementById('faceDetect')).prop('checked') == true &&
-            results.multiFaceLandmarks[0]
-          ) {
-            console.log(results.multiFaceLandmarks[0][10]);
+          if ($(document.getElementById('faceDetect')).prop('checked') == true && results.multiFaceLandmarks[0]) {
+           console.log(results.multiFaceLandmarks[0][10]);
+            if ( results.multiFaceLandmarks[0][10].y <= 0.1) {
+              console.log("얼굴 위쪽으로 이탈");
+              speech('이탈. 아래쪽으로 이동하시오.');
+            }
+            if ( results.multiFaceLandmarks[0][234].x <= 0.1) {
+              console.log("얼굴 왼쪽으로 이탈");
+              speech('이탈. 오른쪽으로 이동하시오.');
+            }
+            if ( results.multiFaceLandmarks[0][454].x >= 0.9) {
+              console.log("얼굴 오른쪽으로 이탈");
+              speech('이탈. 왼쪽으로 이동하시오.');
+            }
+            if ( results.multiFaceLandmarks[0][152].y >= 0.9) {
+              console.log("얼굴 아래쪽으로 이탈");
+              speech('이탈. 위쪽으로 이동하시오.');
+            }
+            if (results.multiFaceLandmarks[0][10].y > 0 && results.multiFaceLandmarks[0][10].y < 1 
+              && results.multiFaceLandmarks[0][234].x > 0 && results.multiFaceLandmarks[0][234].x < 1) {
+              console.log("얼굴 정상범위");
+              speech('이탈. 왼쪽으로 이동하시오.');
+            }
           }
         }
 
