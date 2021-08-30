@@ -216,6 +216,13 @@ export class App {
     }
   }
 
+  openWaitroom(newRoom: boolean = false) {
+    if (!this.closed) {
+      document.title = this.room + ' | ' + document.title;
+      app.devices.gotDevices(true);
+    }
+  }
+
   subtitleExtracttion() {
     const annyang = require('annyang');
 
