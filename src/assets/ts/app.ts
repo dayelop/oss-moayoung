@@ -141,7 +141,6 @@ export class App {
   hotkey: HotkeyTest;
   switch_: Switch;
 
-  faceDetect: HTMLElement;
   subtitleExtract: HTMLElement;
   libMagnify: HTMLElement;
   participantAlarm: HTMLElement;
@@ -173,7 +172,6 @@ export class App {
     this.switch_ = new Switch(this);
     this.videogrid.init();
 
-    this.faceDetect = document.getElementById('faceDetect');
     this.subtitleExtract = document.getElementById('subtitleExtract');
     this.libMagnify = document.getElementById('libMagnify');
     this.participantAlarm = document.getElementById('participantAlarm');
@@ -370,7 +368,8 @@ export class App {
 
         function onResults(results) {
           if (
-            $(document.getElementById('faceDetect')).prop('checked') == true
+            $(document.getElementById('faceDetect')).prop('checked') == true &&
+            results.multiFaceLandmarks[0]
           ) {
             console.log(results.multiFaceLandmarks[0][10]);
           }
