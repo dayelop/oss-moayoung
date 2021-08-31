@@ -407,7 +407,9 @@ export class App {
                 speech('정상 범위에 들어왔습니다.');
               }
             }
-          } 
+          } else if ($(document.getElementById('faceDetect')).prop('checked') !== true ){
+            faceRecognitionState = 1;
+          }
         }
 
         const faceMesh = new FaceMesh({
