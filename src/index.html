@@ -466,9 +466,12 @@
     </div>
     <div id="create-room" v-bind:class="{'show': showDialog}">
       <!-- 방 만드는 창 -->
-      <div class="create-room-inner" v-bind:class="{'show': showInner}">
-        <form v-on:submit.prevent="openWaitroom">
+      <div class="create-room-inner">
+        <form v-on:submit.prevent="createRoom">
           <div class="title" style="text-align: center">모아영</div>
+          <!-- Video Chat -->
+          <!-- {{title}} -->
+          <!-- <div class="message" data-lang="통화방 이름을 입력하고, 통화를 시작해보세요 ❕">통화방 이름을 입력하고, 통화를 시작해보세요 ❕</div> -->
           <div class="message" style="text-align: center">
             통화방 이름을 입력하고,<br />
             통화방을 개설해보세요 ❕
@@ -477,7 +480,6 @@
             <!-- 방 이름 쓰는 칸 -->
             <input
               autofocus
-              id="room-name"
               type="text"
               v-model="roomName"
               @keydown.enter.exact.prevent
@@ -490,59 +492,13 @@
             ></button>
           </div>
           <div class="button-area">
-            <button type="submit" data-lang="대기방" class="button" v-on:click="openWaitroom">
+            <!-- 방 만들기 버튼 -->
+            <button type="submit" data-lang="통화 시작" class="button">
               Create
             </button>
           </div>
         </form>
       </div>
-      <!-- 대기방 -->
-      <div id="waitroom" v-bind:class="{'show': showWaitroom}">
-        <div>
-          <form>
-            사용자 이름
-            <input class="name-input"/>
-          </form>
-        </div>
-
-        <div id="waitroomControls">
-          <div class="waitroomVideoDiv" v-bind:class="{'show': cameraOn}"> 
-            <video id="waitroomVideo" autoplay muted playsinline v-bind:class="{'show': cameraOn}" style="width: 800px; height: 700px;"></video>
-          </div>  
-  
-          <div class="waitroomVideoDiv" v-bind:class="{'show': !cameraOn}"> 
-             <div class="cameraOff">
-                <p>camera off</p>
-            </div>
-          </div> 
-
-          <div>
-            <span
-              v-on:click="toogleMicrophone"
-              v-bind:class="{'fa-microphone': microphoneOn, 'fa-microphone-slash': !microphoneOn}"
-              class="microphone fas fa-microphone">
-            </span>
-            <span
-              v-on:click="toogleCamera"
-              v-bind:class="{'fa-video': cameraOn, 'fa-video-slash': !cameraOn}"
-              class="camera fas fa-video">
-            </span>
-          </div>
-        </div>
-
-        <div>
-          <form v-on:submit.prevent="createRoom" style="display: inline-block;">
-            <button style="border-width: 0px; background: transparent; position: fixed; top: 82.5%; right: 20.5%;">
-              <span
-                 v-on:click="openWaitroom"
-                 v-bind:class="{'green': hangouted}"
-                 class="hangup fas fa-phone">
-              </span>
-            </button>
-          </form>
-        </div>
-      </div>
     </div>
-
   </body>
 </html>

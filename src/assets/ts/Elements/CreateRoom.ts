@@ -51,7 +51,7 @@ export class CreateRoom{
                         cla.app.openConnection(true);
                         cla.app.invite.resetLink();
                         this.showDialog = false;
-                        location.reload();
+                        // location.reload();
                     }
                 },
                 setRandomName: function(){
