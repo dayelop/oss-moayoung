@@ -397,24 +397,28 @@ export class App {
               console.log('얼굴 위쪽으로 이탈');
               if (faceRecognitionState !== -1) {
                 faceRecognitionState = -1;
+                window.speechSynthesis.cancel();
                 speech('이탈. 아래쪽으로 이동하시오.');
               }
             } else if (results.multiFaceLandmarks[0][10].y >= 0.6) {
               console.log('얼굴 아래쪽으로 이탈');
               if (faceRecognitionState !== -2) {
                 faceRecognitionState = -2;
+                window.speechSynthesis.cancel();
                 speech('이탈. 위쪽으로 이동하시오.');
               }
             } else if (results.multiFaceLandmarks[0][234].x <= 0.1) {
               console.log('얼굴 오른쪽으로 이탈');
               if (faceRecognitionState !== -3) {
                 faceRecognitionState = -3;
+                window.speechSynthesis.cancel();
                 speech('이탈. 왼쪽으로 이동하시오.');
               }
             } else if (results.multiFaceLandmarks[0][454].x >= 0.9) {
               console.log('얼굴 왼쪽으로 이탈');
               if (faceRecognitionState !== -4) {
                 faceRecognitionState = -4;
+                window.speechSynthesis.cancel();
                 speech('이탈. 오른쪽으로 이동하시오.');
               }
             } else if (
@@ -426,6 +430,7 @@ export class App {
               console.log('얼굴 정상범위');
               if (faceRecognitionState !== 0) {
                 faceRecognitionState = 0;
+                window.speechSynthesis.cancel();
                 speech('정상 범위에 들어왔습니다.');
               }
             }
