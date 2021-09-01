@@ -62,7 +62,6 @@ export class CreateRoom{
                         this.showInner = false;
                         this.showWaitroom = true;
                         cla.app.room = this.roomName;
-                        // location.hash = this.roomName + '/wait';
                         cla.app.openWaitroom(true);
 
                         const mediaStreamConstraints = {
