@@ -80,7 +80,6 @@
           if (
             $(document.getElementById('libMagnify')).prop('checked') == true
           ) {
-            console.log('온리절트 들어옴');
             if (results.multiFaceLandmarks[0]) {
               canvasCtx.clearRect(0, 0, canvas_.width, canvas_.height);
               let lipwidth =
@@ -111,7 +110,6 @@
 
         faceMesh.onResults(onResults);
         if (interval != null) {
-          console.log('ㅇㅇ');
           clearInterval(interval);
         }
         interval = setInterval(async () => {
