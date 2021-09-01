@@ -146,6 +146,9 @@ export class App {
   firstlipdiv: boolean = true;
   fisrtfacedetection: boolean = true;
 
+  myfaceMesh: FaceMesh;
+  partnerfaceMesh: FaceMesh;
+
   constructor() {
     this.yourVideo = document.getElementById('yourVideo');
     this.yourVideoElement = new Video(
@@ -173,6 +176,16 @@ export class App {
     this.subtitleExtract = document.getElementById('subtitleExtract');
     this.libMagnify = document.getElementById('libMagnify');
     this.participantAlarm = document.getElementById('participantAlarm');
+    this.myfaceMesh = new FaceMesh({
+      locateFile: (file) => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+      },
+    });
+    this.myfaceMesh.setOptions({
+      maxNumFaces: 1,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    });
   }
 
   run() {
@@ -371,70 +384,69 @@ export class App {
           'input_video'
         )[0] as HTMLVideoElement;
 
-
         function onResults(results) {
-          if ($(document.getElementById('faceDetect')).prop('checked') == true && results.multiFaceLandmarks[0]) {
+          if (
+            $(document.getElementById('faceDetect')).prop('checked') == true &&
+            results.multiFaceLandmarks[0]
+          ) {
             if (faceRecognitionState == 1) {
-              console.log("얼굴인식시작")
+              console.log('얼굴인식시작');
               speech('얼굴 인식이 시작되었습니다.');
             }
-            if ( results.multiFaceLandmarks[0][10].y <= 0.1) {
-              console.log("얼굴 위쪽으로 이탈");
+            if (results.multiFaceLandmarks[0][10].y <= 0.1) {
+              console.log('얼굴 위쪽으로 이탈');
               if (faceRecognitionState !== -1) {
                 faceRecognitionState = -1;
+                window.speechSynthesis.cancel();
                 speech('이탈. 아래쪽으로 이동하시오.');
               }
-            }
-            else if ( results.multiFaceLandmarks[0][10].y >= 0.6) {
-              console.log("얼굴 아래쪽으로 이탈");
+            } else if (results.multiFaceLandmarks[0][10].y >= 0.6) {
+              console.log('얼굴 아래쪽으로 이탈');
               if (faceRecognitionState !== -2) {
                 faceRecognitionState = -2;
+                window.speechSynthesis.cancel();
                 speech('이탈. 위쪽으로 이동하시오.');
               }
-            }
-            else if ( results.multiFaceLandmarks[0][234].x <= 0.1) {
-              console.log("얼굴 오른쪽으로 이탈");
+            } else if (results.multiFaceLandmarks[0][234].x <= 0.1) {
+              console.log('얼굴 오른쪽으로 이탈');
               if (faceRecognitionState !== -3) {
                 faceRecognitionState = -3;
+                window.speechSynthesis.cancel();
                 speech('이탈. 왼쪽으로 이동하시오.');
               }
-            }
-            else if ( results.multiFaceLandmarks[0][454].x >= 0.9) {
-              console.log("얼굴 왼쪽으로 이탈");
+            } else if (results.multiFaceLandmarks[0][454].x >= 0.9) {
+              console.log('얼굴 왼쪽으로 이탈');
               if (faceRecognitionState !== -4) {
                 faceRecognitionState = -4;
+                window.speechSynthesis.cancel();
                 speech('이탈. 오른쪽으로 이동하시오.');
               }
-            }
-            else if (results.multiFaceLandmarks[0][10].y > 0.1 && results.multiFaceLandmarks[0][10].y < 0.6 
-              && results.multiFaceLandmarks[0][234].x > 0.1 && results.multiFaceLandmarks[0][234].x < 0.9) {
-              console.log("얼굴 정상범위");
+            } else if (
+              results.multiFaceLandmarks[0][10].y > 0.1 &&
+              results.multiFaceLandmarks[0][10].y < 0.6 &&
+              results.multiFaceLandmarks[0][234].x > 0.1 &&
+              results.multiFaceLandmarks[0][234].x < 0.9
+            ) {
+              console.log('얼굴 정상범위');
               if (faceRecognitionState !== 0) {
                 faceRecognitionState = 0;
+                window.speechSynthesis.cancel();
                 speech('정상 범위에 들어왔습니다.');
               }
             }
-          } else if ($(document.getElementById('faceDetect')).prop('checked') !== true ){
+          } else if (
+            $(document.getElementById('faceDetect')).prop('checked') !== true
+          ) {
             faceRecognitionState = 1;
           }
         }
 
-        const faceMesh = new FaceMesh({
-          locateFile: (file) => {
-            return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
-          },
-        });
-        faceMesh.setOptions({
-          maxNumFaces: 1,
-          minDetectionConfidence: 0.5,
-          minTrackingConfidence: 0.5,
-        });
         var faceRecognitionState = 1;
-        faceMesh.onResults(onResults);
+        app.myfaceMesh.onResults(onResults);
 
         const camera = new Camera(videoElement, {
           onFrame: async () => {
-            await faceMesh.send({ image: videoElement });
+            await app.myfaceMesh.send({ image: videoElement });
           },
           width: 1280,
           height: 720,
@@ -575,54 +587,22 @@ export class App {
         document.onmousemove = null;
       }
     }
-    app.partners[partnerId].videoElement.addEventListener('playing', () => {
-      // Promise.all([
-      //   //모델 불러오기
-      //   faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-      //   faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-      //   faceapi.nets.faceLandmark68TinyNet.loadFromUri('/models'),
-      // ]).then(() => {
-      //   console.log('파트너 얼굴 인식 시작');
-      //   let thisPartner = app.partners[partnerId];
-      //   thisPartner.lipcanvas = faceapi.createCanvasFromMedia(
-      //     thisPartner.videoElement
-      //   );
-      //   thisPartner.lipcanvas.id = thisPartner.id;
-      //   thisPartner.lipcanvas.style.display = 'none';
-      //   document.getElementById('lip-area').append(thisPartner.lipcanvas); //여기
-      //   thisPartner.lipcanvas.width = 300;
-      //   thisPartner.lipcanvas.height = 200;
-      //   setInterval(async () => {
-      //     const detections = await faceapi
-      //       .detectAllFaces(
-      //         app.partners[partnerId].videoElement,
-      //         new faceapi.TinyFaceDetectorOptions()
-      //       )
-      //       .withFaceLandmarks(true);
-      //     if (detections[0] !== undefined) {
-      //       let lipwidth =
-      //         detections[0].landmarks.positions[55].x -
-      //         detections[0].landmarks.positions[49].x;
-      //       let lipheight =
-      //         detections[0].landmarks.positions[58].y -
-      //         detections[0].landmarks.positions[51].y;
-      //       thisPartner.lipcanvas
-      //         .getContext('2d')
-      //         .drawImage(
-      //           thisPartner.videoElement,
-      //           detections[0].landmarks.positions[49].x - 30,
-      //           detections[0].landmarks.positions[51].y - 10,
-      //           lipwidth + 60,
-      //           lipheight + 20,
-      //           0,
-      //           0,
-      //           300,
-      //           200
-      //         );
-      //     }
-      //   }, 100);
-      // });
-    });
+
+    $('#lip-area').append(
+      '<canvas class="output_canvas-' +
+        partnerId +
+        '" id ="' +
+        partnerId +
+        '"></canvas>'
+    );
+
+    let thisPartner = app.partners[partnerId];
+    thisPartner.lipcanvas = document.getElementsByClassName(
+      'output_canvas-' + partnerId
+    )[0] as HTMLCanvasElement;
+    thisPartner.lipcanvas.style.display = 'none';
+    thisPartner.lipcanvas.width = 300;
+    thisPartner.lipcanvas.height = 200;
   }
 
   partnerOnConnected(partner: IPartner) {
