@@ -176,16 +176,10 @@ export class App {
   }
 
   run() {
-    if (location.hash && location.hash.includes('/wait')) {
-      $('#create-room').show();
-      this.createRoom.createRoomVueObject.roomName = `${location.hash.split('/')[0]}`;
-      this.createRoom.createRoomVueObject.openWaitroom();
-    }
-    else if (location.hash) {
+    if (location.hash) {
       this.room = decodeURIComponent(location.hash.substring(1));
       this.openConnection();
-    } 
-    else {
+    } else {
       this.createRoom.showCreateRoom();
     }
     $('#main').show();

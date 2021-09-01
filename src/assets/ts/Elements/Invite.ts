@@ -18,7 +18,7 @@ export class Invite{
         this.inviteVueObject = new Vue({
             el: '#invite',
             data: {
-                link: location + '/wait',
+                link: location,
                 copied: false,
                 inviteotherwithlink: Translator.get("inviteotherwithlink")
             },
