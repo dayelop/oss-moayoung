@@ -48,7 +48,16 @@
     <script>
       var prevRadio = null;
       var firstlip = true;
-      var faceMesh;
+      var faceMesh = new FaceMesh({
+        locateFile: (file) => {
+          return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+        },
+      });
+      faceMesh.setOptions({
+        maxNumFaces: 1,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5,
+      });
       var interval = null;
       function check(input) {
         var lips_area = document.getElementById('lips-area');
@@ -58,17 +67,6 @@
         } else {
           lips_area.style.display = 'none';
         }
-
-        faceMesh = new FaceMesh({
-          locateFile: (file) => {
-            return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
-          },
-        });
-        faceMesh.setOptions({
-          maxNumFaces: 1,
-          minDetectionConfidence: 0.5,
-          minTrackingConfidence: 0.5,
-        });
       }
 
       function libSelect() {
@@ -96,7 +94,9 @@
               canvasCtx.drawImage(
                 results.image,
                 results.multiFaceLandmarks[0][57].x * videoElement.videoWidth,
-                results.multiFaceLandmarks[0][164].y * videoElement.videoHeight,
+                results.multiFaceLandmarks[0][164].y *
+                  videoElement.videoHeight +
+                  5,
                 lipwidth * videoElement.videoWidth,
                 litheight * videoElement.videoHeight,
                 0,
@@ -108,7 +108,6 @@
             }
           }
         }
-      }
 
         faceMesh.onResults(onResults);
         if (interval != null) {
@@ -126,7 +125,7 @@
           prevRadio.style.display = 'none';
           prevRadio = canvas_;
         }
-      
+      }
     </script>
     <script>
       function saveAsFile(filename) {
@@ -536,7 +535,12 @@
             ></button>
           </div>
           <div class="button-area">
-            <button type="submit" data-lang="대기방" class="button" v-on:click="openWaitroom">
+            <button
+              type="submit"
+              data-lang="대기방"
+              class="button"
+              v-on:click="openWaitroom"
+            >
               Create
             </button>
           </div>
@@ -547,48 +551,65 @@
         <div>
           <form>
             사용자 이름
-            <input class="name-input"/>
+            <input class="name-input" />
           </form>
         </div>
 
         <div id="waitroomControls">
-          <div class="waitroomVideoDiv" v-bind:class="{'show': cameraOn}"> 
-            <video id="waitroomVideo" autoplay muted playsinline v-bind:class="{'show': cameraOn}" style="width: 800px; height: 700px;"></video>
-          </div>  
-  
-          <div class="waitroomVideoDiv" v-bind:class="{'show': !cameraOn}"> 
-             <div class="cameraOff">
-                <p>camera off</p>
+          <div class="waitroomVideoDiv" v-bind:class="{'show': cameraOn}">
+            <video
+              id="waitroomVideo"
+              autoplay
+              muted
+              playsinline
+              v-bind:class="{'show': cameraOn}"
+              style="width: 800px; height: 700px"
+            ></video>
+          </div>
+
+          <div class="waitroomVideoDiv" v-bind:class="{'show': !cameraOn}">
+            <div class="cameraOff">
+              <p>camera off</p>
             </div>
-          </div> 
+          </div>
 
           <div>
             <span
               v-on:click="toogleMicrophone"
               v-bind:class="{'fa-microphone': microphoneOn, 'fa-microphone-slash': !microphoneOn}"
-              class="microphone fas fa-microphone">
+              class="microphone fas fa-microphone"
+            >
             </span>
             <span
               v-on:click="toogleCamera"
               v-bind:class="{'fa-video': cameraOn, 'fa-video-slash': !cameraOn}"
-              class="camera fas fa-video">
+              class="camera fas fa-video"
+            >
             </span>
           </div>
         </div>
 
         <div>
-          <form v-on:submit.prevent="createRoom" style="display: inline-block;">
-            <button style="border-width: 0px; background: transparent; position: fixed; top: 82.5%; right: 20.5%;">
+          <form v-on:submit.prevent="createRoom" style="display: inline-block">
+            <button
+              style="
+                border-width: 0px;
+                background: transparent;
+                position: fixed;
+                top: 82.5%;
+                right: 20.5%;
+              "
+            >
               <span
-                 v-on:click="openWaitroom"
-                 v-bind:class="{'green': hangouted}"
-                 class="hangup fas fa-phone">
+                v-on:click="openWaitroom"
+                v-bind:class="{'green': hangouted}"
+                class="hangup fas fa-phone"
+              >
               </span>
             </button>
           </form>
         </div>
       </div>
     </div>
-
   </body>
 </html>
