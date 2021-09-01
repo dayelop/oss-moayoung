@@ -51,7 +51,7 @@ export class CreateRoom{
                         cla.app.openConnection(true);
                         cla.app.invite.resetLink();
                         this.showDialog = false;
-                        location.reload();
+                        // location.reload();
                     }
                 },
                 setRandomName: function(){
@@ -62,7 +62,6 @@ export class CreateRoom{
                         this.showInner = false;
                         this.showWaitroom = true;
                         cla.app.room = this.roomName;
-                        location.hash = this.roomName;
                         cla.app.openWaitroom(true);
 
                         const mediaStreamConstraints = {
