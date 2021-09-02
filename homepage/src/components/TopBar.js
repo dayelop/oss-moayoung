@@ -31,8 +31,8 @@ const menu = css`
   padding: 10px;
   border: none;
   border: 2px solid #ccc;
-  border-radius: 5px;
-  box-shadow: 5px 5px 15px #555;
+  border-top: 0px;
+  border-radius: 0px 0px 15px 15px;
   outline: none;
   cursor: pointer;
   margin-left: 30px;
@@ -62,7 +62,7 @@ function TopBar() {
               단축키
             </button>
             <button css={menu} onClick={() => setIsSettingOn(!isSettingOn)}>
-              기능 제어
+              편의기능
             </button>
           </div>
         </div>
