@@ -1,5 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
+import { useEffect, useState } from 'react';
 import { TopBar } from '../components';
 
 const background = css`
@@ -80,13 +81,37 @@ const menu = css`
 `;
 
 function Home() {
-  const GoCreateRoom = () => {
+  const [flag, setFlag] = useState(0);
+  const [placeholder, setPlaceholder] = useState('통화방 링크 입력');
+  const [roomUrl, setRoomUrl] = useState('');
+  const [toggle, setToggle] = useState(0);
+
+  const createRoom = () => {
     window.location.href = 'http://127.0.0.1:8887/dist/';
   };
-  const GoMeetingRoom = () => {
-    const roomUrl = document.getElementById('roomUrl').value;
-    window.location.href = roomUrl;
+  const linkInput = () => {
+    const link = document.getElementById('link');
+
+    if (link.value) {
+      setPlaceholder('이름 입력');
+      setRoomUrl(roomUrl + link.value);
+      setToggle(!toggle);
+      link.type = 'text';
+      link.value = '';
+    }
   };
+  const nameInput = () => {
+    const link = document.getElementById('link');
+
+    if (link.value) {
+      setFlag(1);
+      setRoomUrl(`${roomUrl}/${link.value}`);
+    }
+  };
+
+  useEffect(() => {
+    window.open(roomUrl);
+  }, [flag]);
 
   return (
     <div css={background}>
@@ -99,20 +124,25 @@ function Home() {
           <br />
           언제 어디서든 무료로 이용할 수 있습니다.
         </p>
-        <button css={menu} onClick={GoCreateRoom}>
+        <button css={menu} onClick={createRoom}>
           + 새 통화방 생성
         </button>
         <div css={participate}>
-          <input
-            css={input}
-            name="id"
-            id="roomUrl"
-            placeholder="통화방 링크 입력"
-            required
-          />
-          <button css={button} onClick={GoMeetingRoom}>
-            참여
-          </button>
+          <form>
+            <input
+              type="url"
+              id="link"
+              css={input}
+              placeholder={placeholder}
+              required
+            />
+            <input
+              type="submit"
+              value="참여"
+              css={button}
+              onClick={!toggle ? linkInput : nameInput}
+            />
+          </form>
         </div>
       </div>
     </div>
