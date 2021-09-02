@@ -39,7 +39,7 @@ const input = css`
   color: black;
   background-color: whitesmoke;
   font-size: 20px;
-  font-family: 'S-CoreDream-4Regular';
+  font-family: 'S-CoreDream-5Medium';
 
   :focus {
     outline: none;
