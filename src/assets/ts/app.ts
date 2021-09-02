@@ -50,6 +50,8 @@ import {
 import { drawConnectors } from '@mediapipe/drawing_utils';
 import { Camera } from '@mediapipe/camera_utils';
 
+declare var Vue: any;
+
 var voices = [];
 
 function setVoiceList() {
@@ -149,6 +151,8 @@ export class App {
   myfaceMesh: FaceMesh;
   partnerfaceMesh: FaceMesh;
 
+  featureOnOffVueObject: any; 
+
   constructor() {
     this.yourVideo = document.getElementById('yourVideo');
     this.yourVideoElement = new Video(
@@ -185,6 +189,18 @@ export class App {
       maxNumFaces: 1,
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5,
+    });
+
+    this.featureOnOffVueObject = new Vue({
+      el: '#settingSwitch',
+      data: {
+          setting: false,
+      },
+      methods: {
+          isFaceDetect: function(){
+             console.log('클릭 isFaceDetect')
+          },
+      }
     });
   }
 
