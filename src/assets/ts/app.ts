@@ -207,8 +207,9 @@ export class App {
     });
   }
 
-  toggleCameraInApp() {
+  toggleCameraInApp(isCameraOn) {
     console.log('클릭 toggleCameraInApp')
+    console.log(isCameraOn)
   }
 
   run() {
