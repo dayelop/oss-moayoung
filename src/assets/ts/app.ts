@@ -200,8 +200,15 @@ export class App {
           isFaceDetect: function(){
              console.log('클릭 isFaceDetect')
           },
+          isLipMagnify: function() {
+            console.log('클릭 isLipMagnify')
+          }
       }
     });
+  }
+
+  toggleCameraInApp() {
+    console.log('클릭 toggleCameraInApp')
   }
 
   run() {

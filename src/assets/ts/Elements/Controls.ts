@@ -53,6 +53,7 @@ export class Controls{
                     } else {
                         new Alert(Translator.get("cannotstartcamera"));
                     }
+                    cla.app.toggleCameraInApp();
                 },hangOut: function () {
                     if(!this.hangouted){
                         cla.hangOut();
