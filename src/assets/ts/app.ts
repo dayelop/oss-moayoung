@@ -179,6 +179,8 @@ export class App {
     this.switch_ = new Switch(this);
     this.videogrid.init();
 
+    this.camerastate = this.controls.controlsVueObject.cameraOn;
+
     this.subtitleExtract = document.getElementById('subtitleExtract');
     this.libMagnify = document.getElementById('libMagnify');
     this.participantAlarm = document.getElementById('participantAlarm');
@@ -265,12 +267,16 @@ export class App {
           var faceRecognitionState = 1;
           app.myfaceMesh.onResults(onResults);
 
-          if (app.interval != null || app.camerastate == false) {
+          if (app.interval != null) {
             clearInterval(app.interval);
-            console.log('위 끔');
-          } else {
+            app.interval = null;
+            console.log('설정 끔');
+          } else if (app.camerastate == true) {
+            console.log('설정 킴');
             app.interval = setInterval(async () => {
-              await app.myfaceMesh.send({ image: videoElement });
+              if (videoElement.videoWidth != 0) {
+                await app.myfaceMesh.send({ image: videoElement });
+              }
             }, 200);
           }
           // const camera = new Camera(videoElement, {
@@ -288,6 +294,7 @@ export class App {
       },
     });
   }
+  lipselect() {}
 
   toggleCameraInApp(isCameraOn) {
     this.camerastate = isCameraOn;
@@ -355,16 +362,25 @@ export class App {
     var faceRecognitionState = 1;
     app.myfaceMesh.onResults(onResults);
     if (isCameraOn == false) {
-      console.log('끔');
-      console.log(app.interval);
+      console.log(' 카메라 끔');
       clearInterval(app.interval);
-      console.log(app.interval);
-    } else {
-      setTimeout(() => {
-        app.interval = setInterval(async () => {
+      app.interval = null;
+    } else if (
+      $(document.getElementById('faceDetect')).prop('checked') == true
+    ) {
+      console.log(' 카메라 킴');
+      app.interval = setInterval(async () => {
+        if (videoElement.videoWidth != 0) {
           await app.myfaceMesh.send({ image: videoElement });
-        }, 200);
-      }, 2000);
+        }
+      }, 200);
+
+      // setTimeout(() => {
+      //   console.log(videoElement.videoWidth);
+      //   app.interval = setInterval(async () => {
+      //     await app.myfaceMesh.send({ image: videoElement });
+      //   }, 200);
+      // }, 2000);
     }
   }
 
