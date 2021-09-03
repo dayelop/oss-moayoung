@@ -81,7 +81,7 @@ const menu = css`
 `;
 
 function Home() {
-  const [flag, setFlag] = useState(0);
+  const [nameRoomUrl, setNameRoomUrl] = useState('');
   const [placeholder, setPlaceholder] = useState('통화방 링크 입력');
   const [roomUrl, setRoomUrl] = useState('');
   const [toggle, setToggle] = useState(0);
@@ -106,14 +106,15 @@ function Home() {
     const link = document.getElementById('link');
 
     if (link.value) {
-      setFlag(1);
-      setRoomUrl(`${roomUrl}/${link.value}`);
+      setNameRoomUrl(`${roomUrl}/${link.value}`);
     }
   };
 
   useEffect(() => {
-    window.open(roomUrl);
-  }, [flag]);
+    if (nameRoomUrl) {
+      window.open(nameRoomUrl);
+    }
+  }, [nameRoomUrl]);
 
   return (
     <div css={background}>
