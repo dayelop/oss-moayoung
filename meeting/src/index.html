@@ -113,7 +113,9 @@
           clearInterval(interval);
         }
         interval = setInterval(async () => {
-          await faceMesh.send({ image: videoElement });
+          if (videoElement.videoWidth != 0) {
+            await faceMesh.send({ image: videoElement });
+          }
         }, 200);
         canvas_.style.display = 'inline'; //1
 
@@ -451,7 +453,11 @@
                   <div class="switchbox">
                     <p>얼굴 벗어남 감지</p>
                     <label class="switch">
-                      <input type="checkbox" id="faceDetect" v-on:click="isFaceDetect"/>
+                      <input
+                        type="checkbox"
+                        id="faceDetect"
+                        v-on:click="isFaceDetect"
+                      />
                       <span class="slider round"></span>
                     </label>
                   </div>
