@@ -1,0 +1,107 @@
+#footer {
+  height: $footer-height;
+  background-color: #fff;
+  #controls {
+    text-align: center;
+    user-select: None;
+    span {
+      color: $footer-button-color;
+      background: $footer-button-background;
+      display: inline-block;
+      width: 70px;
+      height: 70px;
+      border-style: none;
+      box-shadow: 0 0 5px 1px #999;
+      border-radius: 50%;
+      font-size: 30px;
+      line-height: 230%;
+      margin: 0px 5px;
+      @media only screen and (max-width: $xs-max) {
+        margin: 0px 2px;
+      }
+      &:hover {
+        background-color: #0071e3;
+      }
+      cursor: pointer;
+      &.fa-microphone {
+        background: #0071e3;
+        color: #fff;
+        &.fa-microphone-slash {
+          color: $footer-button-color;
+          background: $footer-button-background;
+        }
+      }
+      &.fa-video {
+        background: #0071e3;
+        color: #fff;
+        &.fa-video-slash {
+          color: $footer-button-color;
+          background: $footer-button-background;
+        }
+      }
+      &.fa-phone {
+        background: #fff;
+        color: red;
+        &:hover {
+          background-color: red;
+          color: white;
+        }
+        &.green {
+          color: green;
+          &:hover {
+            background-color: green;
+            color: white;
+          }
+        }
+      }
+      &.screen {
+        &.screenon {
+          background: #0071e3;
+          color: #fff;
+        }
+        &.disabled {
+          display: none;
+        }
+      }
+      &.option {
+        position: relative;
+        &.optionon {
+          background: #0071e3;
+          color: #fff;
+        }
+        &.newMessage::after {
+          width: 12px;
+          height: 12px;
+          border-radius: 6px;
+          background: $notificationColor;
+          content: '';
+          display: block;
+          position: absolute;
+          top: -3px;
+          right: -3px;
+        }
+      }
+      &.optionclose {
+        display: none;
+        position: absolute;
+        right: 2px;
+        top: 2px;
+        font-size: 24px;
+        background: transparent;
+        color: #555;
+        border-radius: 0;
+        box-shadow: none;
+        z-index: 40;
+        padding: 0;
+        width: auto;
+        height: auto;
+        &.optiononclose {
+          display: block;
+        }
+        &:hover {
+          color: $active-hover-color;
+        }
+      }
+    }
+  }
+}

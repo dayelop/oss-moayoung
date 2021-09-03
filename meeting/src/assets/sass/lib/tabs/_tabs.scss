@@ -1,0 +1,43 @@
+ .tabs{
+    height: 100%;
+     .tabs-header{
+         margin-bottom: 10px;
+         > *{
+            text-align: center;
+            border-bottom: 2px solid #aaa;
+            font-weight: bold;
+            color: $passive-color;
+            position: relative;
+            cursor: pointer;
+            &.active{
+                cursor: default;
+                color: $active-color;
+                border-bottom: 2px solid $active-color;
+            }
+            &:not(.active):hover{
+                color: $active-hover-color;
+                border-bottom: 2px solid $active-hover-color;
+            }
+            &.notification:after{
+                width: 8px;
+                height: 8px;
+                border-radius: 4px;
+                background: $notificationColor;
+                content: "";
+                display: block;
+                position: absolute;
+                top: 10px;
+                right: 10px;
+            }
+         }
+     }
+     .tabs-content{
+         > *{
+            height: 100%;
+            display: none;
+            &.active{
+                display: block;
+            }
+         }
+     }
+ }

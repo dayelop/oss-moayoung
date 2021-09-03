@@ -1,0 +1,46 @@
+{
+    "meta": {
+        "title": "Video Chat",
+        "description": "Open-Source video chat based on WebRTC and Firebase.",
+        "keywords": "chat, video-call, video-chat, webrtc, firebase",
+        "image": ""
+    },
+    "privacy": {
+        "firebaseAnalytics": 0,
+        "imprint": "",
+        "gdpr": ""
+    },
+    "exchangeServices": { 
+        "service": "firebase", 
+        "firebase": {
+            "apiKey": "AIzaSyDZBypNShAbcyQ3NmM0BwjGRdlOJdXD0L4",
+            "authDomain": "webrtc-3aa33.firebaseapp.com",
+            "databaseURL": "https://webrtc-3aa33-default-rtdb.firebaseio.com",
+            "projectId": "webrtc-3aa33",
+            "storageBucket": "webrtc-3aa33.appspot.com",
+            "messagingSenderId": "662086632041",
+            "appId": "1:662086632041:web:801b5b48f6e178e688d8f8",
+            "measurementId": "G-EYQ562Z1D4"
+        },
+        "chat-server": {
+            "host": "ws://"
+        }
+    },
+    "communication": {
+        "webrtc": {
+            "iceServers": [
+                {"urls": "stun:stun.services.mozilla.com"}, 
+                {"urls": "stun:stun.l.google.com:19302"},
+                {
+                    "urls": "turn:numb.viagenie.ca",
+                    "credential": "muazkh",
+                    "username": "webrtc@live.com"
+                }
+            ],
+            "iceServersFromUrl": ""
+        }
+    },
+    "features": {
+        "soundEffects": false
+    }
+}
