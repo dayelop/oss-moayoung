@@ -85,6 +85,7 @@ function Home() {
   const [placeholder, setPlaceholder] = useState('통화방 링크 입력');
   const [roomUrl, setRoomUrl] = useState('');
   const [toggle, setToggle] = useState(0);
+  const [value, setValue] = useState('다음');
 
   const createRoom = () => {
     window.location.href = 'http://127.0.0.1:8887/dist/';
@@ -96,6 +97,7 @@ function Home() {
       setPlaceholder('이름 입력');
       setRoomUrl(roomUrl + link.value);
       setToggle(!toggle);
+      setValue('참여');
       link.type = 'text';
       link.value = '';
     }
@@ -138,7 +140,7 @@ function Home() {
             />
             <input
               type="submit"
-              value="참여"
+              value={value}
               css={button}
               onClick={!toggle ? linkInput : nameInput}
             />
