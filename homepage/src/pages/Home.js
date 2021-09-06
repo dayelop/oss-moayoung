@@ -88,7 +88,7 @@ function Home() {
   const [value, setValue] = useState('다음');
 
   const createRoom = () => {
-    window.location.href = 'http://127.0.0.1:8887/dist/';
+    window.location.href = 'https://moayoung-b2596.web.app/';
   };
   const linkInput = () => {
     const link = document.getElementById('link');
