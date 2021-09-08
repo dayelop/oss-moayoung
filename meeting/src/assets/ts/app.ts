@@ -364,12 +364,13 @@ export class App {
 
   run() {
     if (location.hash && location.hash.includes('/')) {
-      this.userinfo.setUserInfo(decodeURIComponent(`${location.hash.split('/')[1]}`));
+      this.userinfo.setUserInfo(
+        decodeURIComponent(`${location.hash.split('/')[1]}`)
+      );
       this.room = decodeURIComponent(location.hash.split('/')[0].substring(1));
       location.hash = this.room;
       this.openConnection();
-    }
-    else if (location.hash) {
+    } else if (location.hash) {
       this.room = decodeURIComponent(location.hash.substring(1));
       this.openConnection();
     } else {
@@ -636,7 +637,7 @@ export class App {
     this.videogrid.recalculateLayout();
 
     if ($(this.participantAlarm).prop('checked') == true) {
-      TTS.playSound(TTS.newpartnersound, '참여자');
+      TTS.playSound(TTS.newpartnersound, this.yourName);
     }
 
     if (app.firstlipdiv) {
