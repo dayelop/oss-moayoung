@@ -1,14 +1,14 @@
-# <center>oss-moayoung</center><br>
+# <div align="center">oss-moayoung</div><br>
 
 <br>
 
-<center>
+<div align="center">
 
 ![license](https://img.shields.io/crates/l/ap?color=white)
 ![contributors](https://img.shields.io/github/contributors/daaaayeah/oss-moayoung?color=white)
 ![last-commit](https://img.shields.io/github/last-commit/daaaayeah/oss-moayoung?color=white)
 
-</center>
+</div>
 
 <br>
 
@@ -31,16 +31,15 @@ Video calling service that encompasses everyone (hereinafter referred to as "moa
 
 ## Using moayoung
 
-<a herf="https://moayoung-call.web.app/">Go to moayoung !</a>
+- <a href="https://moayoung-call.web.app/">Go to moayoung !</a>
 
 <br>
 
 ## Browser support
 
-<img src="https://img.shields.io/badge/chrome-4285F4?style=flat-square&logo=Google Chrome&logoColor=white" width="100"/>
-<img src="https://img.shields.io/badge/Microsoft Edge-0078D7?style=flat-square&logo=Microsoft Edge&logoColor=white" width="150"/>
+<img src="https://img.shields.io/badge/chrome-4285F4?style=flat-square&logo=Google Chrome&logoColor=white" width="100" height="32"/>
+<img src="https://img.shields.io/badge/Microsoft Edge-0078D7?style=flat-square&logo=Microsoft Edge&logoColor=white" width="150" height="32"/>
 
-<br>
 <br>
 
 ## Installation
