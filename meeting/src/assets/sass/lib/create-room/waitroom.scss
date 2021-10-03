@@ -1,10 +1,123 @@
 #waitroom {
-  //   display: none;
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   z-index: 300;
-  background: #eee;
+  background: black;
+
+  #waitroomInner {
+    height: 100%;
+  }
+
+  #waitroomControls {
+    background: white;
+    padding: 16px;
+    bottom: 0;
+    position: absolute;
+  }
+
+  #waitroomVideoDiv {
+    display: flex;
+    justify-content: center;
+  }
+
+  #waitroomVideo {
+    visibility: hidden;
+
+    &.show {
+      visibility: inherit;
+    }
+  }
+
+  span {
+    color: $footer-button-color;
+    background: $footer-button-background;
+    display: inline-block;
+    width: 70px;
+    height: 70px;
+    border-style: none;
+    box-shadow: 0 0 5px 1px #999;
+    border-radius: 50%;
+    font-size: 30px;
+    line-height: 230%;
+    margin: 0px 5px;
+    text-align: center;
+
+    &:hover {
+      background-color: #0071e3;
+    }
+    cursor: pointer;
+    &.fa-microphone {
+      background: #0071e3;
+      color: #fff;
+      &.fa-microphone-slash {
+        color: $footer-button-color;
+        background: $footer-button-background;
+      }
+    }
+    &.fa-video {
+      background: #0071e3;
+      color: #fff;
+      &.fa-video-slash {
+        color: $footer-button-color;
+        background: $footer-button-background;
+      }
+    }
+    &.fa-phone {
+      background: #fff;
+      color: green;
+      &:hover {
+        background-color: green;
+        color: white;
+      }
+      &.green {
+        color: red;
+        &:hover {
+          background-color: red;
+          color: white;
+        }
+      }
+    }
+    &.option {
+      position: relative;
+      &.optionon {
+        background: #0071e3;
+        color: #fff;
+      }
+      &.newMessage::after {
+        width: 12px;
+        height: 12px;
+        border-radius: 6px;
+        background: $notificationColor;
+        content: '';
+        display: block;
+        position: absolute;
+        top: -3px;
+        right: -3px;
+      }
+    }
+    &.optionclose {
+      display: none;
+      position: absolute;
+      right: 2px;
+      top: 2px;
+      font-size: 24px;
+      background: transparent;
+      color: #555;
+      border-radius: 0;
+      box-shadow: none;
+      z-index: 40;
+      padding: 0;
+      width: auto;
+      height: auto;
+      &.optiononclose {
+        display: block;
+      }
+      &:hover {
+        color: $active-hover-color;
+      }
+    }
+  }
 }
