@@ -634,10 +634,6 @@ export class App {
       TTS.playSound(TTS.newpartnersound, this.partners[partnerId].name);
     }, 2000);
 
-    if ($(this.participantAlarm).prop('checked') == true) {
-      TTS.playSound(TTS.newpartnersound, this.yourName);
-    }
-
     if (app.firstlipdiv) {
       $('#lips-area').append(
         '<div id="mydiv"><div id="mydivheader">Click here to move</div><div id="lip-area" style="margin:0px"></div></div>'
