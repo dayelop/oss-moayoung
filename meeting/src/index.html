@@ -550,5 +550,9 @@
         </form>
       </div>
     </div>
+    <div id="waitroom" v-if="showWaitroom">
+      <input v-model="userName" />
+      <button v-on:click="enterRoom">방 입장하기</button>
+    </div>
   </body>
 </html>

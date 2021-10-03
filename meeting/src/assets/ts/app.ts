@@ -363,17 +363,11 @@ export class App {
   }
 
   run() {
-    if (location.hash && location.hash.includes('/')) {
-      this.userinfo.setUserInfo(
-        decodeURIComponent(`${location.hash.split('/')[1]}`)
-      );
-      this.room = decodeURIComponent(location.hash.split('/')[0].substring(1));
-      location.hash = this.room;
-      this.openConnection();
-    } else if (location.hash) {
-      this.room = decodeURIComponent(location.hash.substring(1));
-      this.openConnection();
+    if (location.hash) {
+      this.createRoom.waitroomVueObject.isHost = false;
+      this.createRoom.showCreateRoom();
     } else {
+      this.createRoom.waitroomVueObject.isHost = true;
       this.createRoom.showCreateRoom();
     }
     $('#main').show();
@@ -635,6 +629,10 @@ export class App {
     );
     this.setStreamToPartner(this.partners[partnerId], true);
     this.videogrid.recalculateLayout();
+
+    setTimeout(() => {
+      TTS.playSound(TTS.newpartnersound, this.partners[partnerId].name);
+    }, 2000);
 
     if ($(this.participantAlarm).prop('checked') == true) {
       TTS.playSound(TTS.newpartnersound, this.yourName);
