@@ -1,0 +1,30 @@
+$active-color: #0071e3;
+$active-hover-color: darken($active-color, 5%);
+$passive-color: #555;
+$main-background: #000;
+$footer-button-background: #000;
+$footer-button-color: #fff;
+
+$textchat-own-color: #fff;
+$textchat-own-background: $active-color;
+$textchat-own-border: 0px solid #888;
+$textchat-other-color: #fff;
+$textchat-other-background: #000;
+$textchat-other-border: 0px solid #ccc;
+
+@font-face {
+  font-family: 'S-CoreDream-5Medium';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-5Medium.woff')
+    format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+$default-font: 'S-CoreDream-5Medium';
+
+$video-background: #000;
+$notificationColor: orange;
+
+$footer-height: 100px;
+$sidebar-header-height: 62px;
+$sidebar-width: 350px;

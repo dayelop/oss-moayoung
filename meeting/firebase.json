@@ -1,0 +1,7 @@
+{
+  "hosting": {
+    "site": "moayoung-b2596",
+    "public": "dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+  }
+}

@@ -1,0 +1,236 @@
+#textchat {
+  height: 100%;
+
+  .msger {
+    display: flex;
+    flex-flow: column;
+    justify-content: space-between;
+    width: 100%;
+    height: 99.25%;
+    border: 2px solid $active-color;
+    background: #fff;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+
+  .msger-chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    max-width: 100%;
+    box-sizing: border-box;
+    background-color: #fcfcfe;
+  }
+  .msger-chat::-webkit-scrollbar {
+    width: 6px;
+  }
+  .msger-chat::-webkit-scrollbar-track {
+    background: #ddd;
+  }
+  .msger-chat::-webkit-scrollbar-thumb {
+    background: #bdbdbd;
+  }
+  .msg {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 5px;
+  }
+  .msg:last-of-type {
+    margin: 0;
+  }
+  .msg-img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+    background: #ddd;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border-radius: 50%;
+  }
+  .msg-bubble {
+    max-width: 220px;
+    padding: 10px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    background: $textchat-other-background;
+    color: $textchat-other-color;
+    border: $textchat-other-border;
+  }
+  .msg-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  .msg-image {
+    margin-bottom: 5px;
+    border-radius: 5px;
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    img,
+    video {
+      max-width: 100%;
+      width: 100%;
+      height: auto;
+      vertical-align: middle;
+    }
+  }
+  .msg-text {
+    overflow: hidden;
+    word-break: break-word;
+    a {
+      text-decoration: none;
+      color: #002284;
+      &:hover {
+        color: darken(#002284, 20%);
+      }
+    }
+  }
+
+  .msg-info-name {
+    margin-right: 10px;
+    font-weight: bold;
+  }
+  .msg-info-time {
+    font-size: 0.85em;
+    text-align: right;
+  }
+
+  .left-msg .msg-bubble {
+    border-bottom-left-radius: 0;
+  }
+
+  .right-msg {
+    flex-direction: row-reverse;
+  }
+  .right-msg .msg-bubble {
+    background: $textchat-own-background;
+    color: $textchat-own-color;
+    border-bottom-right-radius: 0;
+    border: $textchat-own-border;
+  }
+  .right-msg .msg-img {
+    margin: 0 0 0 10px;
+  }
+
+  .msger-inputarea {
+    display: flex;
+    border-top: 1px solid $active-color;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .msger-inputarea * {
+    padding: 15px 10px 10px;
+    border: none;
+    font-size: 1em;
+    &:focus {
+      outline: none;
+    }
+  }
+  .msger-input {
+    flex: 1;
+    height: 25px;
+    resize: none;
+    line-height: 1.2;
+  }
+  .msger-send-btn {
+    padding: 10px;
+    background: $active-color;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.23s;
+  }
+  .msger-send-btn:hover {
+    background: $active-hover-color;
+  }
+  .msger-emoji-area {
+    display: flex;
+    padding: 0px;
+    max-width: 100%;
+    box-sizing: border-box;
+    border-top: 1px solid $active-color;
+    position: relative;
+    &.hidden {
+      display: none;
+    }
+    .close {
+      color: #555;
+      margin: 2px 4px;
+      position: absolute;
+      right: 0;
+      cursor: pointer;
+      &:hover {
+        color: $active-hover-color;
+      }
+    }
+    emoji-picker {
+      width: 100%;
+      height: 250px;
+      --input-border-radius: 0;
+      --input-font-size: 14px;
+      --input-padding: 2px 4px;
+      --emoji-padding: 0.4rem;
+      --indicator-color: #{$active-color};
+      --input-placeholder-color: #666;
+      --outline-color: #{$active-color};
+      --input-border-color: #{$active-color};
+    }
+  }
+  .msger-extrainfo {
+    display: flex;
+    padding: 0px;
+    border-top: 1px solid $active-color;
+    background: #eee;
+    max-width: 100%;
+    box-sizing: border-box;
+    max-height: 150px;
+    text-align: center;
+    background: #888;
+    position: relative;
+    &.hidden {
+      display: none;
+    }
+    img {
+      max-height: 100%;
+      max-width: 100%;
+    }
+    .close {
+      color: #555;
+      margin: 2px 4px;
+      position: absolute;
+      right: 0;
+      cursor: pointer;
+      &:hover {
+        color: $active-hover-color;
+      }
+    }
+  }
+  .msger-imgupload,
+  .msger-emoji {
+    background: #fff;
+    color: #555;
+    transition: color 0.3s ease-in-out;
+    cursor: pointer;
+    align-self: center;
+    &:hover {
+      color: #000;
+    }
+    input {
+      width: 0.1px;
+      height: 0.1px;
+      opacity: 0;
+      overflow: hidden;
+      position: absolute;
+      z-index: -1;
+    }
+    &.msger-imgupload {
+      padding: 10px;
+    }
+    &.msger-emoji {
+      padding: 10px 2px;
+    }
+  }
+}

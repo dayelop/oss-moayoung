@@ -1,0 +1,18 @@
+/*!
+ * Font Awesome Free 5.15.1 by @fontawesome - https://fontawesome.com
+ * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
+ */
+@import 'variables';
+
+@font-face {
+  font-family: 'Font Awesome 5 Brands';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-5Medium.woff')
+    format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.fab {
+  font-family: 'Font Awesome 5 Brands';
+  font-weight: 400;
+}

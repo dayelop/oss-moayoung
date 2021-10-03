@@ -1,0 +1,262 @@
+#video-area {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+  .video-item {
+    width: var(--width);
+    height: var(--height);
+    .video-wrap {
+      background: $video-background;
+      margin: 4px;
+      width: calc(var(--width) - 8px);
+      height: calc(var(--height) - 8px);
+      box-shadow: 0 0 4px 1px #000;
+      position: relative;
+      .video-inner-wrap {
+        overflow: hidden;
+        video {
+          width: calc(100% + 2px);
+          height: calc(100% + 2px);
+          margin: -1px;
+        }
+      }
+      .video-info-wrap {
+        position: absolute;
+        top: 0;
+        * {
+          border-radius: 0;
+        }
+        &.cammeraoff {
+          background: $video-background;
+        }
+        .video-name {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          height: auto;
+          text-align: center;
+          color: #fff;
+          background: rgba(0, 0, 0, 0.2);
+          padding: 3px 0px;
+          border-radius: 0 0 5px 5px;
+          flex-wrap: nowrap; //--
+          .microphone,
+          .camera,
+          .screen,
+          .listener {
+            display: inline;
+            margin-left: 5px;
+            &.on {
+              display: none;
+            }
+          }
+          /*
+          input {
+            display: inline;
+            margin-left: 5px;
+            //border-radius: 1px;
+            //padding: 1px;
+            width: 15px; //13
+            height: 15px;
+          }
+          */
+          .onoffswitch {
+            width: 70px;
+            height: 23px;
+            display: inline-block;
+            //--
+            text-align: center;
+            margin-left: 5px;
+
+            .onoffswitch-checkbox {
+              display: none;
+            }
+
+            .onoffswitch-label {
+              display: block;
+              overflow: hidden;
+              cursor: pointer;
+              border: 0px solid black;
+              border-radius: 0px;
+              width: 70px;
+              height: 23px;
+            }
+
+            .onoffswitch-inner {
+              width: 200%;
+              height: 23px;
+              margin-left: -100%;
+              -moz-transition: margin 0.3s ease-in 0s;
+              -webkit-transition: margin 0.3s ease-in 0s;
+              -o-transition: margin 0.3s ease-in 0s;
+              transition: margin 0.3s ease-in 0s;
+            }
+
+            .onoffswitch-inner > div {
+              float: left;
+              position: relative;
+              width: 50%;
+              height: 23px;
+              padding: 0;
+              line-height: 23px;
+              font-size: 14px;
+              color: white;
+              font-family: Trebuchet, Arial, sans-serif;
+              font-weight: bold;
+              -moz-box-sizing: border-box;
+              -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+              top: 3.3px;
+            }
+
+            .onoffswitch-inner .onoffswitch-active {
+              padding-left: 15px;
+              background-color: white;
+              color: #ffffff;
+            }
+
+            .onoffswitch-inner .onoffswitch-inactive {
+              padding-right: 15px;
+              background-color: white;
+              color: #ffffff;
+              text-align: right;
+            }
+
+            .onoffswitch-switch {
+              width: 30px;
+              margin: 0px;
+              text-align: center;
+              border: 0px solid white;
+              border-radius: 0px;
+              position: absolute;
+              top: 0;
+              bottom: 0;
+            }
+
+            .onoffswitch-active .onoffswitch-switch {
+              background: #0071e3;
+              left: 0;
+            }
+
+            .onoffswitch-inactive .onoffswitch-switch {
+              background: #c8c8c8;
+              right: 0;
+            }
+
+            .onoffswitch-active .onoffswitch-switch:before {
+              content: ' ';
+              position: absolute;
+              top: 0;
+              left: 30px;
+              border-style: solid;
+              border-color: #0071e3 transparent transparent #0071e3;
+              border-width: 15px 10px;
+            }
+
+            .onoffswitch-inactive .onoffswitch-switch:before {
+              content: ' ';
+              position: absolute;
+              top: 0;
+              right: 30px;
+              border-style: solid;
+              border-color: transparent #c8c8c8 #c8c8c8 transparent;
+              border-width: 15px 10px;
+            }
+
+            .onoffswitch-checkbox:checked
+              + .onoffswitch-label
+              .onoffswitch-inner {
+              margin-left: 0;
+            }
+          }
+        }
+        .expand {
+          position: absolute;
+          top: 0;
+          left: 0;
+          padding: 1px 3px;
+          border-radius: 5px 0px 0px 0px;
+          color: #fff;
+          //background: rgba(0,0,0,0.2);
+          width: auto;
+          height: auto;
+          cursor: pointer;
+        }
+        .connect {
+          display: none;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 70px;
+          height: 60px;
+          margin-left: -35px;
+          margin-top: -30px;
+          color: #fff;
+          text-align: center;
+          text-shadow: 0px 0px 5px black;
+          * {
+            width: auto;
+            height: auto;
+          }
+          .fas {
+            font-size: 30px;
+            animation: spin 4s linear infinite;
+          }
+          .text {
+            font-size: 16px;
+            line-height: 40px;
+          }
+        }
+      }
+    }
+    &.unconnected {
+      .video-wrap .video-info-wrap .connect {
+        display: block;
+      }
+    }
+    * {
+      height: 100%;
+      width: 100%;
+      border-radius: 5px;
+    }
+  }
+  &.yoursmall {
+    #yourVideoArea:not(.big) {
+      max-width: 150px;
+      @media only screen and (max-width: $xs-max) {
+        max-width: 80px;
+      }
+      width: auto;
+      height: auto;
+      position: absolute;
+      right: 8px;
+      top: 0;
+      z-index: 10;
+      .video-wrap {
+        height: 100%;
+        width: 100%;
+        .video-inner-wrap video {
+          width: calc(100% + 8px);
+          height: calc(100% + 8px);
+          margin: -4px;
+        }
+      }
+    }
+  }
+}
+#mydiv {
+  position: absolute;
+  z-index: 9;
+  background-color: #f1f1f1;
+  text-align: center;
+  border: 1px solid #d3d3d3;
+}
+
+#mydivheader {
+  padding: 10px;
+  cursor: move;
+  z-index: 10;
+  background-color: #0071e3;
+  color: #fff;
+}
