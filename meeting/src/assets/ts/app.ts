@@ -680,9 +680,9 @@ export class App {
     this.setStreamToPartner(this.partners[partnerId], true);
     this.videogrid.recalculateLayout();
 
-    if ($(this.participantAlarm).prop('checked') == true) {
-      TTS.playSound(TTS.newpartnersound, this.yourName);
-    }
+    setTimeout(() => {
+      TTS.playSound(TTS.newpartnersound, this.partners[partnerId].name);
+    }, 2000);
 
     if (app.firstlipdiv) {
       $('#lips-area').append(
