@@ -396,6 +396,7 @@ export class App {
     if (location.hash) {
       this.createRoom.waitroomVueObject.isHost = false;
       this.createRoom.showCreateRoom();
+      this.createRoom.openDialog(this.yourName ? false : true);
     } else {
       this.createRoom.waitroomVueObject.isHost = true;
       this.createRoom.showCreateRoom();
