@@ -109,23 +109,15 @@ function speech(txt) {
 }
 
 function faceRelocateVoice(faceRecognitionState) {
-    
   faceRecognitionStateCount = 0;
 
-  if (faceRecognitionState == 1)
-    speech('얼굴 인식이 시작되었습니다.');
-  else if (faceRecognitionState == -1)
-    speech('이탈. 아래쪽으로 이동하시오.');
-  else if (faceRecognitionState == -2)
-    speech('이탈. 위쪽으로 이동하시오.');
-  else if (faceRecognitionState == -3)
-    speech('이탈. 왼쪽으로 이동하시오.');
-  else if (faceRecognitionState == -4)
-    speech('이탈. 오른쪽으로 이동하시오.');
-  else if (faceRecognitionState == 0)
-    speech('정상 범위에 들어왔습니다.');
+  if (faceRecognitionState == 1) speech('얼굴 인식이 시작되었습니다.');
+  else if (faceRecognitionState == -1) speech('이탈. 아래쪽으로 이동하시오.');
+  else if (faceRecognitionState == -2) speech('이탈. 위쪽으로 이동하시오.');
+  else if (faceRecognitionState == -3) speech('이탈. 왼쪽으로 이동하시오.');
+  else if (faceRecognitionState == -4) speech('이탈. 오른쪽으로 이동하시오.');
+  else if (faceRecognitionState == 0) speech('정상 범위에 들어왔습니다.');
 }
-
 
 export class App {
   room: string;
@@ -326,8 +318,7 @@ export class App {
 
     function onResults(results) {
       if (
-        $(document.getElementById('faceDetect')).prop('checked') ==
-          true &&
+        $(document.getElementById('faceDetect')).prop('checked') == true &&
         results.multiFaceLandmarks[0]
       ) {
         if (faceRecognitionState == 1) {
@@ -337,32 +328,28 @@ export class App {
         if (results.multiFaceLandmarks[0][10].y <= 0.1) {
           console.log('Face Out Direction: Up');
           if (faceRecognitionState !== -1) {
-            if (faceRecognitionState !== 1)
-              window.speechSynthesis.cancel();
+            if (faceRecognitionState !== 1) window.speechSynthesis.cancel();
             faceRecognitionState = -1;
             faceRelocateVoice(faceRecognitionState);
           } else faceRecognitionStateCount++;
         } else if (results.multiFaceLandmarks[0][10].y >= 0.6) {
           console.log('Face Out Direction: Down');
           if (faceRecognitionState !== -2) {
-            if (faceRecognitionState !== 1)
-              window.speechSynthesis.cancel();
+            if (faceRecognitionState !== 1) window.speechSynthesis.cancel();
             faceRecognitionState = -2;
             faceRelocateVoice(faceRecognitionState);
           } else faceRecognitionStateCount++;
         } else if (results.multiFaceLandmarks[0][234].x <= 0.1) {
           console.log('Face Out Direction: Right');
           if (faceRecognitionState !== -3) {
-            if (faceRecognitionState !== 1)
-              window.speechSynthesis.cancel();
+            if (faceRecognitionState !== 1) window.speechSynthesis.cancel();
             faceRecognitionState = -3;
             faceRelocateVoice(faceRecognitionState);
           } else faceRecognitionStateCount++;
         } else if (results.multiFaceLandmarks[0][454].x >= 0.9) {
           console.log('Face Out Direction: Left');
           if (faceRecognitionState !== -4) {
-            if (faceRecognitionState !== 1)
-              window.speechSynthesis.cancel();
+            if (faceRecognitionState !== 1) window.speechSynthesis.cancel();
             faceRecognitionState = -4;
             faceRelocateVoice(faceRecognitionState);
           } else faceRecognitionStateCount++;
@@ -374,8 +361,7 @@ export class App {
         ) {
           console.log('Face in Normal Range');
           if (faceRecognitionState !== 0) {
-            if (faceRecognitionState !== 1)
-              window.speechSynthesis.cancel();
+            if (faceRecognitionState !== 1) window.speechSynthesis.cancel();
             faceRecognitionState = 0;
             faceRelocateVoice(faceRecognitionState);
           }
@@ -407,17 +393,11 @@ export class App {
   }
 
   run() {
-    if (location.hash && location.hash.includes('/')) {
-      this.userinfo.setUserInfo(
-        decodeURIComponent(`${location.hash.split('/')[1]}`)
-      );
-      this.room = decodeURIComponent(location.hash.split('/')[0].substring(1));
-      location.hash = this.room;
-      this.openConnection();
-    } else if (location.hash) {
-      this.room = decodeURIComponent(location.hash.substring(1));
-      this.openConnection();
+    if (location.hash) {
+      this.createRoom.waitroomVueObject.isHost = false;
+      this.createRoom.showCreateRoom();
     } else {
+      this.createRoom.waitroomVueObject.isHost = true;
       this.createRoom.showCreateRoom();
     }
     $('#main').show();
