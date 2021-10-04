@@ -31,7 +31,7 @@
   "dependencies": {
     "@mediapipe/camera_utils": "^0.3.1620247984",
     "@mediapipe/drawing_utils": "^0.3.1620248257",
-    "@mediapipe/face_mesh": "^0.4.1629159166",
+    "@mediapipe/face_mesh": "0.4.1629159166",
     "annyang": "^2.6.1",
     "canvas": "2.8.0",
     "ngrok": "4.0.1"
