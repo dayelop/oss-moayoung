@@ -49,6 +49,7 @@ import {
 } from '@mediapipe/face_mesh';
 import { drawConnectors } from '@mediapipe/drawing_utils';
 import { Camera } from '@mediapipe/camera_utils';
+import { TypePredicateKind } from 'typescript';
 
 declare var Vue: any;
 
@@ -172,9 +173,12 @@ export class App {
   myfaceMesh: FaceMesh;
   partnerfaceMesh: FaceMesh;
 
+  FRAMES_PER_SECOND: number;
+  FRAME_MIN_TIME: number;
+
   featureOnOffVueObject: any;
   camerastate: boolean;
-  interval: any;
+  myrequest: any;
 
   constructor() {
     this.yourVideo = document.getElementById('yourVideo');
@@ -205,9 +209,14 @@ export class App {
     this.subtitleExtract = document.getElementById('subtitleExtract');
     this.libMagnify = document.getElementById('libMagnify');
     this.participantAlarm = document.getElementById('participantAlarm');
+
+    this.FRAMES_PER_SECOND = 5;
+    this.FRAME_MIN_TIME =
+      (1000 / 60) * (60 / this.FRAMES_PER_SECOND) - (1000 / 60) * 0.5;
+
     this.myfaceMesh = new FaceMesh({
       locateFile: (file) => {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4/${file}`;
       },
     });
     this.myfaceMesh.setOptions({
@@ -299,15 +308,37 @@ export class App {
 
           app.myfaceMesh.onResults(onResults);
 
-          if (app.interval != null) {
-            clearInterval(app.interval);
-            app.interval = null;
-          } else if (app.camerastate == true) {
-            app.interval = setInterval(async () => {
-              if (videoElement.videoWidth != 0) {
-                await app.myfaceMesh.send({ image: videoElement });
+          var lastFrameTime = 0;
+          async function predict() {
+            if (videoElement.videoWidth != 0) {
+              await app.myfaceMesh.send({ image: videoElement });
+            }
+          }
+          var startdetect = async function (time) {
+            if (
+              $(document.getElementById('faceDetect')).prop('checked') ==
+                true &&
+              app.camerastate == true
+            ) {
+              if (time - lastFrameTime < app.FRAME_MIN_TIME) {
+                app.myrequest = requestAnimationFrame(startdetect);
+                return;
               }
-            }, 200);
+
+              lastFrameTime = time;
+              app.myrequest = window.requestAnimationFrame(startdetect);
+            }
+            predict();
+          };
+
+          if (app.myrequest != null) {
+            console.log('끝냄****************************************');
+            cancelAnimationFrame(app.myrequest);
+            window.cancelAnimationFrame(app.myrequest);
+            app.myrequest = null;
+          } else if (app.camerastate == true) {
+            console.log('시작22****************************************');
+            app.myrequest = window.requestAnimationFrame(startdetect);
           }
         },
         isLipMagnify: function () {},
@@ -392,17 +423,39 @@ export class App {
     }
 
     app.myfaceMesh.onResults(onResults);
+
+    var lastFrameTime = 0;
+    async function predict() {
+      if (videoElement.videoWidth != 0) {
+        await app.myfaceMesh.send({ image: videoElement });
+      }
+    }
+    var startdetect = async function (time) {
+      if (
+        $(document.getElementById('faceDetect')).prop('checked') == true &&
+        app.camerastate == true
+      ) {
+        if (time - lastFrameTime < app.FRAME_MIN_TIME) {
+          app.myrequest = requestAnimationFrame(startdetect);
+          return;
+        }
+
+        lastFrameTime = time;
+        app.myrequest = window.requestAnimationFrame(startdetect);
+      }
+      predict();
+    };
+
     if (isCameraOn == false) {
-      clearInterval(app.interval);
-      app.interval = null;
+      console.log('****************************************끝냄');
+      cancelAnimationFrame(app.myrequest);
+      window.cancelAnimationFrame(app.myrequest);
+      app.myrequest = null;
     } else if (
       $(document.getElementById('faceDetect')).prop('checked') == true
     ) {
-      app.interval = setInterval(async () => {
-        if (videoElement.videoWidth != 0) {
-          await app.myfaceMesh.send({ image: videoElement });
-        }
-      }, 200);
+      console.log('****************************************시작');
+      app.myrequest = window.requestAnimationFrame(startdetect);
     }
   }
 
