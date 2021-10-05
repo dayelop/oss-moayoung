@@ -10,6 +10,7 @@ declare var Vue: any;
 export class CreateRoom {
   app: App;
   createRoomVueObject: any;
+  setNameVueObject: any;
   waitroomVueObject: any;
 
   readonly microphoneCookie: string = 'microphoneOn';
@@ -50,6 +51,7 @@ export class CreateRoom {
             cla.app.room = this.roomName;
             location.hash = this.roomName;
             this.showDialog = false;
+            cla.openDialog(this.yourName ? false : true);
             cla.waitroomVueObject.showWaitroom = true;
             cla.waitroomVueObject.setVideo();
             cla.app.devices.gotDevices(true);
@@ -61,11 +63,31 @@ export class CreateRoom {
       },
     });
 
+    this.setNameVueObject = new Vue({
+      el: '#waitroom-setname',
+      data: {
+        open: false,
+        showSetName: false,
+        name: '',
+      },
+      methods: {
+        changeUserinfo: function () {
+          cla.app.userinfo.setUserInfo(this.name);
+        },
+        close: function () {
+          if (!this.name) return;
+
+          cla.waitroomVueObject.userName = this.name;
+          cla.closeDialog();
+        },
+      },
+    });
+
     this.waitroomVueObject = new Vue({
       el: '#waitroom',
       data: {
-        showWaitroom: false,
         userName: '',
+        showWaitroom: false,
         isHost: true,
         microphoneOn:
           Cookie.getCookie(cla.microphoneCookie) == 'false' ? false : true,
@@ -75,10 +97,8 @@ export class CreateRoom {
       },
       methods: {
         enterRoom: function () {
-          if (this.userName == '' || this.userName == null) {
-            return;
-          }
-          cla.app.userinfo.setUserInfo(this.userName);
+          if (!this.userName) return;
+
           if (this.isHost && this.roomName !== '') {
             cla.app.openConnection(true);
             cla.app.invite.resetLink();
@@ -223,5 +243,21 @@ export class CreateRoom {
       !this.createRoomVueObject.cameraOn;
     this.app.partnerListElement.partnerListElementVueObject.cameraOff =
       !this.createRoomVueObject.cameraOn;
+  }
+
+  openDialog(noName: boolean) {
+    var cla = this;
+    this.setNameVueObject.showSetName = noName;
+
+    if (noName) {
+      setTimeout(function () {
+        cla.setNameVueObject.open = true;
+        $('#waitroom-setname .setname input').focus();
+      }, 100);
+    }
+  }
+
+  closeDialog() {
+    this.setNameVueObject.open = false;
   }
 }

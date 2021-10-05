@@ -550,9 +550,33 @@
         </form>
       </div>
     </div>
+    <div id="waitroom-setname" v-bind:class="{'open': open}">
+      <div class="waitroom-setname-inner">
+        <div class="setname row" v-bind:class="{'show': showSetName}">
+          <div class="col-xs-12 setname-header">이름을 입력하세요.</div>
+          <div class="col-xs-12 setname-content">
+            <input
+              v-model="name"
+              @blur="changeUserinfo"
+              autofocus
+              @keydown.enter.exact.prevent
+              @keyup.enter.exact="close"
+            />
+          </div>
+        </div>
+        <button
+          v-bind:class="{'show': showSetName}"
+          v-on:click="close"
+          type="submit"
+          data-lang="확인"
+          class="button starting"
+        >
+          Starting
+        </button>
+        <div class="row"></div>
+      </div>
+    </div>
     <div id="waitroom" v-if="showWaitroom">
-      <input v-model="userName" placeholder="이름을 입력해야 넘어가요" />
-
       <div id="waitroomInner">
         <div id="waitroomVideoDiv">
           <video
@@ -561,7 +585,7 @@
             autoplay
             muted
             playsinline
-            style="height: 860px"
+            style="height: 100vh"
           ></video>
         </div>
 
