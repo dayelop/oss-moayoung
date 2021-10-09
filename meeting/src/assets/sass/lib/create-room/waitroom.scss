@@ -1,3 +1,7 @@
+// @import '../switch/switch.scss';
+
+$waitroomOptionWidth: 350px;
+
 #waitroom {
   position: absolute;
   top: 0;
@@ -9,6 +13,7 @@
 
   #waitroomInner {
     height: 100%;
+    width: 100%;
   }
 
   #waitroomControls {
@@ -16,6 +21,7 @@
     padding: 16px;
     bottom: 0;
     position: absolute;
+    width: 100%;
   }
 
   #waitroomVideoDiv {
@@ -31,7 +37,35 @@
     }
   }
 
-  span {
+  #waitroomOptions {
+    display: none;
+  }
+
+  &.openWaitroomOption {
+    #waitroomInner {
+      width: calc(100% - #{$waitroomOptionWidth});
+    }
+
+    #waitroomControls {
+      width: calc(100% - #{$waitroomOptionWidth});
+    }
+
+    #waitroomOptions {
+      background: white;
+      display: block;
+      width: $waitroomOptionWidth;
+      z-index: 10000;
+      position: absolute;
+      height: 100%;
+      top: 0;
+      right: 0;
+      box-shadow: 0px 0 10px 1px #555;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+  }
+
+  .spanBtn {
     color: $footer-button-color;
     background: $footer-button-background;
     display: inline-block;
@@ -118,6 +152,92 @@
       &:hover {
         color: $active-hover-color;
       }
+    }
+  }
+
+  #waitroomFeatureControl {
+    box-shadow: 1px 1px 5px 1px grey;
+    border-radius: 7px;
+    padding: 10px;
+
+    h2 {
+      color: #0071e3;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+
+    .settingTitle {
+      display: flex;
+      justify-content: center;
+    }
+
+    .switchbox {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      p {
+        margin-left: 3px;
+        font-size: 18px;
+        font-weight: bold;
+      }
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: 0.4s;
+      transition: 0.4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: '';
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      -webkit-transition: 0.4s;
+      transition: 0.4s;
+    }
+
+    input:checked + .slider {
+      background-color: #0071e3;
+    }
+
+    input:focus + .slider {
+      box-shadow: 0 0 1px #0071e3;
+    }
+
+    input:checked + .slider:before {
+      -webkit-transform: translateX(26px);
+      -ms-transform: translateX(26px);
+      transform: translateX(26px);
+    }
+
+    .slider.round {
+      border-radius: 34px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
     }
   }
 }

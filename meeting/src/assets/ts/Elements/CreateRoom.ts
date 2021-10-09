@@ -176,6 +176,33 @@ export class CreateRoom {
             new Alert(Translator.get('cannotstartcamera'));
           }
         },
+        toggleOptions: function () {
+          $('#waitroom').toggleClass('openWaitroomOption');
+        },
+        toggleFaceDetection: function () {
+          $(document.getElementById('faceDetect')).prop(
+            'checked',
+            !$(document.getElementById('faceDetect')).prop('checked')
+          );
+        },
+        toggleSubtitleExtract: function () {
+          $(document.getElementById('subtitleExtract')).prop(
+            'checked',
+            !$(document.getElementById('subtitleExtract')).prop('checked')
+          );
+        },
+        toggleLipMagnify: function () {
+          $(document.getElementById('libMagnify')).prop(
+            'checked',
+            !$(document.getElementById('libMagnify')).prop('checked')
+          );
+        },
+        toggleParticipantAlarm: function () {
+          $(document.getElementById('participantAlarm')).prop(
+            'checked',
+            !$(document.getElementById('participantAlarm')).prop('checked')
+          );
+        },
       },
     });
   }
