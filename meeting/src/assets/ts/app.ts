@@ -32,7 +32,7 @@ import { IceServers } from './Utils/IceServers';
 import { Sounds, TTS } from './Utils/Sounds';
 import { Settings } from './Utils/Settings';
 import { ChatServer } from './Exchange/ChatServer';
-import { HotkeyTest } from '../js/HotkeyTest';
+import { Hotkey } from './Elements/Hotkey';
 import { Switch } from './Elements/Switch';
 import '@mediapipe/face_mesh';
 import '@mediapipe/drawing_utils';
@@ -151,7 +151,7 @@ export class App {
   stateIsSet: boolean = false;
   yourVideoElement: Video;
   partnerListElement: PartnerListElement;
-  hotkey: HotkeyTest;
+  hotkey: Hotkey;
   switch_: Switch;
 
   subtitleExtract: HTMLElement;
@@ -188,7 +188,7 @@ export class App {
     this.noInternet = new NoInternet(this);
     this.welcome = new Welcome(this);
     this.videogrid = new Videogrid();
-    this.hotkey = new HotkeyTest(this);
+    this.hotkey = new Hotkey(this);
     this.switch_ = new Switch(this);
     this.videogrid.init();
 

@@ -619,28 +619,44 @@
           <div class="switchbox">
             <p>얼굴 벗어남 감지</p>
             <label class="switch">
-              <input type="checkbox" v-on:click="toggleFaceDetection" />
+              <input
+                id="waitroomFaceDetectionChkbox"
+                type="checkbox"
+                v-on:click="toggleFaceDetection"
+              />
               <span class="slider round"></span>
             </label>
           </div>
           <div class="switchbox">
             <p>자막 추출</p>
             <label class="switch">
-              <input type="checkbox" v-on:click="toggleSubtitleExtract" />
+              <input
+                id="waitroomSubtitleExtractChkbox"
+                type="checkbox"
+                v-on:click="toggleSubtitleExtract"
+              />
               <span class="slider round"></span>
             </label>
           </div>
           <div class="switchbox">
             <p>발화자 입 확대</p>
             <label class="switch">
-              <input type="checkbox" v-on:click="toggleLipMagnify" />
+              <input
+                id="waitroomLipMagnifyChkbox"
+                type="checkbox"
+                v-on:click="toggleLipMagnify"
+              />
               <span class="slider round"></span>
             </label>
           </div>
           <div class="switchbox">
             <p>참여자 음성 알림</p>
             <label class="switch">
-              <input type="checkbox" v-on:click="toggleParticipantAlarm" />
+              <input
+                id="waitroomParticipantAlarmChkbox"
+                type="checkbox"
+                v-on:click="toggleParticipantAlarm"
+              />
               <span class="slider round"></span>
             </label>
           </div>

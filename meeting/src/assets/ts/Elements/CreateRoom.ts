@@ -94,6 +94,7 @@ export class CreateRoom {
         cameraOn: Cookie.getCookie(cla.cameraCookie) == 'false' ? false : true,
         hangouted: false,
         video: document.getElementById('waitroomVideo') as HTMLMediaElement,
+        isInWaitroom: true,
       },
       methods: {
         enterRoom: function () {
@@ -110,6 +111,7 @@ export class CreateRoom {
             this.showWaitroom = false;
           }
           this.stopVideo();
+          this.isInWaitroom = false;
         },
         setVideo: function () {
           if (!this.cameraOn) {
