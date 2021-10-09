@@ -141,6 +141,9 @@ export class CreateRoom {
           }, 500);
         },
         stopVideo: function () {
+          if (localStream == null) {
+            return;
+          }
           this.video.pause();
           this.video.src = '';
           localStream.getTracks()[0].stop();
