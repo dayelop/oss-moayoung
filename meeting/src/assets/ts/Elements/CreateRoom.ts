@@ -1,4 +1,4 @@
-import { App } from '../app';
+import { App, speech } from '../app';
 import { Translator } from '../Utils/Translator';
 import { Settings } from '../Utils/Settings';
 import config from '../../../config.json';
@@ -185,10 +185,113 @@ export class CreateRoom {
           $('#waitroom').toggleClass('openWaitroomOption');
         },
         toggleFaceDetection: function () {
-          $(document.getElementById('faceDetect')).prop(
-            'checked',
-            !$(document.getElementById('faceDetect')).prop('checked')
-          );
+          const videoElement = document.getElementById(
+            'waitroomVideo'
+          ) as HTMLVideoElement;
+
+          // var faceRecognitionState = 1;
+          // var faceRecognitionStateCount = 0;
+
+          cla.app.faceRecognitionState = 1;
+          cla.app.faceRecognitionStateCount = 0;
+
+          function faceRelocateVoice(faceRecognitionState) {
+            cla.app.faceRecognitionStateCount = 0;
+
+            if (faceRecognitionState == 1)
+              speech('얼굴 인식이 시작되었습니다.');
+            else if (faceRecognitionState == -1)
+              speech('이탈. 아래쪽으로 이동하시오.');
+            else if (faceRecognitionState == -2)
+              speech('이탈. 위쪽으로 이동하시오.');
+            else if (faceRecognitionState == -3)
+              speech('이탈. 왼쪽으로 이동하시오.');
+            else if (faceRecognitionState == -4)
+              speech('이탈. 오른쪽으로 이동하시오.');
+            else if (faceRecognitionState == 0)
+              speech('정상 범위에 들어왔습니다.');
+          }
+
+          function onResults(results) {
+            if (
+              $(document.getElementById('waitroomFaceDetectionChkbox')).prop(
+                'checked'
+              ) &&
+              results.multiFaceLandmarks[0]
+            ) {
+              if (cla.app.faceRecognitionState == 1) {
+                console.log('Start Face Detection');
+                faceRelocateVoice(cla.app.faceRecognitionState);
+              }
+              if (results.multiFaceLandmarks[0][10].y <= 0.1) {
+                console.log('Face Out Direction: Up');
+                if (cla.app.faceRecognitionState !== -1) {
+                  if (cla.app.faceRecognitionState !== 1)
+                    window.speechSynthesis.cancel();
+                  cla.app.faceRecognitionState = -1;
+                  faceRelocateVoice(cla.app.faceRecognitionState);
+                } else cla.app.faceRecognitionStateCount++;
+              } else if (results.multiFaceLandmarks[0][10].y >= 0.6) {
+                console.log('Face Out Direction: Down');
+                if (cla.app.faceRecognitionState !== -2) {
+                  if (cla.app.faceRecognitionState !== 1)
+                    window.speechSynthesis.cancel();
+                  cla.app.faceRecognitionState = -2;
+                  faceRelocateVoice(cla.app.faceRecognitionState);
+                } else cla.app.faceRecognitionStateCount++;
+              } else if (results.multiFaceLandmarks[0][234].x <= 0.1) {
+                console.log('Face Out Direction: Right');
+                if (cla.app.faceRecognitionState !== -3) {
+                  if (cla.app.faceRecognitionState !== 1)
+                    window.speechSynthesis.cancel();
+                  cla.app.faceRecognitionState = -3;
+                  faceRelocateVoice(cla.app.faceRecognitionState);
+                } else cla.app.faceRecognitionStateCount++;
+              } else if (results.multiFaceLandmarks[0][454].x >= 0.9) {
+                console.log('Face Out Direction: Left');
+                if (cla.app.faceRecognitionState !== -4) {
+                  if (cla.app.faceRecognitionState !== 1)
+                    window.speechSynthesis.cancel();
+                  cla.app.faceRecognitionState = -4;
+                  faceRelocateVoice(cla.app.faceRecognitionState);
+                } else cla.app.faceRecognitionStateCount++;
+              } else if (
+                results.multiFaceLandmarks[0][10].y > 0.1 &&
+                results.multiFaceLandmarks[0][10].y < 0.6 &&
+                results.multiFaceLandmarks[0][234].x > 0.1 &&
+                results.multiFaceLandmarks[0][234].x < 0.9
+              ) {
+                console.log('Face in Normal Range');
+                if (cla.app.faceRecognitionState !== 0) {
+                  if (cla.app.faceRecognitionState !== 1)
+                    window.speechSynthesis.cancel();
+                  cla.app.faceRecognitionState = 0;
+                  faceRelocateVoice(cla.app.faceRecognitionState);
+                }
+              }
+            } else if (
+              !$(document.getElementById('waitroomFaceDetectionChkbox')).prop(
+                'cheked'
+              )
+            ) {
+              cla.app.faceRecognitionState = 1;
+            }
+            if (cla.app.faceRecognitionStateCount == 25) {
+              speech('아직 정상 범위에 들어오지 않았습니다');
+              faceRelocateVoice(cla.app.faceRecognitionState);
+            }
+          }
+
+          cla.app.waitroomFaceMesh.onResults(onResults);
+
+          if (cla.app.interval != null) {
+            clearInterval(cla.app.interval);
+            cla.app.interval = null;
+          } else if (this.cameraOn == true) {
+            cla.app.interval = setInterval(async () => {
+              await cla.app.waitroomFaceMesh.send({ image: videoElement });
+            }, 200);
+          }
         },
         toggleSubtitleExtract: function () {
           $(document.getElementById('subtitleExtract')).prop(
