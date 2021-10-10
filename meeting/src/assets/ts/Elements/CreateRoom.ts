@@ -94,6 +94,7 @@ export class CreateRoom {
         cameraOn: Cookie.getCookie(cla.cameraCookie) == 'false' ? false : true,
         hangouted: false,
         video: document.getElementById('waitroomVideo') as HTMLMediaElement,
+        isInWaitroom: true,
       },
       methods: {
         enterRoom: function () {
@@ -110,6 +111,7 @@ export class CreateRoom {
             this.showWaitroom = false;
           }
           this.stopVideo();
+          this.isInWaitroom = false;
         },
         setVideo: function () {
           if (!this.cameraOn) {
@@ -141,6 +143,9 @@ export class CreateRoom {
           }, 500);
         },
         stopVideo: function () {
+          if (localStream == null) {
+            return;
+          }
           this.video.pause();
           this.video.src = '';
           localStream.getTracks()[0].stop();
@@ -175,6 +180,33 @@ export class CreateRoom {
           } else {
             new Alert(Translator.get('cannotstartcamera'));
           }
+        },
+        toggleOptions: function () {
+          $('#waitroom').toggleClass('openWaitroomOption');
+        },
+        toggleFaceDetection: function () {
+          $(document.getElementById('faceDetect')).prop(
+            'checked',
+            !$(document.getElementById('faceDetect')).prop('checked')
+          );
+        },
+        toggleSubtitleExtract: function () {
+          $(document.getElementById('subtitleExtract')).prop(
+            'checked',
+            !$(document.getElementById('subtitleExtract')).prop('checked')
+          );
+        },
+        toggleLipMagnify: function () {
+          $(document.getElementById('libMagnify')).prop(
+            'checked',
+            !$(document.getElementById('libMagnify')).prop('checked')
+          );
+        },
+        toggleParticipantAlarm: function () {
+          $(document.getElementById('participantAlarm')).prop(
+            'checked',
+            !$(document.getElementById('participantAlarm')).prop('checked')
+          );
         },
       },
     });
