@@ -1,5 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
+import { useState } from 'react';
 import { TopBar } from '../components';
 
 const background = css`
@@ -44,6 +45,9 @@ const input = css`
   :focus {
     outline: none;
   }
+  ::placeholder {
+    color: black;
+  }
 `;
 const button = css`
   height: 50px;
@@ -80,8 +84,13 @@ const menu = css`
 `;
 
 function Home() {
+  const [isValid, setValid] = useState(true);
+
   const createRoom = () => {
     window.location.href = 'https://moayoung-b2596.web.app/';
+  };
+  const onChange = () => {
+    setValid(true);
   };
   const enterRoom = () => {
     const roomName = document.getElementById('roomName').value;
@@ -89,6 +98,9 @@ function Home() {
 
     if (roomName) {
       window.location.href = link;
+    } else {
+      alert('입장할 통화방의 이름을 입력하세요.');
+      setValid(false);
     }
   };
 
@@ -111,7 +123,9 @@ function Home() {
             type="text"
             id="roomName"
             css={input}
+            style={{ backgroundColor: isValid ? 'whitesmoke' : 'pink' }}
             placeholder="통화방 이름 입력"
+            onChange={onChange}
             autoFocus
             required
           />
