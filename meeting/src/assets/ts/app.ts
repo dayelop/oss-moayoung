@@ -37,18 +37,7 @@ import { Switch } from './Elements/Switch';
 import '@mediapipe/face_mesh';
 import '@mediapipe/drawing_utils';
 import '@mediapipe/camera_utils';
-import {
-  FaceMesh,
-  FACEMESH_FACE_OVAL,
-  FACEMESH_LEFT_EYE,
-  FACEMESH_LEFT_EYEBROW,
-  FACEMESH_LIPS,
-  FACEMESH_RIGHT_EYE,
-  FACEMESH_RIGHT_EYEBROW,
-  FACEMESH_TESSELATION,
-} from '@mediapipe/face_mesh';
-import { drawConnectors } from '@mediapipe/drawing_utils';
-import { Camera } from '@mediapipe/camera_utils';
+import { FaceMesh } from '@mediapipe/face_mesh';
 
 declare var Vue: any;
 
