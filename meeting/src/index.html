@@ -556,7 +556,6 @@
             autoplay
             muted
             playsinline
-            style="height: 100vh"
           ></video>
         </div>
 
@@ -590,6 +589,9 @@
         </div>
       </div>
       <div id="waitroomOptions">
+        <div class="closeBtn" v-on:click="toggleOptions" title="ctrl+o">
+          <span class="optionclose fas fa-times"></span>
+        </div>
         <div id="waitroomFeatureControl">
           <div class="switchbox">
             <p>얼굴 벗어남 감지</p>
