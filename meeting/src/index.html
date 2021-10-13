@@ -226,31 +226,37 @@
                 v-on:click="toogleMicrophone"
                 v-bind:class="{'fa-microphone': microphoneOn, 'fa-microphone-slash': !microphoneOn}"
                 class="microphone fas fa-microphone"
+                title="ctrl+m"
               ></span>
               <span
                 v-on:click="toogleCamera"
                 v-bind:class="{'fa-video': cameraOn, 'fa-video-slash': !cameraOn}"
                 class="camera fas fa-video"
+                title="ctrl+c"
               ></span>
               <span
                 v-on:click="toogleScreen"
                 v-bind:class="{'screenon': screenOn, 'disabled': screenSharingNotAllowed}"
                 class="screen fas fa-desktop"
+                title="ctrl+s"
               ></span>
               <span
                 v-on:click="toogleOption"
                 v-bind:class="{'optionon': optionOn, 'newMessage': hasNewMessage}"
                 class="option fas fa-bars"
+                title="ctrl+o"
               ></span>
               <span
                 v-on:click="toogleOption"
                 v-bind:class="{'optiononclose': optionOn}"
                 class="optionclose fas fa-times"
+                title="ctrl+o"
               ></span>
               <span
                 v-on:click="hangOut"
                 v-bind:class="{'green': hangouted}"
                 class="hangup fas fa-phone"
+                title="ctrl+e"
               ></span>
             </div>
           </div>
@@ -452,7 +458,7 @@
                   <!-- 편의 기능 제어 -->
                   <div class="switchbox">
                     <p>얼굴 벗어남 감지</p>
-                    <label class="switch">
+                    <label class="switch" title="ctrl+f">
                       <input
                         type="checkbox"
                         id="faceDetect"
@@ -463,14 +469,14 @@
                   </div>
                   <div class="switchbox">
                     <p>자막 추출</p>
-                    <label class="switch">
+                    <label class="switch" title="ctrl+b">
                       <input type="checkbox" id="subtitleExtract" />
                       <span class="slider round"></span>
                     </label>
                   </div>
                   <div class="switchbox">
                     <p>발화자 입 확대</p>
-                    <label class="switch">
+                    <label class="switch" title="ctrl+l">
                       <input
                         type="checkbox"
                         id="libMagnify"
@@ -482,7 +488,7 @@
                   </div>
                   <div class="switchbox">
                     <p>참여자 음성 알림</p>
-                    <label class="switch">
+                    <label class="switch" title="ctrl+a">
                       <input type="checkbox" id="participantAlarm" />
                       <span class="slider round"></span>
                     </label>
@@ -594,22 +600,26 @@
             v-on:click="toogleMicrophone"
             v-bind:class="{'fa-microphone': microphoneOn, 'fa-microphone-slash': !microphoneOn}"
             class="spanBtn microphone fas fa-microphone"
+            title="ctrl+m"
           >
           </span>
           <span
             v-on:click="toogleCamera"
             v-bind:class="{'fa-video': cameraOn, 'fa-video-slash': !cameraOn}"
             class="spanBtn camera fas fa-video"
+            title="ctrl+c"
           >
           </span>
           <span
             class="spanBtn option fas fa-bars"
             v-on:click="toggleOptions"
+            title="ctrl+o"
           ></span>
           <span
             v-on:click="enterRoom"
             v-bind:class="{'green': hangouted}"
             class="spanBtn hangup fas fa-phone"
+            title="ctrl+e"
           >
           </span>
         </div>
@@ -618,7 +628,7 @@
         <div id="waitroomFeatureControl">
           <div class="switchbox">
             <p>얼굴 벗어남 감지</p>
-            <label class="switch">
+            <label class="switch" title="ctrl+f">
               <input
                 id="waitroomFaceDetectionChkbox"
                 type="checkbox"
@@ -629,7 +639,7 @@
           </div>
           <div class="switchbox">
             <p>자막 추출</p>
-            <label class="switch">
+            <label class="switch" title="ctrl+b">
               <input
                 id="waitroomSubtitleExtractChkbox"
                 type="checkbox"
@@ -640,7 +650,7 @@
           </div>
           <div class="switchbox">
             <p>발화자 입 확대</p>
-            <label class="switch">
+            <label class="switch" title="ctrl+l">
               <input
                 id="waitroomLipMagnifyChkbox"
                 type="checkbox"
@@ -651,7 +661,7 @@
           </div>
           <div class="switchbox">
             <p>참여자 음성 알림</p>
-            <label class="switch">
+            <label class="switch" title="ctrl+a">
               <input
                 id="waitroomParticipantAlarmChkbox"
                 type="checkbox"
