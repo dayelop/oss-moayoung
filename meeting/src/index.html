@@ -10,7 +10,6 @@
     <meta name="description" content="@@description" />
     <meta name="keywords" content="@@keywords" />
     <title>모아영</title>
-    <!--title-->
     <meta property="og:title" content="@@title" />
     <meta property="og:description" content="@@description" />
     <meta property="og:image" content="@@image" />
@@ -145,9 +144,7 @@
           <div id="video-area">
             <div class="video-item" id="yourVideoArea">
               <div class="video-wrap">
-                <!-- Video.ts -->
                 <div class="video-inner-wrap">
-                  <!-- Video.ts -->
                   <video
                     class="input_video"
                     id="yourVideo"
@@ -155,7 +152,6 @@
                     muted
                     playsinline
                   ></video>
-                  <!-- 비디오 -->
                 </div>
               </div>
             </div>
@@ -164,15 +160,9 @@
               class="welcome-messages"
               v-bind:class="{'open': open}"
             >
-              <!-- elements > welcome.ts-->
-              <!-- #welcome -->
               <div class="welcome-inner">
                 <span class="close fas fa-times" v-on:click="close"></span>
-                <!-- welcome.ts에서 close 함수 -->
                 <div class="invite row" v-bind:class="{'show': showInvite}">
-                  <!-- elements > welcome.ts-->
-                  <!-- <div class="col-xs-12 invite-header">{{inviteotherwithlink}}:</div>-->
-                  <!-- elements > welcome.ts / translator.ts -> "Invite other with this link" 딱 방 만들면 나오는 알림창 -->
                   <div class="col-xs-12 invite-header">
                     아래의 링크로 초대해보세요 😎
                   </div>
@@ -191,7 +181,6 @@
                 </div>
                 <div class="setname row" v-bind:class="{'show': showSetName}">
                   <div class="col-xs-12 setname-header">{{yournamelabel}}:</div>
-                  <!-- elements > welcome.ts / 처음 들어왔을 때 이름 설정-->
                   <div class="col-xs-12 setname-content">
                     <input
                       v-model="name"
@@ -219,9 +208,6 @@
           </div>
           <div class="row center-xs" id="footer">
             <div class="col-xs-12" id="controls">
-              <!-- 마이크, 카메라, 화면 공유, 채팅창, 통화 시작 버튼 -->
-              <!-- controls.ts #controls-->
-              <!-- css : 속성 -->
               <span
                 v-on:click="toogleMicrophone"
                 v-bind:class="{'fa-microphone': microphoneOn, 'fa-microphone-slash': !microphoneOn}"
@@ -262,7 +248,6 @@
           </div>
         </div>
         <div id="sidebar">
-          <!-- option창 눌렀을 때 옆에 뜨는 창 -->
           <div class="tabs">
             <div class="tabs-header row">
               <div tab="partner" class="col-xs-3" data-lang="참여자">
@@ -282,11 +267,8 @@
               </div>
             </div>
             <div class="tabs-content">
-              <!-- tab 하나 하나 -->
               <div id="tab-partner">
-                <!-- participant 창  -->
                 <div id="invite" class="row">
-                  <!-- <div class="col-xs-12 invite-header">{{inviteotherwithlink}}:</div> -->
                   <div class="col-xs-12 invite-header">
                     아래의 링크로 초대해보세요 😎
                   </div>
@@ -309,7 +291,6 @@
               </div>
               <div id="tab-chat">
                 <div id="textchat">
-                  <!-- 채팅창 TextChat.ts #textchat-->
                   <div class="msger">
                     <div class="msger-chat"></div>
                     <div
@@ -371,11 +352,8 @@
                 <p class="subtitles"></p>
               </div>
               <div id="tab-settings">
-                <!-- 설정창 : 이름, 마이크 .. 등-->
                 <div id="userinfo">
-                  <!-- 이름 설정 -->
                   <div class="row">
-                    <!-- <label class="col-xs-6" >{{namelabel}}:</label> -->
                     <label class="col-xs-6">이름</label>
                     <input
                       class="col-xs-6"
@@ -386,9 +364,7 @@
                   </div>
                 </div>
                 <div id="devices">
-                  <!-- 마이크 설정 -->
                   <div class="row">
-                    <!-- <label class="col-xs-6" >{{microphonelabel}}:</label> -->
                     <label class="col-xs-6">마이크</label>
                     <select
                       class="col-xs-6"
@@ -405,8 +381,6 @@
                     </select>
                   </div>
                   <div class="row">
-                    <!-- 비디오 설정 -->
-                    <!-- <label class="col-xs-6" >{{videolabel}}:</label> -->
                     <label class="col-xs-6">카메라</label>
                     <select
                       class="col-xs-6"
@@ -426,8 +400,6 @@
                     class="row sound"
                     v-bind:class="{'allowed': soundAllowed}"
                   >
-                    <!-- 스피커 설정 -->
-                    <!-- <label class="col-xs-6" >{{speakerlabel}}:</label> -->
                     <label class="col-xs-6">스피커</label>
                     <select
                       class="col-xs-6"
@@ -455,7 +427,6 @@
                   </div>
                 </div>
                 <div id="settingSwitch">
-                  <!-- 편의 기능 제어 -->
                   <div class="switchbox">
                     <p>얼굴 벗어남 감지</p>
                     <label class="switch" title="ctrl+f">
@@ -521,19 +492,14 @@
       <span class="close fas fa-times" v-on:click="closeLightbox"></span>
     </div>
     <div id="create-room" v-bind:class="{'show': showDialog}">
-      <!-- 방 만드는 창 -->
       <div class="create-room-inner">
         <form v-on:submit.prevent="createRoom">
           <div class="title" style="text-align: center">모아영</div>
-          <!-- Video Chat -->
-          <!-- {{title}} -->
-          <!-- <div class="message" data-lang="통화방 이름을 입력하고, 통화를 시작해보세요 ❕">통화방 이름을 입력하고, 통화를 시작해보세요 ❕</div> -->
           <div class="message" style="text-align: center">
             통화방 이름을 입력하고,<br />
             통화방을 개설해보세요 ❕
           </div>
           <div class="room-input">
-            <!-- 방 이름 쓰는 칸 -->
             <input
               autofocus
               type="text"
@@ -548,7 +514,6 @@
             ></button>
           </div>
           <div class="button-area">
-            <!-- 방 만들기 버튼 -->
             <button type="submit" data-lang="통화 시작" class="button">
               Create
             </button>
