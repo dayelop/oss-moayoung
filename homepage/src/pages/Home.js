@@ -10,7 +10,7 @@ const background = css`
   justify-content: center;
 `;
 const container = css`
-  width: 1000px;
+  width: 65%;
   height: calc(100vh - 100px);
   display: flex;
   flex-direction: column;
@@ -28,6 +28,7 @@ const container = css`
   }
 `;
 const participate = css`
+  width: calc(400px + 82.4px);
   display: flex;
 `;
 const input = css`
