@@ -35,20 +35,7 @@ import { ChatServer } from './Exchange/ChatServer';
 import { Hotkey } from './Elements/Hotkey';
 import { Switch } from './Elements/Switch';
 import '@mediapipe/face_mesh';
-import '@mediapipe/drawing_utils';
-import '@mediapipe/camera_utils';
-import {
-  FaceMesh,
-  FACEMESH_FACE_OVAL,
-  FACEMESH_LEFT_EYE,
-  FACEMESH_LEFT_EYEBROW,
-  FACEMESH_LIPS,
-  FACEMESH_RIGHT_EYE,
-  FACEMESH_RIGHT_EYEBROW,
-  FACEMESH_TESSELATION,
-} from '@mediapipe/face_mesh';
-import { drawConnectors } from '@mediapipe/drawing_utils';
-import { Camera } from '@mediapipe/camera_utils';
+import { FaceMesh } from '@mediapipe/face_mesh';
 
 declare var Vue: any;
 
@@ -162,6 +149,7 @@ export class App {
   fisrtfacedetection: boolean = true;
 
   myfaceMesh: FaceMesh;
+  isStartFaceDetect: boolean;
   partnerfaceMesh: FaceMesh;
 
   featureOnOffVueObject: any;
@@ -199,6 +187,7 @@ export class App {
     this.participantAlarm = document.getElementById('participantAlarm');
     this.myfaceMesh = new FaceMesh({
       locateFile: (file) => {
+        console.log('Load FaceMesh');
         return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
       },
     });
@@ -207,6 +196,7 @@ export class App {
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5,
     });
+    this.isStartFaceDetect = true;
 
     this.featureOnOffVueObject = new Vue({
       el: '#settingSwitch',
@@ -215,13 +205,11 @@ export class App {
       },
       methods: {
         isFaceDetect: function () {
+          faceRecognitionState = 1;
+          faceRecognitionStateCount = 0;
           const videoElement = document.getElementsByClassName(
             'input_video'
           )[0] as HTMLVideoElement;
-
-          faceRecognitionState = 1;
-          faceRecognitionStateCount = 0;
-
           function onResults(results) {
             if (
               $(document.getElementById('faceDetect')).prop('checked') ==
@@ -290,14 +278,39 @@ export class App {
           }
 
           app.myfaceMesh.onResults(onResults);
-
-          if (app.interval != null) {
-            clearInterval(app.interval);
-            app.interval = null;
-          } else if (app.camerastate == true) {
+          var delay = 0;
+          if (app.fisrtfacedetection) {
+            //얼굴인식 켜는 순간 interval 설정하고 다른 곳에서는 interval 설정안함
+            //interval내에서 if문으로 처리하기 때문
+            app.fisrtfacedetection = false;
             app.interval = setInterval(async () => {
-              if (videoElement.videoWidth != 0) {
-                await app.myfaceMesh.send({ image: videoElement });
+              var face_input = document.getElementsByClassName(
+                'input_video'
+              )[0] as HTMLVideoElement;
+              if (face_input.videoHeight != 0) {
+                if (app.isStartFaceDetect) {
+                  //처음에 얼굴인식 시작할때 로드를 위해서 1번 send하고 5초 쉼
+                  if (delay == 0) {
+                    console.log('Start 5s Delay');
+                    //5초 쉬기 전에 한번 send하고
+                    app.myfaceMesh.initialize();
+                  }
+                  delay += 1; //0.2초마다 interval 실행하기 때문에 delay가 25를 넘는 순간이 5초가 됨
+                  if (delay > 25) {
+                    console.log('Finish 5s Delay');
+                    app.isStartFaceDetect = false;
+                  }
+                } else {
+                  if (
+                    app.camerastate &&
+                    $(document.getElementById('faceDetect')).prop('checked') ==
+                      true
+                  ) {
+                    await app.myfaceMesh.send({
+                      image: face_input,
+                    });
+                  }
+                }
               }
             }, 200);
           }
@@ -308,88 +321,7 @@ export class App {
   }
 
   toggleCameraInApp(isCameraOn) {
-    this.camerastate = isCameraOn;
-    const videoElement = document.getElementsByClassName(
-      'input_video'
-    )[0] as HTMLVideoElement;
-
-    faceRecognitionState = 1;
-    faceRecognitionStateCount = 0;
-
-    function onResults(results) {
-      if (
-        $(document.getElementById('faceDetect')).prop('checked') == true &&
-        results.multiFaceLandmarks[0]
-      ) {
-        if (faceRecognitionState == 1) {
-          console.log('Start Face Detection');
-          faceRelocateVoice(faceRecognitionState);
-        }
-        if (results.multiFaceLandmarks[0][10].y <= 0.1) {
-          console.log('Face Out Direction: Up');
-          if (faceRecognitionState !== -1) {
-            if (faceRecognitionState !== 1) window.speechSynthesis.cancel();
-            faceRecognitionState = -1;
-            faceRelocateVoice(faceRecognitionState);
-          } else faceRecognitionStateCount++;
-        } else if (results.multiFaceLandmarks[0][10].y >= 0.6) {
-          console.log('Face Out Direction: Down');
-          if (faceRecognitionState !== -2) {
-            if (faceRecognitionState !== 1) window.speechSynthesis.cancel();
-            faceRecognitionState = -2;
-            faceRelocateVoice(faceRecognitionState);
-          } else faceRecognitionStateCount++;
-        } else if (results.multiFaceLandmarks[0][234].x <= 0.1) {
-          console.log('Face Out Direction: Right');
-          if (faceRecognitionState !== -3) {
-            if (faceRecognitionState !== 1) window.speechSynthesis.cancel();
-            faceRecognitionState = -3;
-            faceRelocateVoice(faceRecognitionState);
-          } else faceRecognitionStateCount++;
-        } else if (results.multiFaceLandmarks[0][454].x >= 0.9) {
-          console.log('Face Out Direction: Left');
-          if (faceRecognitionState !== -4) {
-            if (faceRecognitionState !== 1) window.speechSynthesis.cancel();
-            faceRecognitionState = -4;
-            faceRelocateVoice(faceRecognitionState);
-          } else faceRecognitionStateCount++;
-        } else if (
-          results.multiFaceLandmarks[0][10].y > 0.1 &&
-          results.multiFaceLandmarks[0][10].y < 0.6 &&
-          results.multiFaceLandmarks[0][234].x > 0.1 &&
-          results.multiFaceLandmarks[0][234].x < 0.9
-        ) {
-          console.log('Face in Normal Range');
-          if (faceRecognitionState !== 0) {
-            if (faceRecognitionState !== 1) window.speechSynthesis.cancel();
-            faceRecognitionState = 0;
-            faceRelocateVoice(faceRecognitionState);
-          }
-        }
-      } else if (
-        $(document.getElementById('faceDetect')).prop('checked') !== true
-      ) {
-        faceRecognitionState = 1;
-      }
-      if (faceRecognitionStateCount == 25) {
-        speech('조금만 더 크게 이동해 주세요');
-        faceRelocateVoice(faceRecognitionState);
-      }
-    }
-
-    app.myfaceMesh.onResults(onResults);
-    if (isCameraOn == false) {
-      clearInterval(app.interval);
-      app.interval = null;
-    } else if (
-      $(document.getElementById('faceDetect')).prop('checked') == true
-    ) {
-      app.interval = setInterval(async () => {
-        if (videoElement.videoWidth != 0) {
-          await app.myfaceMesh.send({ image: videoElement });
-        }
-      }, 200);
-    }
+    app.camerastate = isCameraOn;
   }
 
   run() {
@@ -860,6 +792,7 @@ export class App {
 
   hangOut() {
     if (!this.closed) {
+      console.log('**************끝***********');
       history.back();
 
       this.closed = true;
