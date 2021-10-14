@@ -42,8 +42,6 @@ import { FaceMesh } from '@mediapipe/face_mesh';
 declare var Vue: any;
 
 var voices = [];
-// var faceRecognitionState;
-// var faceRecognitionStateCount;
 
 function setVoiceList() {
   voices = window.speechSynthesis.getVoices();
@@ -98,16 +96,75 @@ export function speech(txt) {
 }
 
 export function faceRelocateVoice() {
-  if (app.faceRecognitionState == 1) speech('얼굴 인식이 시작되었습니다.');
-  else if (app.faceRecognitionState == 0) speech('정상 범위에 들어왔습니다.');
-  else if (app.faceRecognitionState == -1)
-    speech('이탈. 아래쪽으로 이동하시오.');
-  else if (app.faceRecognitionState == -2) speech('이탈. 위쪽으로 이동하시오.');
-  else if (app.faceRecognitionState == -3) speech('이탈. 왼쪽으로 이동하시오.');
-  else if (app.faceRecognitionState == -4)
-    speech('이탈. 오른쪽으로 이동하시오.');
+  if (app.faceDetectionState == 1) speech('얼굴 인식이 시작되었습니다.');
+  else if (app.faceDetectionState == 0) speech('정상 범위에 들어왔습니다.');
+  else if (app.faceDetectionState == -1) speech('이탈. 아래쪽으로 이동하시오.');
+  else if (app.faceDetectionState == -2) speech('이탈. 위쪽으로 이동하시오.');
+  else if (app.faceDetectionState == -3) speech('이탈. 왼쪽으로 이동하시오.');
+  else if (app.faceDetectionState == -4) speech('이탈. 오른쪽으로 이동하시오.');
 
-  app.faceRecognitionStateCount = 0;
+  app.faceDetectionStateCount = 0;
+}
+
+function onResults(results) {
+  if (
+    $(document.getElementById('faceDetect')).prop('checked') == true &&
+    results.multiFaceLandmarks[0]
+  ) {
+    if (app.faceDetectionState == 1) {
+      console.log('Start Face Detection');
+      faceRelocateVoice();
+    }
+    if (results.multiFaceLandmarks[0][10].y <= 0.1) {
+      console.log('Face Out Direction: Up');
+      if (app.faceDetectionState !== -1) {
+        if (app.faceDetectionState !== 1) window.speechSynthesis.cancel();
+        app.faceDetectionState = -1;
+        faceRelocateVoice();
+      } else app.faceDetectionStateCount++;
+    } else if (results.multiFaceLandmarks[0][10].y >= 0.6) {
+      console.log('Face Out Direction: Down');
+      if (app.faceDetectionState !== -2) {
+        if (app.faceDetectionState !== 1) window.speechSynthesis.cancel();
+        app.faceDetectionState = -2;
+        faceRelocateVoice();
+      } else app.faceDetectionStateCount++;
+    } else if (results.multiFaceLandmarks[0][234].x <= 0.1) {
+      console.log('Face Out Direction: Right');
+      if (app.faceDetectionState !== -3) {
+        if (app.faceDetectionState !== 1) window.speechSynthesis.cancel();
+        app.faceDetectionState = -3;
+        faceRelocateVoice();
+      } else app.faceDetectionStateCount++;
+    } else if (results.multiFaceLandmarks[0][454].x >= 0.9) {
+      console.log('Face Out Direction: Left');
+      if (app.faceDetectionState !== -4) {
+        if (app.faceDetectionState !== 1) window.speechSynthesis.cancel();
+        app.faceDetectionState = -4;
+        faceRelocateVoice();
+      } else app.faceDetectionStateCount++;
+    } else if (
+      results.multiFaceLandmarks[0][10].y > 0.1 &&
+      results.multiFaceLandmarks[0][10].y < 0.6 &&
+      results.multiFaceLandmarks[0][234].x > 0.1 &&
+      results.multiFaceLandmarks[0][234].x < 0.9
+    ) {
+      console.log('Face in Normal Range');
+      if (app.faceDetectionState !== 0) {
+        if (app.faceDetectionState !== 1) window.speechSynthesis.cancel();
+        app.faceDetectionState = 0;
+        faceRelocateVoice();
+      }
+    }
+  } else if (
+    $(document.getElementById('faceDetect')).prop('checked') !== true
+  ) {
+    app.faceDetectionState = 1;
+  }
+  if (app.faceDetectionStateCount == 25) {
+    speech('아직 정상 범위에 들어오지 않았습니다');
+    faceRelocateVoice();
+  }
 }
 
 export class App {
@@ -152,12 +209,11 @@ export class App {
   firstlipdiv: boolean = true;
   fisrtfacedetection: boolean = true;
 
-  myfaceMesh: FaceMesh;
+  myFaceMesh: FaceMesh;
   waitroomFaceMesh: FaceMesh;
-  partnerfaceMesh: FaceMesh;
 
-  faceRecognitionState: any;
-  faceRecognitionStateCount: any;
+  faceDetectionState: any;
+  faceDetectionStateCount: any;
 
   featureOnOffVueObject: any;
   camerastate: boolean;
@@ -193,12 +249,12 @@ export class App {
     this.libMagnify = document.getElementById('libMagnify');
     this.participantAlarm = document.getElementById('participantAlarm');
 
-    this.myfaceMesh = new FaceMesh({
+    this.myFaceMesh = new FaceMesh({
       locateFile: (file) => {
         return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
       },
     });
-    this.myfaceMesh.setOptions({
+    this.myFaceMesh.setOptions({
       maxNumFaces: 1,
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5,
@@ -225,87 +281,20 @@ export class App {
             'input_video'
           )[0] as HTMLVideoElement;
 
-          app.faceRecognitionState = 1;
-          app.faceRecognitionStateCount = 0;
+          this.faceDetectionState = 1;
+          this.faceDetectionStateCount = 0;
 
-          function onResults(results) {
-            if (
-              $(document.getElementById('faceDetect')).prop('checked') ==
-                true &&
-              results.multiFaceLandmarks[0]
-            ) {
-              if (app.faceRecognitionState == 1) {
-                console.log('Start Face Detection');
-                faceRelocateVoice();
-              }
-              if (results.multiFaceLandmarks[0][10].y <= 0.1) {
-                console.log('Face Out Direction: Up');
-                if (app.faceRecognitionState !== -1) {
-                  if (app.faceRecognitionState !== 1)
-                    window.speechSynthesis.cancel();
-                  app.faceRecognitionState = -1;
-                  faceRelocateVoice();
-                } else app.faceRecognitionStateCount++;
-              } else if (results.multiFaceLandmarks[0][10].y >= 0.6) {
-                console.log('Face Out Direction: Down');
-                if (app.faceRecognitionState !== -2) {
-                  if (app.faceRecognitionState !== 1)
-                    window.speechSynthesis.cancel();
-                  app.faceRecognitionState = -2;
-                  faceRelocateVoice();
-                } else app.faceRecognitionStateCount++;
-              } else if (results.multiFaceLandmarks[0][234].x <= 0.1) {
-                console.log('Face Out Direction: Right');
-                if (app.faceRecognitionState !== -3) {
-                  if (app.faceRecognitionState !== 1)
-                    window.speechSynthesis.cancel();
-                  app.faceRecognitionState = -3;
-                  faceRelocateVoice();
-                } else app.faceRecognitionStateCount++;
-              } else if (results.multiFaceLandmarks[0][454].x >= 0.9) {
-                console.log('Face Out Direction: Left');
-                if (app.faceRecognitionState !== -4) {
-                  if (app.faceRecognitionState !== 1)
-                    window.speechSynthesis.cancel();
-                  app.faceRecognitionState = -4;
-                  faceRelocateVoice();
-                } else app.faceRecognitionStateCount++;
-              } else if (
-                results.multiFaceLandmarks[0][10].y > 0.1 &&
-                results.multiFaceLandmarks[0][10].y < 0.6 &&
-                results.multiFaceLandmarks[0][234].x > 0.1 &&
-                results.multiFaceLandmarks[0][234].x < 0.9
-              ) {
-                console.log('Face in Normal Range');
-                if (app.faceRecognitionState !== 0) {
-                  if (app.faceRecognitionState !== 1)
-                    window.speechSynthesis.cancel();
-                  app.faceRecognitionState = 0;
-                  faceRelocateVoice();
-                }
-              }
-            } else if (
-              $(document.getElementById('faceDetect')).prop('checked') !== true
-            ) {
-              app.faceRecognitionState = 1;
-            }
-            if (app.faceRecognitionStateCount == 25) {
-              speech('아직 정상 범위에 들어오지 않았습니다');
-              faceRelocateVoice();
-            }
-          }
-
-          app.myfaceMesh.onResults(onResults);
-
-          if (app.interval != null) {
+          app.myFaceMesh.onResults(onResults);
+          if (
+            app.camerastate &&
+            $(document.getElementById('faceDetect')).prop('checked') == true
+          ) {
+            app.interval = setInterval(async () => {
+              await app.myFaceMesh.send({ image: videoElement });
+            }, 200);
+          } else {
             clearInterval(app.interval);
             app.interval = null;
-          } else if (app.camerastate == true) {
-            app.interval = setInterval(async () => {
-              if (videoElement.videoWidth != 0) {
-                await app.myfaceMesh.send({ image: videoElement });
-              }
-            }, 200);
           }
         },
         isLipMagnify: function () {},
@@ -315,86 +304,26 @@ export class App {
 
   toggleCameraInApp(isCameraOn) {
     this.camerastate = isCameraOn;
+
     const videoElement = document.getElementsByClassName(
       'input_video'
     )[0] as HTMLVideoElement;
 
-    app.faceRecognitionState = 1;
-    app.faceRecognitionStateCount = 0;
+    app.faceDetectionState = 1;
+    app.faceDetectionStateCount = 0;
 
-    function onResults(results) {
-      if (
-        $(document.getElementById('faceDetect')).prop('checked') == true &&
-        results.multiFaceLandmarks[0]
-      ) {
-        if (app.faceRecognitionState == 1) {
-          console.log('Start Face Detection');
-          faceRelocateVoice();
-        }
-        if (results.multiFaceLandmarks[0][10].y <= 0.1) {
-          console.log('Face Out Direction: Up');
-          if (app.faceRecognitionState !== -1) {
-            if (app.faceRecognitionState !== 1) window.speechSynthesis.cancel();
-            app.faceRecognitionState = -1;
-            faceRelocateVoice();
-          } else app.faceRecognitionStateCount++;
-        } else if (results.multiFaceLandmarks[0][10].y >= 0.6) {
-          console.log('Face Out Direction: Down');
-          if (app.faceRecognitionState !== -2) {
-            if (app.faceRecognitionState !== 1) window.speechSynthesis.cancel();
-            app.faceRecognitionState = -2;
-            faceRelocateVoice();
-          } else app.faceRecognitionStateCount++;
-        } else if (results.multiFaceLandmarks[0][234].x <= 0.1) {
-          console.log('Face Out Direction: Right');
-          if (app.faceRecognitionState !== -3) {
-            if (app.faceRecognitionState !== 1) window.speechSynthesis.cancel();
-            app.faceRecognitionState = -3;
-            faceRelocateVoice();
-          } else app.faceRecognitionStateCount++;
-        } else if (results.multiFaceLandmarks[0][454].x >= 0.9) {
-          console.log('Face Out Direction: Left');
-          if (app.faceRecognitionState !== -4) {
-            if (app.faceRecognitionState !== 1) window.speechSynthesis.cancel();
-            app.faceRecognitionState = -4;
-            faceRelocateVoice();
-          } else app.faceRecognitionStateCount++;
-        } else if (
-          results.multiFaceLandmarks[0][10].y > 0.1 &&
-          results.multiFaceLandmarks[0][10].y < 0.6 &&
-          results.multiFaceLandmarks[0][234].x > 0.1 &&
-          results.multiFaceLandmarks[0][234].x < 0.9
-        ) {
-          console.log('Face in Normal Range');
-          if (app.faceRecognitionState !== 0) {
-            if (app.faceRecognitionState !== 1) window.speechSynthesis.cancel();
-            app.faceRecognitionState = 0;
-            faceRelocateVoice();
-          }
-        }
-      } else if (
-        $(document.getElementById('faceDetect')).prop('checked') !== true
-      ) {
-        app.faceRecognitionState = 1;
-      }
-      if (app.faceRecognitionStateCount == 25) {
-        speech('조금만 더 크게 이동해 주세요');
-        faceRelocateVoice();
-      }
-    }
+    app.myFaceMesh.onResults(onResults);
 
-    app.myfaceMesh.onResults(onResults);
-    if (isCameraOn == false) {
-      clearInterval(app.interval);
-      app.interval = null;
-    } else if (
+    if (
+      app.camerastate &&
       $(document.getElementById('faceDetect')).prop('checked') == true
     ) {
       app.interval = setInterval(async () => {
-        if (videoElement.videoWidth != 0) {
-          await app.myfaceMesh.send({ image: videoElement });
-        }
+        await app.myFaceMesh.send({ image: videoElement });
       }, 200);
+    } else {
+      clearInterval(app.interval);
+      app.interval = null;
     }
   }
 
