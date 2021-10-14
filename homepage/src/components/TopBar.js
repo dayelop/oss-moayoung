@@ -16,7 +16,7 @@ const background = css`
   justify-content: center;
 `;
 const container = css`
-  width: 1000px;
+  width: 65%;
   height: 100%;
   display: flex;
   justify-content: space-between;
