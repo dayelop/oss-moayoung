@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { TopBar } from '../components';
 
 const background = css`
@@ -10,7 +10,7 @@ const background = css`
   justify-content: center;
 `;
 const container = css`
-  width: 1000px;
+  width: 65%;
   height: calc(100vh - 100px);
   display: flex;
   flex-direction: column;
@@ -28,6 +28,7 @@ const container = css`
   }
 `;
 const participate = css`
+  width: calc(400px + 82.4px);
   display: flex;
 `;
 const input = css`
@@ -44,6 +45,9 @@ const input = css`
 
   :focus {
     outline: none;
+  }
+  ::placeholder {
+    color: black;
   }
 `;
 const button = css`
@@ -81,40 +85,25 @@ const menu = css`
 `;
 
 function Home() {
-  const [nameRoomUrl, setNameRoomUrl] = useState('');
-  const [placeholder, setPlaceholder] = useState('통화방 링크 입력');
-  const [roomUrl, setRoomUrl] = useState('');
-  const [toggle, setToggle] = useState(0);
-  const [value, setValue] = useState('다음');
+  const [isValid, setValid] = useState(true);
 
   const createRoom = () => {
     window.location.href = 'https://moayoung-b2596.web.app/';
   };
-  const linkInput = () => {
-    const link = document.getElementById('link');
+  const onChange = () => {
+    setValid(true);
+  };
+  const enterRoom = () => {
+    const roomName = document.getElementById('roomName').value;
+    const link = 'https://moayoung-b2596.web.app/' + roomName;
 
-    if (link.value) {
-      setPlaceholder('이름 입력');
-      setRoomUrl(roomUrl + link.value);
-      setToggle(!toggle);
-      setValue('참여');
-      link.type = 'text';
-      link.value = '';
+    if (roomName) {
+      window.location.href = link;
+    } else {
+      alert('입장할 통화방의 이름을 입력하세요.');
+      setValid(false);
     }
   };
-  const nameInput = () => {
-    const link = document.getElementById('link');
-
-    if (link.value) {
-      setNameRoomUrl(`${roomUrl}/${link.value}`);
-    }
-  };
-
-  useEffect(() => {
-    if (nameRoomUrl) {
-      window.open(nameRoomUrl);
-    }
-  }, [nameRoomUrl]);
 
   return (
     <div css={background}>
@@ -131,21 +120,17 @@ function Home() {
           + 새 통화방 생성
         </button>
         <div css={participate}>
-          <form>
-            <input
-              type="url"
-              id="link"
-              css={input}
-              placeholder={placeholder}
-              required
-            />
-            <input
-              type="submit"
-              value={value}
-              css={button}
-              onClick={!toggle ? linkInput : nameInput}
-            />
-          </form>
+          <input
+            type="text"
+            id="roomName"
+            css={input}
+            style={{ backgroundColor: isValid ? 'whitesmoke' : 'pink' }}
+            placeholder="통화방 이름 입력"
+            onChange={onChange}
+            autoFocus
+            required
+          />
+          <input type="submit" value="입장" css={button} onClick={enterRoom} />
         </div>
       </div>
     </div>
