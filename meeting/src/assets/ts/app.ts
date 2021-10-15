@@ -81,11 +81,6 @@ export function speech(txt) {
     }
   }
 
-  // if (!voiceFound) {
-  //   alert('Voice not found!');
-  //   return;
-  // }
-
   utterThis.lang = lang;
   utterThis.pitch = 1;
   utterThis.rate = 1.2; //속도
@@ -205,14 +200,17 @@ export class App {
   participantAlarm: HTMLElement;
 
   firstlipdiv: boolean = true;
-  fisrtfacedetection: boolean = true;
+  fisrtFaceDetection: boolean = true;
+  waitroomFirstFaceDetection: boolean = true;
 
-  myfaceMesh: FaceMesh;
-  isStartFaceDetect: boolean;
-  partnerfaceMesh: FaceMesh;
+  myFaceMesh: FaceMesh;
+  waitroomFaceMesh: FaceMesh;
 
   faceDetectionState: any;
   faceDetectionStateCount: any;
+
+  isStartFaceDetect: boolean;
+  partnerfaceMesh: FaceMesh;
 
   featureOnOffVueObject: any;
   camerastate: boolean;
@@ -250,11 +248,20 @@ export class App {
 
     this.myFaceMesh = new FaceMesh({
       locateFile: (file) => {
-        console.log('Load FaceMesh');
         return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
       },
     });
     this.myFaceMesh.setOptions({
+      maxNumFaces: 1,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    });
+    this.waitroomFaceMesh = new FaceMesh({
+      locateFile: (file) => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+      },
+    });
+    this.waitroomFaceMesh.setOptions({
       maxNumFaces: 1,
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5,
@@ -268,53 +275,51 @@ export class App {
       },
       methods: {
         isFaceDetect: function () {
-          faceRecognitionState = 1;
-          faceRecognitionStateCount = 0;
-          const videoElement = document.getElementsByClassName(
-            'input_video'
-          )[0] as HTMLVideoElement;
+          app.faceDetectionState = 1;
+          app.faceDetectionStateCount = 0;
+
           function onResults(results) {
             if (
               $(document.getElementById('faceDetect')).prop('checked') ==
                 true &&
               results.multiFaceLandmarks[0]
             ) {
-              if (faceRecognitionState == 1) {
+              if (app.faceDetectionState == 1) {
                 console.log('Start Face Detection');
                 faceRelocateVoice(faceRecognitionState);
               }
               if (results.multiFaceLandmarks[0][10].y <= 0.1) {
                 console.log('Face Out Direction: Up');
-                if (faceRecognitionState !== -1) {
-                  if (faceRecognitionState !== 1)
+                if (app.faceDetectionState !== -1) {
+                  if (app.faceDetectionState !== 1)
                     window.speechSynthesis.cancel();
-                  faceRecognitionState = -1;
-                  faceRelocateVoice(faceRecognitionState);
-                } else faceRecognitionStateCount++;
+                  app.faceDetectionState = -1;
+                  faceRelocateVoice();
+                } else app.faceDetectionStateCount++;
               } else if (results.multiFaceLandmarks[0][10].y >= 0.6) {
                 console.log('Face Out Direction: Down');
-                if (faceRecognitionState !== -2) {
-                  if (faceRecognitionState !== 1)
+                if (app.faceDetectionState !== -2) {
+                  if (app.faceDetectionState !== 1)
                     window.speechSynthesis.cancel();
-                  faceRecognitionState = -2;
-                  faceRelocateVoice(faceRecognitionState);
-                } else faceRecognitionStateCount++;
+                  app.faceDetectionState = -2;
+                  faceRelocateVoice();
+                } else app.faceDetectionStateCount++;
               } else if (results.multiFaceLandmarks[0][234].x <= 0.1) {
                 console.log('Face Out Direction: Right');
-                if (faceRecognitionState !== -3) {
-                  if (faceRecognitionState !== 1)
+                if (app.faceDetectionState !== -3) {
+                  if (app.faceDetectionState !== 1)
                     window.speechSynthesis.cancel();
-                  faceRecognitionState = -3;
-                  faceRelocateVoice(faceRecognitionState);
-                } else faceRecognitionStateCount++;
+                  app.faceDetectionState = -3;
+                  faceRelocateVoice();
+                } else app.faceDetectionStateCount++;
               } else if (results.multiFaceLandmarks[0][454].x >= 0.9) {
                 console.log('Face Out Direction: Left');
-                if (faceRecognitionState !== -4) {
-                  if (faceRecognitionState !== 1)
+                if (app.faceDetectionState !== -4) {
+                  if (app.faceDetectionState !== 1)
                     window.speechSynthesis.cancel();
-                  faceRecognitionState = -4;
-                  faceRelocateVoice(faceRecognitionState);
-                } else faceRecognitionStateCount++;
+                  app.faceDetectionState = -4;
+                  faceRelocateVoice();
+                } else app.faceDetectionStateCount++;
               } else if (
                 results.multiFaceLandmarks[0][10].y > 0.1 &&
                 results.multiFaceLandmarks[0][10].y < 0.6 &&
@@ -322,41 +327,44 @@ export class App {
                 results.multiFaceLandmarks[0][234].x < 0.9
               ) {
                 console.log('Face in Normal Range');
-                if (faceRecognitionState !== 0) {
-                  if (faceRecognitionState !== 1)
+                if (app.faceDetectionState !== 0) {
+                  if (app.faceDetectionState !== 1)
                     window.speechSynthesis.cancel();
-                  faceRecognitionState = 0;
-                  faceRelocateVoice(faceRecognitionState);
+                  app.faceDetectionState = 0;
+                  faceRelocateVoice();
                 }
               }
             } else if (
               $(document.getElementById('faceDetect')).prop('checked') !== true
             ) {
-              faceRecognitionState = 1;
+              app.faceDetectionState = 1;
             }
-            if (faceRecognitionStateCount == 25) {
-              speech('조금만 더 크게 이동해 주세요');
-              faceRelocateVoice(faceRecognitionState);
+            if (app.faceDetectionStateCount == 25) {
+              speech('아직 정상 범위에 들어오지 않았습니다');
+              faceRelocateVoice();
+              app.faceDetectionStateCount = 0;
             }
           }
 
-          app.myfaceMesh.onResults(onResults);
+          app.myFaceMesh.onResults(onResults);
           var delay = 0;
-          if (app.fisrtfacedetection) {
+
+          if (app.fisrtFaceDetection) {
             //얼굴인식 켜는 순간 interval 설정하고 다른 곳에서는 interval 설정안함
             //interval내에서 if문으로 처리하기 때문
-            app.fisrtfacedetection = false;
+            app.fisrtFaceDetection = false;
             app.interval = setInterval(async () => {
               var face_input = document.getElementsByClassName(
                 'input_video'
               )[0] as HTMLVideoElement;
+
               if (face_input.videoHeight != 0) {
                 if (app.isStartFaceDetect) {
                   //처음에 얼굴인식 시작할때 로드를 위해서 1번 send하고 5초 쉼
                   if (delay == 0) {
                     console.log('Start 5s Delay');
                     //5초 쉬기 전에 한번 send하고
-                    app.myfaceMesh.initialize();
+                    app.myFaceMesh.initialize();
                   }
                   delay += 1; //0.2초마다 interval 실행하기 때문에 delay가 25를 넘는 순간이 5초가 됨
                   if (delay > 25) {
@@ -369,7 +377,7 @@ export class App {
                     $(document.getElementById('faceDetect')).prop('checked') ==
                       true
                   ) {
-                    await app.myfaceMesh.send({
+                    await app.myFaceMesh.send({
                       image: face_input,
                     });
                   }
