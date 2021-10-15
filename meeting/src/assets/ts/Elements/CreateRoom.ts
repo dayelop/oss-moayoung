@@ -162,77 +162,6 @@ export class CreateRoom {
             new Alert(Translator.get('cannotstartmicrophone'));
           }
         },
-        onResults: function (results) {
-          if (
-            $(document.getElementById('waitroomFaceDetectionChkbox')).prop(
-              'checked'
-            ) == true &&
-            results.multiFaceLandmarks[0]
-          ) {
-            if (cla.app.faceDetectionState == 1) {
-              console.log('Start Face Detection');
-              faceRelocateVoice();
-            }
-
-            if (results.multiFaceLandmarks[0][10].y <= 0.1) {
-              console.log('Face Out Direction: Up');
-              if (cla.app.faceDetectionState !== -1) {
-                if (cla.app.faceDetectionState !== 1)
-                  window.speechSynthesis.cancel();
-                cla.app.faceDetectionState = -1;
-                faceRelocateVoice();
-              } else cla.app.faceDetectionStateCount++;
-            } else if (results.multiFaceLandmarks[0][10].y >= 0.6) {
-              console.log('Face Out Direction: Down');
-              if (cla.app.faceDetectionState !== -2) {
-                if (cla.app.faceDetectionState !== 1)
-                  window.speechSynthesis.cancel();
-                cla.app.faceDetectionState = -2;
-                faceRelocateVoice();
-              } else cla.app.faceDetectionStateCount++;
-            } else if (results.multiFaceLandmarks[0][234].x <= 0.1) {
-              console.log('Face Out Direction: Right');
-              if (cla.app.faceDetectionState !== -3) {
-                if (cla.app.faceDetectionState !== 1)
-                  window.speechSynthesis.cancel();
-                cla.app.faceDetectionState = -3;
-                faceRelocateVoice();
-              } else cla.app.faceDetectionStateCount++;
-            } else if (results.multiFaceLandmarks[0][454].x >= 0.9) {
-              console.log('Face Out Direction: Left');
-              if (cla.app.faceDetectionState !== -4) {
-                if (cla.app.faceDetectionState !== 1)
-                  window.speechSynthesis.cancel();
-                cla.app.faceDetectionState = -4;
-                faceRelocateVoice();
-              } else cla.app.faceDetectionStateCount++;
-            } else if (
-              results.multiFaceLandmarks[0][10].y > 0.1 &&
-              results.multiFaceLandmarks[0][10].y < 0.6 &&
-              results.multiFaceLandmarks[0][234].x > 0.1 &&
-              results.multiFaceLandmarks[0][234].x < 0.9
-            ) {
-              console.log('Face in Normal Range');
-              if (cla.app.faceDetectionState !== 0) {
-                if (cla.app.faceDetectionState !== 1)
-                  window.speechSynthesis.cancel();
-                cla.app.faceDetectionState = 0;
-                faceRelocateVoice();
-              }
-            }
-          } else if (
-            $(document.getElementById('waitroomFaceDetectionChkbox')).prop(
-              'checked'
-            ) !== true
-          ) {
-            cla.app.faceDetectionState = 1;
-            cla.app.faceDetectionStateCount = 0;
-          }
-          if (cla.app.faceDetectionStateCount == 25) {
-            speech('아직 정상 범위에 들어오지 않았습니다');
-            faceRelocateVoice();
-          }
-        },
         toogleCamera: function () {
           if (
             !cla.app.microphoneOnlyNotChangeable &&
@@ -251,29 +180,6 @@ export class CreateRoom {
             cla.app.sendMessageToAllPartners(cla.app.userinfo.getUserInfo());
           } else {
             new Alert(Translator.get('cannotstartcamera'));
-          }
-
-          const videoElement = document.getElementById(
-            'waitroomVideo'
-          ) as HTMLVideoElement;
-
-          cla.app.faceDetectionState = 1;
-          cla.app.faceDetectionStateCount = 0;
-
-          cla.app.waitroomFaceMesh.onResults(this.onResults);
-
-          if (
-            this.cameraOn &&
-            $(document.getElementById('waitroomFaceDetectionChkbox')).prop(
-              'checked'
-            ) == true
-          ) {
-            cla.app.interval = setInterval(async () => {
-              await cla.app.waitroomFaceMesh.send({ image: videoElement });
-            }, 200);
-          } else {
-            clearInterval(cla.app.interval);
-            cla.app.interval = null;
           }
         },
         toggleOptions: function () {
@@ -401,9 +307,6 @@ export class CreateRoom {
                 this.interval = null;
               }
             }, 200);
-          } else {
-            clearInterval(cla.app.interval);
-            cla.app.interval = null;
           }
         },
         toggleSubtitleExtract: function () {

@@ -99,67 +99,6 @@ export function faceRelocateVoice() {
   app.faceDetectionStateCount = 0;
 }
 
-function onResults(results) {
-  if (
-    $(document.getElementById('faceDetect')).prop('checked') == true &&
-    results.multiFaceLandmarks[0]
-  ) {
-    if (app.faceDetectionState == 1) {
-      console.log('Start Face Detection');
-      faceRelocateVoice();
-    }
-    if (results.multiFaceLandmarks[0][10].y <= 0.1) {
-      console.log('Face Out Direction: Up');
-      if (app.faceDetectionState !== -1) {
-        if (app.faceDetectionState !== 1) window.speechSynthesis.cancel();
-        app.faceDetectionState = -1;
-        faceRelocateVoice();
-      } else app.faceDetectionStateCount++;
-    } else if (results.multiFaceLandmarks[0][10].y >= 0.6) {
-      console.log('Face Out Direction: Down');
-      if (app.faceDetectionState !== -2) {
-        if (app.faceDetectionState !== 1) window.speechSynthesis.cancel();
-        app.faceDetectionState = -2;
-        faceRelocateVoice();
-      } else app.faceDetectionStateCount++;
-    } else if (results.multiFaceLandmarks[0][234].x <= 0.1) {
-      console.log('Face Out Direction: Right');
-      if (app.faceDetectionState !== -3) {
-        if (app.faceDetectionState !== 1) window.speechSynthesis.cancel();
-        app.faceDetectionState = -3;
-        faceRelocateVoice();
-      } else app.faceDetectionStateCount++;
-    } else if (results.multiFaceLandmarks[0][454].x >= 0.9) {
-      console.log('Face Out Direction: Left');
-      if (app.faceDetectionState !== -4) {
-        if (app.faceDetectionState !== 1) window.speechSynthesis.cancel();
-        app.faceDetectionState = -4;
-        faceRelocateVoice();
-      } else app.faceDetectionStateCount++;
-    } else if (
-      results.multiFaceLandmarks[0][10].y > 0.1 &&
-      results.multiFaceLandmarks[0][10].y < 0.6 &&
-      results.multiFaceLandmarks[0][234].x > 0.1 &&
-      results.multiFaceLandmarks[0][234].x < 0.9
-    ) {
-      console.log('Face in Normal Range');
-      if (app.faceDetectionState !== 0) {
-        if (app.faceDetectionState !== 1) window.speechSynthesis.cancel();
-        app.faceDetectionState = 0;
-        faceRelocateVoice();
-      }
-    }
-  } else if (
-    $(document.getElementById('faceDetect')).prop('checked') !== true
-  ) {
-    app.faceDetectionState = 1;
-  }
-  if (app.faceDetectionStateCount == 25) {
-    speech('아직 정상 범위에 들어오지 않았습니다');
-    faceRelocateVoice();
-  }
-}
-
 export class App {
   room: string;
   yourId: number = Math.floor(Math.random() * 1000000000);
@@ -286,7 +225,7 @@ export class App {
             ) {
               if (app.faceDetectionState == 1) {
                 console.log('Start Face Detection');
-                faceRelocateVoice(faceRecognitionState);
+                faceRelocateVoice();
               }
               if (results.multiFaceLandmarks[0][10].y <= 0.1) {
                 console.log('Face Out Direction: Up');
@@ -384,9 +323,6 @@ export class App {
                 }
               }
             }, 200);
-          } else {
-            clearInterval(app.interval);
-            app.interval = null;
           }
         },
         isLipMagnify: function () {},
