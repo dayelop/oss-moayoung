@@ -262,7 +262,7 @@ export class CreateRoom {
             }
           }
 
-          cla.app.waitroomFaceMesh.onResults(onResults);
+          cla.app.myFaceMesh.onResults(onResults);
           var delay = 0;
 
           if (cla.app.fisrtFaceDetection) {
@@ -280,7 +280,7 @@ export class CreateRoom {
                   if (delay == 0) {
                     console.log('Start 5s Delay');
                     //5초 쉬기 전에 한번 send하고
-                    cla.app.waitroomFaceMesh.initialize();
+                    cla.app.myFaceMesh.initialize();
                   }
                   delay += 1; //0.2초마다 interval 실행하기 때문에 delay가 25를 넘는 순간이 5초가 됨
                   if (delay > 25) {
@@ -294,7 +294,7 @@ export class CreateRoom {
                       document.getElementById('waitroomFaceDetectionChkbox')
                     ).prop('checked') == true
                   ) {
-                    await cla.app.waitroomFaceMesh.send({
+                    await cla.app.myFaceMesh.send({
                       image: face_input,
                     });
                   }

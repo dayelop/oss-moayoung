@@ -143,7 +143,6 @@ export class App {
   waitroomFirstFaceDetection: boolean = true;
 
   myFaceMesh: FaceMesh;
-  waitroomFaceMesh: FaceMesh;
 
   faceDetectionState: any;
   faceDetectionStateCount: any;
@@ -195,16 +194,7 @@ export class App {
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5,
     });
-    this.waitroomFaceMesh = new FaceMesh({
-      locateFile: (file) => {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
-      },
-    });
-    this.waitroomFaceMesh.setOptions({
-      maxNumFaces: 1,
-      minDetectionConfidence: 0.5,
-      minTrackingConfidence: 0.5,
-    });
+
     this.isStartFaceDetect = true;
 
     this.featureOnOffVueObject = new Vue({
