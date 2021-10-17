@@ -95,7 +95,7 @@ function Home() {
   };
   const enterRoom = () => {
     const roomName = document.getElementById('roomName').value;
-    const link = 'https://moayoung-b2596.web.app/' + roomName;
+    const link = 'https://moayoung-b2596.web.app/#' + roomName;
 
     if (roomName) {
       window.location.href = link;
