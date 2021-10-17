@@ -36,6 +36,7 @@ import { Hotkey } from './Elements/Hotkey';
 import { Switch } from './Elements/Switch';
 import '@mediapipe/face_mesh';
 import { FaceMesh } from '@mediapipe/face_mesh';
+import { Hands } from '@mediapipe/hands';
 
 declare var Vue: any;
 
@@ -89,7 +90,10 @@ function speech(txt) {
 }
 
 function faceRelocateVoice() {
-  if (app.faceDetectionState == 1) speech('얼굴 인식이 시작되었습니다.');
+  if (app.faceDetectionState == 1)
+    speech(
+      '얼굴 인식이 시작되었습니다. 앵글 범위를 찾기 위해 손을 천천히 흔들어보세요'
+    );
   else if (app.faceDetectionState == 0) speech('정상 범위에 들어왔습니다.');
   else if (app.faceDetectionState == -1) speech('이탈. 아래쪽으로 이동하시오.');
   else if (app.faceDetectionState == -2) speech('이탈. 위쪽으로 이동하시오.');
@@ -142,12 +146,16 @@ export class App {
   fisrtFaceDetection: boolean = true;
 
   myFaceMesh: FaceMesh;
+  isFaceDetectionSuccess: boolean;
+  isStartFaceDetect: boolean;
   faceDetectionState: any;
   faceDetectionStateCount: any;
   isInWaitroom: boolean = true;
   waitroomCameraOn: boolean = true;
 
-  isStartFaceDetect: boolean;
+  myHands: Hands;
+  isHandIn: boolean = false;
+
   partnerfaceMesh: FaceMesh;
 
   featureOnOffVueObject: any;
@@ -186,11 +194,25 @@ export class App {
 
     this.myFaceMesh = new FaceMesh({
       locateFile: (file) => {
+        console.log('얼굴인식 로드');
         return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
       },
     });
     this.myFaceMesh.setOptions({
       maxNumFaces: 1,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    });
+    this.myFaceMesh.initialize();
+
+    this.myHands = new Hands({
+      locateFile: (file) => {
+        console.log('손 로드');
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+      },
+    });
+    this.myHands.setOptions({
+      maxNumHands: 2,
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5,
     });
@@ -207,15 +229,47 @@ export class App {
           app.faceDetectionState = 1;
           app.faceDetectionStateCount = 0;
 
-          function onResults(results) {
+          //얼굴인식 기능 켜자마자 말하는걸로 하는걸로 바꿈
+          if (
+            $(document.getElementById('faceDetect')).prop('checked') == true &&
+            app.faceDetectionState == 1
+          ) {
+            console.log('Start Face Detection');
+            faceRelocateVoice();
+            app.faceDetectionState = 0; //디폴트로 우선 정상범위로 바꿈
+          }
+
+          function onResultsOnHands(results) {
+            if (
+              $(document.getElementById('faceDetect')).prop('checked') ==
+                true &&
+              results.multiHandLandmarks.length > 0
+            ) {
+              if (!app.isFaceDetectionSuccess && !app.isHandIn) {
+                app.isHandIn = true;
+                if (app.faceDetectionState !== 1)
+                  window.speechSynthesis.cancel();
+                speech(
+                  '손이 화면에 들어왔습니다. 손의 위치로 얼굴을 이동해주세요'
+                );
+              }
+            } else if (
+              $(document.getElementById('faceDetect')).prop('checked') ==
+                true &&
+              results.multiHandLandmarks.length <= 0
+            ) {
+              app.isHandIn = false;
+            }
+          }
+          function onResultsOnFaceMesh(results) {
             if (
               $(document.getElementById('faceDetect')).prop('checked') ==
                 true &&
               results.multiFaceLandmarks[0]
             ) {
-              if (app.faceDetectionState == 1) {
-                console.log('Start Face Detection');
-                faceRelocateVoice();
+              app.isFaceDetectionSuccess = true;
+              if (app.isHandIn) {
+                window.speechSynthesis.cancel();
               }
               if (results.multiFaceLandmarks[0][10].y <= 0.1) {
                 console.log('Face Out Direction: Up');
@@ -263,6 +317,12 @@ export class App {
                   faceRelocateVoice();
                 }
               }
+            } else if (
+              $(document.getElementById('faceDetect')).prop('checked') ==
+                true &&
+              results.multiFaceLandmarks.length <= 0
+            ) {
+              app.isFaceDetectionSuccess = false;
             }
             if (app.faceDetectionStateCount == 25) {
               speech('아직 정상 범위에 들어오지 않았습니다');
@@ -271,7 +331,8 @@ export class App {
             }
           }
 
-          app.myFaceMesh.onResults(onResults);
+          app.myHands.onResults(onResultsOnHands);
+          app.myFaceMesh.onResults(onResultsOnFaceMesh);
           var delay = 0;
 
           if (app.fisrtFaceDetection) {
@@ -298,7 +359,7 @@ export class App {
                   if (delay == 0) {
                     console.log('Start 5s Delay');
                     //5초 쉬기 전에 한번 send하고
-                    app.myFaceMesh.initialize();
+                    app.myHands.initialize();
                   }
                   delay += 1; //0.2초마다 interval 실행하기 때문에 delay가 25를 넘는 순간이 5초가 됨
                   if (delay > 25) {
@@ -311,6 +372,9 @@ export class App {
                     $(document.getElementById('faceDetect')).prop('checked') ==
                       true
                   ) {
+                    await app.myHands.send({
+                      image: face_input,
+                    });
                     await app.myFaceMesh.send({
                       image: face_input,
                     });
