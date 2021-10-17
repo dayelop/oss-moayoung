@@ -32,30 +32,15 @@ import { IceServers } from './Utils/IceServers';
 import { Sounds, TTS } from './Utils/Sounds';
 import { Settings } from './Utils/Settings';
 import { ChatServer } from './Exchange/ChatServer';
-import { HotkeyTest } from '../js/HotkeyTest';
+import { Hotkey } from './Elements/Hotkey';
 import { Switch } from './Elements/Switch';
 import '@mediapipe/face_mesh';
-import '@mediapipe/drawing_utils';
-import '@mediapipe/camera_utils';
-import {
-  FaceMesh,
-  FACEMESH_FACE_OVAL,
-  FACEMESH_LEFT_EYE,
-  FACEMESH_LEFT_EYEBROW,
-  FACEMESH_LIPS,
-  FACEMESH_RIGHT_EYE,
-  FACEMESH_RIGHT_EYEBROW,
-  FACEMESH_TESSELATION,
-} from '@mediapipe/face_mesh';
-import { drawConnectors } from '@mediapipe/drawing_utils';
-import { Camera } from '@mediapipe/camera_utils';
-import { TypePredicateKind } from 'typescript';
+import { FaceMesh } from '@mediapipe/face_mesh';
+import { Hands } from '@mediapipe/hands';
 
 declare var Vue: any;
 
 var voices = [];
-var faceRecognitionState;
-var faceRecognitionStateCount;
 
 function setVoiceList() {
   voices = window.speechSynthesis.getVoices();
@@ -97,11 +82,6 @@ function speech(txt) {
     }
   }
 
-  // if (!voiceFound) {
-  //   alert('Voice not found!');
-  //   return;
-  // }
-
   utterThis.lang = lang;
   utterThis.pitch = 1;
   utterThis.rate = 1.2; //속도
@@ -109,24 +89,19 @@ function speech(txt) {
   window.speechSynthesis.speak(utterThis);
 }
 
-function faceRelocateVoice(faceRecognitionState) {
-    
-  faceRecognitionStateCount = 0;
+function faceRelocateVoice() {
+  if (app.faceDetectionState == 1)
+    speech(
+      '얼굴 인식이 시작되었습니다. 앵글 범위를 찾기 위해 손을 천천히 흔들어보세요'
+    );
+  else if (app.faceDetectionState == 0) speech('정상 범위에 들어왔습니다.');
+  else if (app.faceDetectionState == -1) speech('이탈. 아래쪽으로 이동하시오.');
+  else if (app.faceDetectionState == -2) speech('이탈. 위쪽으로 이동하시오.');
+  else if (app.faceDetectionState == -3) speech('이탈. 왼쪽으로 이동하시오.');
+  else if (app.faceDetectionState == -4) speech('이탈. 오른쪽으로 이동하시오.');
 
-  if (faceRecognitionState == 1)
-    speech('얼굴 인식이 시작되었습니다.');
-  else if (faceRecognitionState == -1)
-    speech('이탈. 아래쪽으로 이동하시오.');
-  else if (faceRecognitionState == -2)
-    speech('이탈. 위쪽으로 이동하시오.');
-  else if (faceRecognitionState == -3)
-    speech('이탈. 왼쪽으로 이동하시오.');
-  else if (faceRecognitionState == -4)
-    speech('이탈. 오른쪽으로 이동하시오.');
-  else if (faceRecognitionState == 0)
-    speech('정상 범위에 들어왔습니다.');
+  app.faceDetectionStateCount = 0;
 }
-
 
 export class App {
   room: string;
@@ -160,7 +135,7 @@ export class App {
   stateIsSet: boolean = false;
   yourVideoElement: Video;
   partnerListElement: PartnerListElement;
-  hotkey: HotkeyTest;
+  hotkey: Hotkey;
   switch_: Switch;
 
   subtitleExtract: HTMLElement;
@@ -168,17 +143,24 @@ export class App {
   participantAlarm: HTMLElement;
 
   firstlipdiv: boolean = true;
-  fisrtfacedetection: boolean = true;
+  fisrtFaceDetection: boolean = true;
 
-  myfaceMesh: FaceMesh;
+  myFaceMesh: FaceMesh;
+  isFaceDetectionSuccess: boolean;
+  isStartFaceDetect: boolean;
+  faceDetectionState: any;
+  faceDetectionStateCount: any;
+  isInWaitroom: boolean = true;
+  waitroomCameraOn: boolean = true;
+
+  myHands: Hands;
+  isHandIn: boolean = false;
+
   partnerfaceMesh: FaceMesh;
-
-  FRAMES_PER_SECOND: number;
-  FRAME_MIN_TIME: number;
 
   featureOnOffVueObject: any;
   camerastate: boolean;
-  myrequest: any;
+  interval: any;
 
   constructor() {
     this.yourVideo = document.getElementById('yourVideo');
@@ -200,7 +182,7 @@ export class App {
     this.noInternet = new NoInternet(this);
     this.welcome = new Welcome(this);
     this.videogrid = new Videogrid();
-    this.hotkey = new HotkeyTest(this);
+    this.hotkey = new Hotkey(this);
     this.switch_ = new Switch(this);
     this.videogrid.init();
 
@@ -210,20 +192,32 @@ export class App {
     this.libMagnify = document.getElementById('libMagnify');
     this.participantAlarm = document.getElementById('participantAlarm');
 
-    this.FRAMES_PER_SECOND = 5;
-    this.FRAME_MIN_TIME =
-      (1000 / 60) * (60 / this.FRAMES_PER_SECOND) - (1000 / 60) * 0.5;
-
-    this.myfaceMesh = new FaceMesh({
+    this.myFaceMesh = new FaceMesh({
       locateFile: (file) => {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4/${file}`;
+        console.log('얼굴인식 로드');
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
       },
     });
-    this.myfaceMesh.setOptions({
+    this.myFaceMesh.setOptions({
       maxNumFaces: 1,
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5,
     });
+    this.myFaceMesh.initialize();
+
+    this.myHands = new Hands({
+      locateFile: (file) => {
+        console.log('손 로드');
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+      },
+    });
+    this.myHands.setOptions({
+      maxNumHands: 2,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    });
+
+    this.isStartFaceDetect = true;
 
     this.featureOnOffVueObject = new Vue({
       el: '#settingSwitch',
@@ -232,55 +226,83 @@ export class App {
       },
       methods: {
         isFaceDetect: function () {
-          const videoElement = document.getElementsByClassName(
-            'input_video'
-          )[0] as HTMLVideoElement;
+          app.faceDetectionState = 1;
+          app.faceDetectionStateCount = 0;
 
-          faceRecognitionState = 1;
-          faceRecognitionStateCount = 0;
+          //얼굴인식 기능 켜자마자 말하는걸로 하는걸로 바꿈
+          if (
+            $(document.getElementById('faceDetect')).prop('checked') == true &&
+            app.faceDetectionState == 1
+          ) {
+            console.log('Start Face Detection');
+            faceRelocateVoice();
+            app.faceDetectionState = 0; //디폴트로 우선 정상범위로 바꿈
+          }
 
-          function onResults(results) {
+          function onResultsOnHands(results) {
+            if (
+              $(document.getElementById('faceDetect')).prop('checked') ==
+                true &&
+              results.multiHandLandmarks.length > 0
+            ) {
+              if (!app.isFaceDetectionSuccess && !app.isHandIn) {
+                app.isHandIn = true;
+                if (app.faceDetectionState !== 1)
+                  window.speechSynthesis.cancel();
+                speech(
+                  '손이 화면에 들어왔습니다. 손의 위치로 얼굴을 이동해주세요'
+                );
+              }
+            } else if (
+              $(document.getElementById('faceDetect')).prop('checked') ==
+                true &&
+              results.multiHandLandmarks.length <= 0
+            ) {
+              app.isHandIn = false;
+            }
+          }
+          function onResultsOnFaceMesh(results) {
             if (
               $(document.getElementById('faceDetect')).prop('checked') ==
                 true &&
               results.multiFaceLandmarks[0]
             ) {
-              if (faceRecognitionState == 1) {
-                console.log('Start Face Detection');
-                faceRelocateVoice(faceRecognitionState);
+              app.isFaceDetectionSuccess = true;
+              if (app.isHandIn) {
+                window.speechSynthesis.cancel();
               }
               if (results.multiFaceLandmarks[0][10].y <= 0.1) {
                 console.log('Face Out Direction: Up');
-                if (faceRecognitionState !== -1) {
-                  if (faceRecognitionState !== 1)
+                if (app.faceDetectionState !== -1) {
+                  if (app.faceDetectionState !== 1)
                     window.speechSynthesis.cancel();
-                  faceRecognitionState = -1;
-                  faceRelocateVoice(faceRecognitionState);
-                } else faceRecognitionStateCount++;
+                  app.faceDetectionState = -1;
+                  faceRelocateVoice();
+                } else app.faceDetectionStateCount++;
               } else if (results.multiFaceLandmarks[0][10].y >= 0.6) {
                 console.log('Face Out Direction: Down');
-                if (faceRecognitionState !== -2) {
-                  if (faceRecognitionState !== 1)
+                if (app.faceDetectionState !== -2) {
+                  if (app.faceDetectionState !== 1)
                     window.speechSynthesis.cancel();
-                  faceRecognitionState = -2;
-                  faceRelocateVoice(faceRecognitionState);
-                } else faceRecognitionStateCount++;
+                  app.faceDetectionState = -2;
+                  faceRelocateVoice();
+                } else app.faceDetectionStateCount++;
               } else if (results.multiFaceLandmarks[0][234].x <= 0.1) {
                 console.log('Face Out Direction: Right');
-                if (faceRecognitionState !== -3) {
-                  if (faceRecognitionState !== 1)
+                if (app.faceDetectionState !== -3) {
+                  if (app.faceDetectionState !== 1)
                     window.speechSynthesis.cancel();
-                  faceRecognitionState = -3;
-                  faceRelocateVoice(faceRecognitionState);
-                } else faceRecognitionStateCount++;
+                  app.faceDetectionState = -3;
+                  faceRelocateVoice();
+                } else app.faceDetectionStateCount++;
               } else if (results.multiFaceLandmarks[0][454].x >= 0.9) {
                 console.log('Face Out Direction: Left');
-                if (faceRecognitionState !== -4) {
-                  if (faceRecognitionState !== 1)
+                if (app.faceDetectionState !== -4) {
+                  if (app.faceDetectionState !== 1)
                     window.speechSynthesis.cancel();
-                  faceRecognitionState = -4;
-                  faceRelocateVoice(faceRecognitionState);
-                } else faceRecognitionStateCount++;
+                  app.faceDetectionState = -4;
+                  faceRelocateVoice();
+                } else app.faceDetectionStateCount++;
               } else if (
                 results.multiFaceLandmarks[0][10].y > 0.1 &&
                 results.multiFaceLandmarks[0][10].y < 0.6 &&
@@ -288,57 +310,78 @@ export class App {
                 results.multiFaceLandmarks[0][234].x < 0.9
               ) {
                 console.log('Face in Normal Range');
-                if (faceRecognitionState !== 0) {
-                  if (faceRecognitionState !== 1)
+                if (app.faceDetectionState !== 0) {
+                  if (app.faceDetectionState !== 1)
                     window.speechSynthesis.cancel();
-                  faceRecognitionState = 0;
-                  faceRelocateVoice(faceRecognitionState);
+                  app.faceDetectionState = 0;
+                  faceRelocateVoice();
                 }
               }
             } else if (
-              $(document.getElementById('faceDetect')).prop('checked') !== true
-            ) {
-              faceRecognitionState = 1;
-            }
-            if (faceRecognitionStateCount == 25) {
-              speech('조금만 더 크게 이동해 주세요');
-              faceRelocateVoice(faceRecognitionState);
-            }
-          }
-
-          app.myfaceMesh.onResults(onResults);
-
-          var lastFrameTime = 0;
-          async function predict() {
-            if (videoElement.videoWidth != 0) {
-              await app.myfaceMesh.send({ image: videoElement });
-            }
-          }
-          var startdetect = async function (time) {
-            if (
               $(document.getElementById('faceDetect')).prop('checked') ==
                 true &&
-              app.camerastate == true
+              results.multiFaceLandmarks.length <= 0
             ) {
-              if (time - lastFrameTime < app.FRAME_MIN_TIME) {
-                app.myrequest = requestAnimationFrame(startdetect);
-                return;
+              app.isFaceDetectionSuccess = false;
+            }
+            if (app.faceDetectionStateCount == 25) {
+              speech('아직 정상 범위에 들어오지 않았습니다');
+              faceRelocateVoice();
+              app.faceDetectionStateCount = 0;
+            }
+          }
+
+          app.myHands.onResults(onResultsOnHands);
+          app.myFaceMesh.onResults(onResultsOnFaceMesh);
+          var delay = 0;
+
+          if (app.fisrtFaceDetection) {
+            //얼굴인식 켜는 순간 interval 설정하고 다른 곳에서는 interval 설정안함
+            //interval내에서 if문으로 처리하기 때문
+            app.fisrtFaceDetection = false;
+            app.interval = setInterval(async () => {
+              if (app.isInWaitroom) {
+                // 현재 대기방
+                var face_input = document.getElementById(
+                  'waitroomVideo'
+                ) as HTMLVideoElement;
+              } else {
+                var face_input = document.getElementsByClassName(
+                  'input_video'
+                )[0] as HTMLVideoElement;
               }
 
-              lastFrameTime = time;
-              app.myrequest = window.requestAnimationFrame(startdetect);
-            }
-            predict();
-          };
-
-          if (app.myrequest != null) {
-            console.log('끝냄****************************************');
-            cancelAnimationFrame(app.myrequest);
-            window.cancelAnimationFrame(app.myrequest);
-            app.myrequest = null;
-          } else if (app.camerastate == true) {
-            console.log('시작22****************************************');
-            app.myrequest = window.requestAnimationFrame(startdetect);
+              if (face_input == null) {
+                app.isInWaitroom = false;
+              } else if (face_input.videoHeight != 0) {
+                if (app.isStartFaceDetect) {
+                  //처음에 얼굴인식 시작할때 로드를 위해서 1번 send하고 5초 쉼
+                  if (delay == 0) {
+                    console.log('Start 5s Delay');
+                    //5초 쉬기 전에 한번 send하고
+                    app.myHands.initialize();
+                  }
+                  delay += 1; //0.2초마다 interval 실행하기 때문에 delay가 25를 넘는 순간이 5초가 됨
+                  if (delay > 25) {
+                    console.log('Finish 5s Delay');
+                    app.isStartFaceDetect = false;
+                  }
+                } else {
+                  if (
+                    (app.waitroomCameraOn || app.camerastate) &&
+                    $(document.getElementById('faceDetect')).prop('checked') ==
+                      true
+                  ) {
+                    await app.myHands.send({
+                      image: face_input,
+                    });
+                    await app.myFaceMesh.send({
+                      image: face_input,
+                    });
+                  }
+                }
+              }
+            }, 200);
           }
         },
         isLipMagnify: function () {},
@@ -347,130 +390,16 @@ export class App {
   }
 
   toggleCameraInApp(isCameraOn) {
-    this.camerastate = isCameraOn;
-    const videoElement = document.getElementsByClassName(
-      'input_video'
-    )[0] as HTMLVideoElement;
-
-    faceRecognitionState = 1;
-    faceRecognitionStateCount = 0;
-
-    function onResults(results) {
-      if (
-        $(document.getElementById('faceDetect')).prop('checked') ==
-          true &&
-        results.multiFaceLandmarks[0]
-      ) {
-        if (faceRecognitionState == 1) {
-          console.log('Start Face Detection');
-          faceRelocateVoice(faceRecognitionState);
-        }
-        if (results.multiFaceLandmarks[0][10].y <= 0.1) {
-          console.log('Face Out Direction: Up');
-          if (faceRecognitionState !== -1) {
-            if (faceRecognitionState !== 1)
-              window.speechSynthesis.cancel();
-            faceRecognitionState = -1;
-            faceRelocateVoice(faceRecognitionState);
-          } else faceRecognitionStateCount++;
-        } else if (results.multiFaceLandmarks[0][10].y >= 0.6) {
-          console.log('Face Out Direction: Down');
-          if (faceRecognitionState !== -2) {
-            if (faceRecognitionState !== 1)
-              window.speechSynthesis.cancel();
-            faceRecognitionState = -2;
-            faceRelocateVoice(faceRecognitionState);
-          } else faceRecognitionStateCount++;
-        } else if (results.multiFaceLandmarks[0][234].x <= 0.1) {
-          console.log('Face Out Direction: Right');
-          if (faceRecognitionState !== -3) {
-            if (faceRecognitionState !== 1)
-              window.speechSynthesis.cancel();
-            faceRecognitionState = -3;
-            faceRelocateVoice(faceRecognitionState);
-          } else faceRecognitionStateCount++;
-        } else if (results.multiFaceLandmarks[0][454].x >= 0.9) {
-          console.log('Face Out Direction: Left');
-          if (faceRecognitionState !== -4) {
-            if (faceRecognitionState !== 1)
-              window.speechSynthesis.cancel();
-            faceRecognitionState = -4;
-            faceRelocateVoice(faceRecognitionState);
-          } else faceRecognitionStateCount++;
-        } else if (
-          results.multiFaceLandmarks[0][10].y > 0.1 &&
-          results.multiFaceLandmarks[0][10].y < 0.6 &&
-          results.multiFaceLandmarks[0][234].x > 0.1 &&
-          results.multiFaceLandmarks[0][234].x < 0.9
-        ) {
-          console.log('Face in Normal Range');
-          if (faceRecognitionState !== 0) {
-            if (faceRecognitionState !== 1)
-              window.speechSynthesis.cancel();
-            faceRecognitionState = 0;
-            faceRelocateVoice(faceRecognitionState);
-          }
-        }
-      } else if (
-        $(document.getElementById('faceDetect')).prop('checked') !== true
-      ) {
-        faceRecognitionState = 1;
-      }
-      if (faceRecognitionStateCount == 25) {
-        speech('조금만 더 크게 이동해 주세요');
-        faceRelocateVoice(faceRecognitionState);
-      }
-    }
-
-    app.myfaceMesh.onResults(onResults);
-
-    var lastFrameTime = 0;
-    async function predict() {
-      if (videoElement.videoWidth != 0) {
-        await app.myfaceMesh.send({ image: videoElement });
-      }
-    }
-    var startdetect = async function (time) {
-      if (
-        $(document.getElementById('faceDetect')).prop('checked') == true &&
-        app.camerastate == true
-      ) {
-        if (time - lastFrameTime < app.FRAME_MIN_TIME) {
-          app.myrequest = requestAnimationFrame(startdetect);
-          return;
-        }
-
-        lastFrameTime = time;
-        app.myrequest = window.requestAnimationFrame(startdetect);
-      }
-      predict();
-    };
-
-    if (isCameraOn == false) {
-      console.log('****************************************끝냄');
-      cancelAnimationFrame(app.myrequest);
-      window.cancelAnimationFrame(app.myrequest);
-      app.myrequest = null;
-    } else if (
-      $(document.getElementById('faceDetect')).prop('checked') == true
-    ) {
-      console.log('****************************************시작');
-      app.myrequest = window.requestAnimationFrame(startdetect);
-    }
+    app.camerastate = isCameraOn;
   }
 
   run() {
-    if (location.hash && location.hash.includes('/')) {
-      this.userinfo.setUserInfo(
-        decodeURIComponent(`${location.hash.split('/')[1]}`)
-      );
-      this.room = decodeURIComponent(location.hash.split('/')[0].substring(1));
-      location.hash = this.room;
-      this.openConnection();
-    } else if (location.hash) {
-      this.room = decodeURIComponent(location.hash.substring(1));
-      this.openConnection();
+    if (location.hash) {
+      this.createRoom.waitroomVueObject.isHost = false;
+      this.createRoom.showCreateRoom();
+      this.createRoom.openDialog(this.yourName ? false : true);
     } else {
+      this.createRoom.waitroomVueObject.isHost = true;
       this.createRoom.showCreateRoom();
     }
     $('#main').show();
@@ -733,9 +662,9 @@ export class App {
     this.setStreamToPartner(this.partners[partnerId], true);
     this.videogrid.recalculateLayout();
 
-    if ($(this.participantAlarm).prop('checked') == true) {
-      TTS.playSound(TTS.newpartnersound, this.yourName);
-    }
+    setTimeout(() => {
+      TTS.playSound(TTS.newpartnersound, this.partners[partnerId].name);
+    }, 2000);
 
     if (app.firstlipdiv) {
       $('#lips-area').append(
@@ -932,6 +861,7 @@ export class App {
 
   hangOut() {
     if (!this.closed) {
+      console.log('**************끝***********');
       history.back();
 
       this.closed = true;
