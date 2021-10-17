@@ -162,6 +162,8 @@ export class CreateRoom {
           }
         },
         toogleCamera: function () {
+          cla.app.waitroomCameraOn = !cla.app.waitroomCameraOn;
+
           if (
             !cla.app.microphoneOnlyNotChangeable &&
             cla.app.localStream !== undefined
@@ -189,6 +191,8 @@ export class CreateRoom {
             'checked',
             !$(document.getElementById('faceDetect')).prop('checked')
           );
+
+          cla.app.featureOnOffVueObject.isFaceDetect();
         },
         toggleSubtitleExtract: function () {
           $(document.getElementById('subtitleExtract')).prop(
