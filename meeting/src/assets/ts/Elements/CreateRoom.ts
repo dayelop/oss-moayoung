@@ -1,4 +1,4 @@
-import { App, faceRelocateVoice, speech } from '../app';
+import { App } from '../app';
 import { Translator } from '../Utils/Translator';
 import { Settings } from '../Utils/Settings';
 import config from '../../../config.json';
@@ -12,7 +12,6 @@ export class CreateRoom {
   createRoomVueObject: any;
   setNameVueObject: any;
   waitroomVueObject: any;
-  interval: any;
 
   readonly microphoneCookie: string = 'microphoneOn';
   readonly cameraCookie: string = 'cameraOn';
@@ -163,6 +162,8 @@ export class CreateRoom {
           }
         },
         toogleCamera: function () {
+          cla.app.waitroomCameraOn = !cla.app.waitroomCameraOn;
+
           if (
             !cla.app.microphoneOnlyNotChangeable &&
             cla.app.localStream !== undefined
@@ -186,128 +187,12 @@ export class CreateRoom {
           $('#waitroom').toggleClass('openWaitroomOption');
         },
         toggleFaceDetection: function () {
-          cla.app.faceDetectionState = 1;
-          cla.app.faceDetectionStateCount = 0;
+          $(document.getElementById('faceDetect')).prop(
+            'checked',
+            !$(document.getElementById('faceDetect')).prop('checked')
+          );
 
-          function onResults(results) {
-            if (
-              $(document.getElementById('waitroomFaceDetectionChkbox')).prop(
-                'checked'
-              ) == true &&
-              results.multiFaceLandmarks[0]
-            ) {
-              if (cla.app.faceDetectionState == 1) {
-                console.log('Start Face Detection');
-                faceRelocateVoice();
-              }
-
-              if (results.multiFaceLandmarks[0][10].y <= 0.1) {
-                console.log('Face Out Direction: Up');
-                if (cla.app.faceDetectionState !== -1) {
-                  if (cla.app.faceDetectionState !== 1)
-                    window.speechSynthesis.cancel();
-                  cla.app.faceDetectionState = -1;
-                  faceRelocateVoice();
-                } else cla.app.faceDetectionStateCount++;
-              } else if (results.multiFaceLandmarks[0][10].y >= 0.6) {
-                console.log('Face Out Direction: Down');
-                if (cla.app.faceDetectionState !== -2) {
-                  if (cla.app.faceDetectionState !== 1)
-                    window.speechSynthesis.cancel();
-                  cla.app.faceDetectionState = -2;
-                  faceRelocateVoice();
-                } else cla.app.faceDetectionStateCount++;
-              } else if (results.multiFaceLandmarks[0][234].x <= 0.1) {
-                console.log('Face Out Direction: Right');
-                if (cla.app.faceDetectionState !== -3) {
-                  if (cla.app.faceDetectionState !== 1)
-                    window.speechSynthesis.cancel();
-                  cla.app.faceDetectionState = -3;
-                  faceRelocateVoice();
-                } else cla.app.faceDetectionStateCount++;
-              } else if (results.multiFaceLandmarks[0][454].x >= 0.9) {
-                console.log('Face Out Direction: Left');
-                if (cla.app.faceDetectionState !== -4) {
-                  if (cla.app.faceDetectionState !== 1)
-                    window.speechSynthesis.cancel();
-                  cla.app.faceDetectionState = -4;
-                  faceRelocateVoice();
-                } else cla.app.faceDetectionStateCount++;
-              } else if (
-                results.multiFaceLandmarks[0][10].y > 0.1 &&
-                results.multiFaceLandmarks[0][10].y < 0.6 &&
-                results.multiFaceLandmarks[0][234].x > 0.1 &&
-                results.multiFaceLandmarks[0][234].x < 0.9
-              ) {
-                console.log('Face in Normal Range');
-                if (cla.app.faceDetectionState !== 0) {
-                  if (cla.app.faceDetectionState !== 1)
-                    window.speechSynthesis.cancel();
-                  cla.app.faceDetectionState = 0;
-                  faceRelocateVoice();
-                }
-              }
-            } else if (
-              $(document.getElementById('waitroomFaceDetectionChkbox')).prop(
-                'checked'
-              ) !== true
-            ) {
-              cla.app.faceDetectionState = 1;
-              cla.app.faceDetectionStateCount = 0;
-            }
-            if (cla.app.faceDetectionStateCount == 25) {
-              speech('아직 정상 범위에 들어오지 않았습니다');
-              faceRelocateVoice();
-              cla.app.faceDetectionStateCount = 0;
-            }
-          }
-
-          cla.app.myFaceMesh.onResults(onResults);
-          var delay = 0;
-
-          if (cla.app.fisrtFaceDetection) {
-            //얼굴인식 켜는 순간 interval 설정하고 다른 곳에서는 interval 설정안함
-            //interval내에서 if문으로 처리하기 때문
-            cla.app.fisrtFaceDetection = false;
-            this.interval = setInterval(async () => {
-              var face_input = document.getElementById(
-                'waitroomVideo'
-              ) as HTMLVideoElement;
-
-              if (face_input != null) {
-                if (cla.app.isStartFaceDetect) {
-                  //처음에 얼굴인식 시작할때 로드를 위해서 1번 send하고 5초 쉼
-                  if (delay == 0) {
-                    console.log('Start 5s Delay');
-                    //5초 쉬기 전에 한번 send하고
-                    cla.app.myFaceMesh.initialize();
-                  }
-                  delay += 1; //0.2초마다 interval 실행하기 때문에 delay가 25를 넘는 순간이 5초가 됨
-                  if (delay > 25) {
-                    console.log('Finish 5s Delay');
-                    cla.app.isStartFaceDetect = false;
-                  }
-                } else {
-                  if (
-                    this.cameraOn &&
-                    $(
-                      document.getElementById('waitroomFaceDetectionChkbox')
-                    ).prop('checked') == true
-                  ) {
-                    await cla.app.myFaceMesh.send({
-                      image: face_input,
-                    });
-                  }
-                }
-              } else {
-                cla.app.fisrtFaceDetection = true;
-                cla.app.isStartFaceDetect = true;
-
-                clearInterval(this.interval);
-                this.interval = null;
-              }
-            }, 200);
-          }
+          cla.app.featureOnOffVueObject.isFaceDetect();
         },
         toggleSubtitleExtract: function () {
           $(document.getElementById('subtitleExtract')).prop(

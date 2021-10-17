@@ -51,7 +51,7 @@ if (window.speechSynthesis.onvoiceschanged !== undefined) {
   window.speechSynthesis.onvoiceschanged = setVoiceList;
 }
 
-export function speech(txt) {
+function speech(txt) {
   if (!window.speechSynthesis) {
     alert(
       '음성 재생을 지원하지 않는 브라우저입니다. 크롬, 파이어폭스 등의 최신 브라우저를 이용하세요.'
@@ -88,7 +88,7 @@ export function speech(txt) {
   window.speechSynthesis.speak(utterThis);
 }
 
-export function faceRelocateVoice() {
+function faceRelocateVoice() {
   if (app.faceDetectionState == 1) speech('얼굴 인식이 시작되었습니다.');
   else if (app.faceDetectionState == 0) speech('정상 범위에 들어왔습니다.');
   else if (app.faceDetectionState == -1) speech('이탈. 아래쪽으로 이동하시오.');
@@ -140,12 +140,12 @@ export class App {
 
   firstlipdiv: boolean = true;
   fisrtFaceDetection: boolean = true;
-  waitroomFirstFaceDetection: boolean = true;
 
   myFaceMesh: FaceMesh;
-
   faceDetectionState: any;
   faceDetectionStateCount: any;
+  isInWaitroom: boolean = true;
+  waitroomCameraOn: boolean = true;
 
   isStartFaceDetect: boolean;
   partnerfaceMesh: FaceMesh;
@@ -263,10 +263,6 @@ export class App {
                   faceRelocateVoice();
                 }
               }
-            } else if (
-              $(document.getElementById('faceDetect')).prop('checked') !== true
-            ) {
-              app.faceDetectionState = 1;
             }
             if (app.faceDetectionStateCount == 25) {
               speech('아직 정상 범위에 들어오지 않았습니다');
@@ -283,11 +279,20 @@ export class App {
             //interval내에서 if문으로 처리하기 때문
             app.fisrtFaceDetection = false;
             app.interval = setInterval(async () => {
-              var face_input = document.getElementsByClassName(
-                'input_video'
-              )[0] as HTMLVideoElement;
+              if (app.isInWaitroom) {
+                // 현재 대기방
+                var face_input = document.getElementById(
+                  'waitroomVideo'
+                ) as HTMLVideoElement;
+              } else {
+                var face_input = document.getElementsByClassName(
+                  'input_video'
+                )[0] as HTMLVideoElement;
+              }
 
-              if (face_input.videoHeight != 0) {
+              if (face_input == null) {
+                app.isInWaitroom = false;
+              } else if (face_input.videoHeight != 0) {
                 if (app.isStartFaceDetect) {
                   //처음에 얼굴인식 시작할때 로드를 위해서 1번 send하고 5초 쉼
                   if (delay == 0) {
@@ -302,7 +307,7 @@ export class App {
                   }
                 } else {
                   if (
-                    app.camerastate &&
+                    (app.waitroomCameraOn || app.camerastate) &&
                     $(document.getElementById('faceDetect')).prop('checked') ==
                       true
                   ) {
