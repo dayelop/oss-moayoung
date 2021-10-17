@@ -35,9 +35,7 @@ import { ChatServer } from './Exchange/ChatServer';
 import { Hotkey } from './Elements/Hotkey';
 import { Switch } from './Elements/Switch';
 import '@mediapipe/face_mesh';
-
 import { FaceMesh } from '@mediapipe/face_mesh';
-
 
 declare var Vue: any;
 
@@ -152,12 +150,9 @@ export class App {
   isStartFaceDetect: boolean;
   partnerfaceMesh: FaceMesh;
 
-  FRAMES_PER_SECOND: number;
-  FRAME_MIN_TIME: number;
-
   featureOnOffVueObject: any;
   camerastate: boolean;
-  myrequest: any;
+  interval: any;
 
   constructor() {
     this.yourVideo = document.getElementById('yourVideo');
@@ -189,10 +184,9 @@ export class App {
     this.libMagnify = document.getElementById('libMagnify');
     this.participantAlarm = document.getElementById('participantAlarm');
 
-
     this.myFaceMesh = new FaceMesh({
       locateFile: (file) => {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4/${file}`;
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
       },
     });
     this.myFaceMesh.setOptions({
@@ -280,7 +274,6 @@ export class App {
           app.myFaceMesh.onResults(onResults);
           var delay = 0;
 
-
           if (app.fisrtFaceDetection) {
             //얼굴인식 켜는 순간 interval 설정하고 다른 곳에서는 interval 설정안함
             //interval내에서 if문으로 처리하기 때문
@@ -324,21 +317,7 @@ export class App {
                   }
                 }
               }
-
-              lastFrameTime = time;
-              app.myrequest = window.requestAnimationFrame(startdetect);
-            }
-            predict();
-          };
-
-          if (app.myrequest != null) {
-            console.log('끝냄****************************************');
-            cancelAnimationFrame(app.myrequest);
-            window.cancelAnimationFrame(app.myrequest);
-            app.myrequest = null;
-          } else if (app.camerastate == true) {
-            console.log('시작22****************************************');
-            app.myrequest = window.requestAnimationFrame(startdetect);
+            }, 200);
           }
         },
         isLipMagnify: function () {},
