@@ -327,8 +327,9 @@ export class App {
             if (app.faceDetectionStateCount == 25) {
               speech('아직 정상 범위에 들어오지 않았습니다');
               faceRelocateVoice();
-              app.faceDetectionStateCount = 0;
+              app.faceDetectionStateCount = -20;
             }
+            console.log(app.faceDetectionStateCount);
           }
 
           app.myHands.onResults(onResultsOnHands);
