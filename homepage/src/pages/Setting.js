@@ -63,6 +63,7 @@ const title = css`
 
 const text = css`
   font-size: calc(0.5vw + 13px);
+  font-weight: bold;
 `;
 
 const Setting = ({ isSettingOn, setIsSettingOn }) => {
