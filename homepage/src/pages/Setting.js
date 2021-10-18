@@ -18,7 +18,6 @@ const settingContainer = css`
 `;
 
 const modalContainer = css`
-  //background-color: black;
   width: 600px;
   height: 500px;
   border-radius: 5% 5% 5% 5%;
@@ -26,41 +25,44 @@ const modalContainer = css`
   flex-direction: column;
   align-items: center;
   padding: 15px;
-  //color: white;
   background-color: white;
   color: gray;
   justify-content: center;
+
+  @media (max-width: 768px) {
+    width: 400px;
+    height: 400px;
+  }
 `;
 
-const optionContainer = css`
-  width: 300px;
-  height: 50px;
-  //background-color: red;
-  margin: 10px;
-  margin-right: 100px;
+const gridContainer = css`
+  display: grid;
+  grid-template-columns: 3fr 1fr;
   background-color: white;
+  width: 90%;
+  row-gap: 30px;
+  column-gap: 30px;
+
+  div {
+    background-color: transparent;
+  }
+
+  p {
+    background-color: transparent;
+    color: black;
+  }
 `;
 
-const switchContainer = css`
-  width: 50px;
-  height: 50px;
-  //background-color: blue;
-  margin: 10px;
+const title = css`
+  margin-bottom: 50px;
   background-color: white;
+  color: #0071e3;
+  font-size: calc(1vw + 15px);
+  font-weight: bold;
 `;
 
-const optionAndSwitchContainer = css`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  background-color: white;
-`;
-
-const textContainer = css`
-  //display: flex;
-  //flex-direction: column;
-  //justify-content: center;
-  //align-items: center;
+const text = css`
+  font-size: calc(0.5vw + 13px);
 `;
 
 const Setting = ({ isSettingOn, setIsSettingOn }) => {
@@ -95,95 +97,36 @@ const Modal = () => {
 
   return (
     <div css={modalContainer} onClick={(e) => e.stopPropagation()}>
-      <h1
-        style={{
-          marginBottom: '30px',
-          backgroundColor: 'white',
-          color: '#0071e3',
-        }}
-      >
-        편의 기능 제어
-      </h1>
+      <p css={title}>편의 기능 제어</p>
 
-      <div css={textContainer}>
-        <div css={optionAndSwitchContainer}>
-          <div css={optionContainer}>
-            <h2
-              css={css`
-                background-color: white;
-                color: gray;
-              `}
-            >
-              얼굴 벗어남 감지
-            </h2>
-          </div>
-          <div css={switchContainer}>
-            <Switch
-              isChecked={faceLocationAlarmToggle}
-              handleToggle={handleFaceLocationAlarmToggle}
-              id={1}
-            />
-          </div>
-        </div>
+      <div css={gridContainer}>
+        <p css={text}>얼굴 벗어남 감지</p>
+        <Switch
+          isChecked={faceLocationAlarmToggle}
+          handleToggle={handleFaceLocationAlarmToggle}
+          id={1}
+        />
 
-        <div css={optionAndSwitchContainer}>
-          <div css={optionContainer}>
-            <h2
-              css={css`
-                background-color: white;
-                color: gray;
-              `}
-            >
-              자막 추출
-            </h2>
-          </div>
-          <div css={switchContainer}>
-            <Switch
-              isChecked={lipReadToggle}
-              handleToggle={handleLipReadToggle}
-              id={2}
-            />
-          </div>
-        </div>
+        <p css={text}>자막 추출</p>
+        <Switch
+          isChecked={lipReadToggle}
+          handleToggle={handleLipReadToggle}
+          id={2}
+        />
 
-        <div css={optionAndSwitchContainer}>
-          <div css={optionContainer}>
-            <h2
-              css={css`
-                background-color: white;
-                color: gray;
-              `}
-            >
-              발화자 입 확대
-            </h2>
-          </div>
-          <div css={switchContainer}>
-            <Switch
-              isChecked={lipMagnifyToggle}
-              handleToggle={handleLipMagnifyToggle}
-              id={3}
-            />
-          </div>
-        </div>
-        <div css={optionAndSwitchContainer}>
-          <div css={optionContainer}>
-            <h2
-              css={css`
-                background-color: white;
-                color: gray;
-              `}
-            >
-              참여자 음성 알림
-            </h2>
-          </div>
-          <div css={switchContainer}>
-            <Switch
-              isChecked={participantAlarmToggle}
-              handleToggle={handleParticipantAlarmToggle}
-              id={7}
-            />
-          </div>
-        </div>
+        <p css={text}>발화자 입 확대</p>
+        <Switch
+          isChecked={lipMagnifyToggle}
+          handleToggle={handleLipMagnifyToggle}
+          id={3}
+        />
+
+        <p css={text}>참여자 음성 알림</p>
+        <Switch
+          isChecked={participantAlarmToggle}
+          handleToggle={handleParticipantAlarmToggle}
+          id={7}
+        />
       </div>
     </div>
   );

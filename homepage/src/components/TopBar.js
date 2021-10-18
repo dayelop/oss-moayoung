@@ -21,11 +21,28 @@ const container = css`
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  @media (max-width: 768px) {
+    width: 80%;
+  }
 `;
 const logo = css`
   cursor: pointer;
   font-size: 30px;
+
+  @media (max-width: 768px) {
+    font-size: 27px;
+  }
 `;
+
+const menuContainer = css`
+  & button:first-of-type {
+    @media (max-width: 600px) {
+      display: none;
+    }
+  }
+`;
+
 const menu = css`
   width: 125px;
   padding: 10px;
@@ -44,6 +61,10 @@ const menu = css`
     background-color: whitesmoke;
     font-family: 'S-CoreDream-7ExtraBold';
   }
+
+  @media (max-width: 600px) {
+    font-size: 17px;
+  }
 `;
 
 function TopBar() {
@@ -57,7 +78,7 @@ function TopBar() {
           <Link to="/" css={logo}>
             모아영
           </Link>
-          <div>
+          <div css={menuContainer}>
             <button css={menu} onClick={() => setIsHotkeyOn(!isHotkeyOn)}>
               단축키
             </button>
