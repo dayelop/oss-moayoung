@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
-import React from 'react';
+import React, { useRef } from 'react';
 
 const settingContainer = css`
   background-color: white;
@@ -17,7 +17,6 @@ const settingContainer = css`
 `;
 
 const modalContainer = css`
-  //background-color: black;
   width: 600px;
   height: 700px;
   border-radius: 5% 5% 5% 5%;
@@ -25,7 +24,6 @@ const modalContainer = css`
   flex-direction: column;
   align-items: center;
   padding: 15px;
-  //color: white;
   background-color: white;
   color: gray;
   justify-content: center;
@@ -37,24 +35,17 @@ const modalContainer = css`
 `;
 
 const textContainer = css`
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  row-gap: 25px;
+  background-color: white;
+  column-gap: 90px;
 `;
 
-const textDiv = css`
-  display: flex;
-  flex-direction: row;
+const title = css`
+  margin-bottom: 30px;
   background-color: white;
-  justify-content: space-between;
-
-  h2 {
-    margin: 13px;
-  }
-
-  h2:nth-of-type(1) {
-    color: gray;
-    margin-right: 60px;
-  }
+  color: #0071e3;
 `;
 
 const Hotkey = ({ isHotkeyOn, setIsHotkeyOn }) => {
@@ -65,7 +56,18 @@ const Hotkey = ({ isHotkeyOn, setIsHotkeyOn }) => {
   );
 };
 
+const Item = ({ title, hotkey }) => {
+  return (
+    <>
+      <h2>{title}</h2>
+      <h2>ctrl + {hotkey}</h2>
+    </>
+  );
+};
+
 const Modal = () => {
+  const _audio = useRef();
+
   React.useEffect(() => {
     keyevent();
   });
@@ -80,11 +82,9 @@ const Modal = () => {
     document.onkeydown = function (e) {
       if (e.which === 17) isCtrl = true;
 
-      if (e.which === 82 && isCtrl === true) {
-        console.log('replay');
-        const alarmAudio = document.getElementById('alarmAudio');
-        alarmAudio.currentTime = 0;
-        alarmAudio.play();
+      if (e.which === 73 && isCtrl === true) {
+        _audio.current.currentTime = 0;
+        _audio.current.play();
         return false;
       }
     };
@@ -92,67 +92,24 @@ const Modal = () => {
 
   return (
     <div css={modalContainer} onClick={(e) => e.stopPropagation()}>
-      <h1
-        style={{
-          marginBottom: '30px',
-          backgroundColor: 'white',
-          color: '#0071e3',
-        }}
-      >
-        단축키 알림
-      </h1>
-      <audio id="alarmAudio" src="/sounds/hotkeyAlarm.mp3" autoPlay></audio>{' '}
-      {/*autoplay */}
+      <h1 css={title}>단축키 알림</h1>
+      <audio
+        id="alarmAudio"
+        src="/sounds/hotkeyAlarm.mp3"
+        ref={_audio}
+        autoPlay
+      ></audio>
       <div css={textContainer}>
-        <div css={textDiv}>
-          <h2>마이크 ON/OFF</h2>
-          <h2>ctrl + m</h2>
-        </div>
-
-        <div css={textDiv}>
-          <h2>카메라 ON/OFF</h2>
-          <h2>ctrl + c</h2>
-        </div>
-
-        <div css={textDiv}>
-          <h2>화면 공유</h2>
-          <h2>ctrl + s</h2>
-        </div>
-
-        <div css={textDiv}>
-          <h2>옵션</h2>
-          <h2>ctrl + o</h2>
-        </div>
-
-        <div css={textDiv}>
-          <h2>통화방 퇴장</h2>
-          <h2>ctrl + e</h2>
-        </div>
-
-        <div css={textDiv}>
-          <h2>얼굴 벗어남 감지 ON/OFF</h2>
-          <h2>ctrl + f</h2>
-        </div>
-
-        <div css={textDiv}>
-          <h2>자막 추출 ON/OFF</h2>
-          <h2>ctrl + t</h2>
-        </div>
-
-        <div css={textDiv}>
-          <h2>발화자 입 확대 ON/OFF</h2>
-          <h2>ctrl + l</h2>
-        </div>
-
-        <div css={textDiv}>
-          <h2>참여자 음성 알림 ON/OFF</h2>
-          <h2>ctrl + a</h2>
-        </div>
-
-        <div css={textDiv}>
-          <h2 style={{ color: '#0071e3' }}>다시 듣기</h2>
-          <h2>ctrl + r</h2>
-        </div>
+        <Item title={'마이크 ON/OFF'} hotkey={'m'} />
+        <Item title={'카메라 ON/OFF'} hotkey={'c'} />
+        <Item title={'화면 공유'} hotkey={'s'} />
+        <Item title={'옵션'} hotkey={'o'} />
+        <Item title={'통화방 입/퇴장'} hotkey={'e'} />
+        <Item title={'얼굴 벗어남 감지 ON/OFF'} hotkey={'f'} />
+        <Item title={'자막 추출 ON/OFF'} hotkey={'b'} />
+        <Item title={'발화자 입 확대 ON/OFF'} hotkey={'l'} />
+        <Item title={'참여자 음성 알림 ON/OFF'} hotkey={'a'} />
+        <Item title={'다시 듣기'} hotkey={'i'} />
       </div>
     </div>
   );
