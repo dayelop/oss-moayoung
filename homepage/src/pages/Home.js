@@ -3,6 +3,9 @@ import { css } from '@emotion/react';
 import { useState } from 'react';
 import { TopBar } from '../components';
 
+import { initializeApp } from 'firebase/app';
+import { getDatabase, get, ref } from 'firebase/database';
+
 const background = css`
   height: 100vh;
   display: flex;
@@ -110,6 +113,16 @@ const menu = css`
 `;
 
 function Home() {
+  const firebaseConfig = {
+    apiKey: process.env.REACT_APP_API_KEY,
+    authDomain: process.env.REACT_APP_AUTH_DOMAIN,
+    databaseURL: process.env.REACT_APP_FIREBASE_DB_URL,
+    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  };
+  const app = initializeApp(firebaseConfig);
+  const database = getDatabase(app);
+  const roomList = ref(database, 'rooms');
+
   const [isValid, setValid] = useState(true);
 
   const createRoom = () => {
@@ -120,10 +133,20 @@ function Home() {
   };
   const enterRoom = () => {
     const roomName = document.getElementById('roomName').value;
-    const link = 'https://moayoung-b2596.web.app/' + roomName;
+    const link = 'https://moayoung-b2596.web.app/#' + roomName;
 
     if (roomName) {
-      window.location.href = link;
+      get(roomList)
+        .then((snapshot) => {
+          if (snapshot.exists() && roomName in snapshot.val()) {
+            window.location.href = link;
+          } else {
+            alert('존재하지 않는 통화방입니다.');
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     } else {
       alert('입장할 통화방의 이름을 입력하세요.');
       setValid(false);

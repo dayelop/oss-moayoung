@@ -72,7 +72,7 @@ export class Firebase implements IExchange {
       receiver: receiver,
       message: JSON.stringify(data),
     });
-    msg.remove();
+    // msg.remove();
   }
 
   readMessage(data, cla) {
