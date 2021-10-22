@@ -3,7 +3,6 @@ import { css } from '@emotion/react';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 
-import Setting from '../pages/Setting';
 import Hotkey from '../pages/Hotkey';
 
 const background = css`
@@ -68,7 +67,6 @@ const menu = css`
 `;
 
 function TopBar() {
-  const [isSettingOn, setIsSettingOn] = useState(false);
   const [isHotkeyOn, setIsHotkeyOn] = useState(false);
 
   return (
@@ -82,18 +80,9 @@ function TopBar() {
             <button css={menu} onClick={() => setIsHotkeyOn(!isHotkeyOn)}>
               단축키
             </button>
-            <button css={menu} onClick={() => setIsSettingOn(!isSettingOn)}>
-              편의기능
-            </button>
           </div>
         </div>
       </div>
-      {isSettingOn && (
-        <Setting
-          isSettingOn={isSettingOn}
-          setIsSettingOn={() => setIsSettingOn()}
-        />
-      )}
       {isHotkeyOn && (
         <Hotkey isHotkeyOn={isHotkeyOn} setIsHotkeyOn={() => setIsHotkeyOn()} />
       )}
