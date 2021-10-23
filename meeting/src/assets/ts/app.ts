@@ -90,9 +90,11 @@ function speech(txt) {
 }
 
 function faceRelocateVoice() {
-  if (app.faceDetectionState == 1)
+  if (app.faceDetectionState == -99)
+    speech('얼굴 인식 기능이 켜졌습니다. 5초 뒤 시작합니다.');
+  else if (app.faceDetectionState == 1)
     speech(
-      '얼굴 인식이 시작되었습니다. 앵글 범위를 찾기 위해 손을 천천히 흔들어보세요'
+      '얼굴인식을 시작합니다. 앵글 범위를 찾기 위해 손을 천천히 흔들어보세요'
     );
   else if (app.faceDetectionState == 0) speech('정상 범위에 들어왔습니다.');
   else if (app.faceDetectionState == -1) speech('이탈. 아래쪽으로 이동하시오.');
@@ -208,7 +210,8 @@ export class App {
     this.myHands = new Hands({
       locateFile: (file) => {
         console.log('손 로드');
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.3.1632795355
+        /${file}`;
       },
     });
     this.myHands.setOptions({
@@ -216,7 +219,6 @@ export class App {
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5,
     });
-
     this.isStartFaceDetect = true;
 
     this.featureOnOffVueObject = new Vue({
@@ -226,17 +228,17 @@ export class App {
       },
       methods: {
         isFaceDetect: function () {
-          app.faceDetectionState = 1;
+          app.faceDetectionState = -99;
           app.faceDetectionStateCount = 0;
 
           //얼굴인식 기능 켜자마자 말하는걸로 하는걸로 바꿈
           if (
             $(document.getElementById('faceDetect')).prop('checked') == true &&
-            app.faceDetectionState == 1
+            app.faceDetectionState == -99
           ) {
             console.log('Start Face Detection');
             faceRelocateVoice();
-            app.faceDetectionState = 0; //디폴트로 우선 정상범위로 바꿈
+            app.faceDetectionState = 1;
           }
 
           function onResultsOnHands(results) {
@@ -323,13 +325,13 @@ export class App {
               results.multiFaceLandmarks.length <= 0
             ) {
               app.isFaceDetectionSuccess = false;
+              app.faceDetectionState = -100;
             }
             if (app.faceDetectionStateCount == 25) {
               speech('아직 정상 범위에 들어오지 않았습니다');
               faceRelocateVoice();
               app.faceDetectionStateCount = -20;
             }
-            console.log(app.faceDetectionStateCount);
           }
 
           app.myHands.onResults(onResultsOnHands);
@@ -366,6 +368,15 @@ export class App {
                   if (delay > 25) {
                     console.log('Finish 5s Delay');
                     app.isStartFaceDetect = false;
+                    console.log(app.faceDetectionState);
+                    if (
+                      $(document.getElementById('faceDetect')).prop(
+                        'checked'
+                      ) == true &&
+                      app.faceDetectionState == 1
+                    ) {
+                      faceRelocateVoice();
+                    }
                   }
                 } else {
                   if (
@@ -862,7 +873,6 @@ export class App {
 
   hangOut() {
     if (!this.closed) {
-      console.log('**************끝***********');
       history.back();
 
       this.closed = true;
