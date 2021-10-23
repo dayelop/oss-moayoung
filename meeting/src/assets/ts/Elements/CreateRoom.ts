@@ -10,6 +10,7 @@ declare var Vue: any;
 export class CreateRoom {
   app: App;
   createRoomVueObject: any;
+  setNameVueObject: any;
   waitroomVueObject: any;
 
   readonly microphoneCookie: string = 'microphoneOn';
@@ -50,6 +51,7 @@ export class CreateRoom {
             cla.app.room = this.roomName;
             location.hash = this.roomName;
             this.showDialog = false;
+            cla.openDialog(this.yourName ? false : true);
             cla.waitroomVueObject.showWaitroom = true;
             cla.waitroomVueObject.setVideo();
             cla.app.devices.gotDevices(true);
@@ -61,24 +63,43 @@ export class CreateRoom {
       },
     });
 
+    this.setNameVueObject = new Vue({
+      el: '#waitroom-setname',
+      data: {
+        open: false,
+        showSetName: false,
+        name: '',
+      },
+      methods: {
+        changeUserinfo: function () {
+          cla.app.userinfo.setUserInfo(this.name);
+        },
+        close: function () {
+          if (!this.name) return;
+
+          cla.waitroomVueObject.userName = this.name;
+          cla.closeDialog();
+        },
+      },
+    });
+
     this.waitroomVueObject = new Vue({
       el: '#waitroom',
       data: {
-        showWaitroom: false,
         userName: '',
+        showWaitroom: false,
         isHost: true,
         microphoneOn:
           Cookie.getCookie(cla.microphoneCookie) == 'false' ? false : true,
         cameraOn: Cookie.getCookie(cla.cameraCookie) == 'false' ? false : true,
         hangouted: false,
         video: document.getElementById('waitroomVideo') as HTMLMediaElement,
+        isInWaitroom: true,
       },
       methods: {
         enterRoom: function () {
-          if (this.userName == '' || this.userName == null) {
-            return;
-          }
-          cla.app.userinfo.setUserInfo(this.userName);
+          if (!this.userName) return;
+
           if (this.isHost && this.roomName !== '') {
             cla.app.openConnection(true);
             cla.app.invite.resetLink();
@@ -90,6 +111,7 @@ export class CreateRoom {
             this.showWaitroom = false;
           }
           this.stopVideo();
+          this.isInWaitroom = false;
         },
         setVideo: function () {
           if (!this.cameraOn) {
@@ -121,6 +143,9 @@ export class CreateRoom {
           }, 500);
         },
         stopVideo: function () {
+          if (localStream == null) {
+            return;
+          }
           this.video.pause();
           this.video.src = '';
           localStream.getTracks()[0].stop();
@@ -137,6 +162,8 @@ export class CreateRoom {
           }
         },
         toogleCamera: function () {
+          cla.app.waitroomCameraOn = !cla.app.waitroomCameraOn;
+
           if (
             !cla.app.microphoneOnlyNotChangeable &&
             cla.app.localStream !== undefined
@@ -155,6 +182,35 @@ export class CreateRoom {
           } else {
             new Alert(Translator.get('cannotstartcamera'));
           }
+        },
+        toggleOptions: function () {
+          $('#waitroom').toggleClass('openWaitroomOption');
+        },
+        toggleFaceDetection: function () {
+          $(document.getElementById('faceDetect')).prop(
+            'checked',
+            !$(document.getElementById('faceDetect')).prop('checked')
+          );
+
+          cla.app.featureOnOffVueObject.isFaceDetect();
+        },
+        toggleSubtitleExtract: function () {
+          $(document.getElementById('subtitleExtract')).prop(
+            'checked',
+            !$(document.getElementById('subtitleExtract')).prop('checked')
+          );
+        },
+        toggleLipMagnify: function () {
+          $(document.getElementById('libMagnify')).prop(
+            'checked',
+            !$(document.getElementById('libMagnify')).prop('checked')
+          );
+        },
+        toggleParticipantAlarm: function () {
+          $(document.getElementById('participantAlarm')).prop(
+            'checked',
+            !$(document.getElementById('participantAlarm')).prop('checked')
+          );
         },
       },
     });
@@ -223,5 +279,21 @@ export class CreateRoom {
       !this.createRoomVueObject.cameraOn;
     this.app.partnerListElement.partnerListElementVueObject.cameraOff =
       !this.createRoomVueObject.cameraOn;
+  }
+
+  openDialog(noName: boolean) {
+    var cla = this;
+    this.setNameVueObject.showSetName = noName;
+
+    if (noName) {
+      setTimeout(function () {
+        cla.setNameVueObject.open = true;
+        $('#waitroom-setname .setname input').focus();
+      }, 100);
+    }
+  }
+
+  closeDialog() {
+    this.setNameVueObject.open = false;
   }
 }
