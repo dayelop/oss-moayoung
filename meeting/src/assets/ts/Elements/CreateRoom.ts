@@ -301,6 +301,8 @@ export class CreateRoom {
         cla.setNameVueObject.open = true;
         $('#waitroom-setname .setname input').focus();
       }, 100);
+    } else {
+      cla.waitroomVueObject.userName = Cookie.getCookie('name');
     }
   }
 
