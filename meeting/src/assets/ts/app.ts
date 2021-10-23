@@ -718,9 +718,11 @@ export class App {
     this.setStreamToPartner(this.partners[partnerId], true);
     this.videogrid.recalculateLayout();
 
-    setTimeout(() => {
-      TTS.playSound(TTS.newpartnersound, this.partners[partnerId].name);
-    }, 2000);
+    if ($(document.getElementById('participantAlarm')).prop('checked')) {
+      setTimeout(() => {
+        TTS.playSound(TTS.newpartnersound, this.partners[partnerId].name);
+      }, 2000);
+    }
 
     if (app.firstlipdiv) {
       $('#lips-area').append(
