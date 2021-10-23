@@ -208,7 +208,8 @@ export class App {
     this.myHands = new Hands({
       locateFile: (file) => {
         console.log('손 로드');
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.3.1632795355
+        /${file}`;
       },
     });
     this.myHands.setOptions({
@@ -216,7 +217,7 @@ export class App {
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5,
     });
-
+    this.myHands.initialize();
     this.isStartFaceDetect = true;
 
     this.featureOnOffVueObject = new Vue({
