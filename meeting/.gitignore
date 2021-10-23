@@ -3,5 +3,3 @@ node_modules
 nbproject
 .tscache
 src/assets/sass/_custom.scss
-src/config.json
-src/config.tmp.json
