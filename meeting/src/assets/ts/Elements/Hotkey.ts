@@ -30,6 +30,7 @@ export class Hotkey {
     const app = this.app;
     $(window).on('load', function () {
       var isCtrl = false;
+      var flag = false;
 
       document.onkeyup = function (e) {
         if (e.which == 17) isCtrl = false;
@@ -164,8 +165,17 @@ export class Hotkey {
 
         if (e.which == 73 && isCtrl == true) {
           //descr[i]be
-          TTS.playSound(
-            `단축키를 안내드리겠습니다
+          if (flag) {
+            window.speechSynthesis.cancel();
+            flag = false;
+            return false;
+          }
+
+          if (!flag) {
+            flag = true;
+            TTS.playSound(
+              `단축키를 안내드리겠습니다.
+          단축키 안내 음성을 정지하시려면 컨트롤 I를 다시 눌러주세요.
           마이크를 끄고 키시려면 컨트롤 M
           카메라를 끄고 키시려면 컨트롤 C
           화면을 공유하시려면 컨트롤 S
@@ -176,8 +186,9 @@ export class Hotkey {
           발화자의 입을 확대하는 기능을 끄고 키시려면 컨트롤 L
           참여자 음성 알림 기능을 끄고 키시려면 컨트롤 A를 눌러주세요
           이 음성을 다시 듣고 싶다면 컨트롤 I을 다시 눌러주세요 `,
-            ''
-          );
+              ''
+            );
+          }
         }
       };
     });

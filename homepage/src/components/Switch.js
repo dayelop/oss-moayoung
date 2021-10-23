@@ -1,8 +1,11 @@
 /** @jsxImportSource @emotion/react */
-import { css } from "@emotion/react";
-import React from "react";
+import { css } from '@emotion/react';
+import React from 'react';
 
 const switchContainer = css`
+  display: flex;
+  justify-content: end;
+
   .switch-checkbox {
     display: none;
   }
@@ -44,12 +47,12 @@ const Switch = (props) => {
     <div css={switchContainer}>
       <input
         type="checkbox"
-        className={"switch-checkbox"}
+        className={'switch-checkbox'}
         checked={isChecked}
         onChange={handleToggle}
         id={`switch-input${id}`}
       />
-      <label className={"switch-label"} htmlFor={`switch-input${id}`}>
+      <label className={'switch-label'} htmlFor={`switch-input${id}`}>
         <div className="ball" />
       </label>
     </div>

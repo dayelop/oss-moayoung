@@ -3,6 +3,9 @@ import { css } from '@emotion/react';
 import { useState } from 'react';
 import { TopBar } from '../components';
 
+import { initializeApp } from 'firebase/app';
+import { getDatabase, get, ref } from 'firebase/database';
+
 const background = css`
   height: 100vh;
   display: flex;
@@ -17,19 +20,32 @@ const container = css`
   justify-content: center;
   margin-top: 100px;
 
+  @media (max-width: 768px) {
+    width: 80%;
+  }
+
   & p:first-of-type {
     color: #eee;
     font-family: 'S-CoreDream-5Medium';
-    font-size: 32.5px;
+    font-size: calc(1vw + 13px);
   }
   & p:last-of-type {
     font-family: 'S-CoreDream-4Regular';
-    font-size: 25px;
+    font-size: calc(0.5vw + 12px);
   }
 `;
 const participate = css`
   width: calc(400px + 82.4px);
   display: flex;
+  font-size: calc(0.5vw + 12px);
+
+  @media (max-width: 768px) {
+    width: 400px;
+  }
+
+  @media (max-width: 600px) {
+    width: 100%;
+  }
 `;
 const input = css`
   width: 400px;
@@ -40,7 +56,7 @@ const input = css`
   border-bottom-left-radius: 30px;
   color: black;
   background-color: whitesmoke;
-  font-size: 20px;
+  font-size: calc(0.5vw + 12px);
   font-family: 'S-CoreDream-5Medium';
 
   :focus {
@@ -48,6 +64,10 @@ const input = css`
   }
   ::placeholder {
     color: black;
+  }
+
+  @media (max-width: 600px) {
+    width: 100%;
   }
 `;
 const button = css`
@@ -58,7 +78,7 @@ const button = css`
   border-bottom-right-radius: 30px;
   cursor: pointer;
   background-color: black;
-  font-size: 20px;
+  font-size: calc(0.5vw + 12px);
   font-family: 'S-CoreDream-5Medium';
 
   :hover {
@@ -75,16 +95,34 @@ const menu = css`
   border-radius: 30px;
   cursor: pointer;
   background-color: #0071e3;
-  font-size: 20px;
+  font-size: calc(0.5vw + 12px);
   font-family: 'S-CoreDream-5Medium';
   text-align: left;
 
   :hover {
     background-color: #0058b0;
   }
+
+  @media (max-width: 768px) {
+    width: 400px;
+  }
+
+  @media (max-width: 600px) {
+    width: 100%;
+  }
 `;
 
 function Home() {
+  const firebaseConfig = {
+    apiKey: process.env.REACT_APP_API_KEY,
+    authDomain: process.env.REACT_APP_AUTH_DOMAIN,
+    databaseURL: process.env.REACT_APP_FIREBASE_DB_URL,
+    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  };
+  const app = initializeApp(firebaseConfig);
+  const database = getDatabase(app);
+  const roomList = ref(database, 'rooms');
+
   const [isValid, setValid] = useState(true);
 
   const createRoom = () => {
@@ -95,10 +133,20 @@ function Home() {
   };
   const enterRoom = () => {
     const roomName = document.getElementById('roomName').value;
-    const link = 'https://moayoung-b2596.web.app/' + roomName;
+    const link = 'https://moayoung-b2596.web.app/#' + roomName;
 
     if (roomName) {
-      window.location.href = link;
+      get(roomList)
+        .then((snapshot) => {
+          if (snapshot.exists() && roomName in snapshot.val()) {
+            window.location.href = link;
+          } else {
+            alert('존재하지 않는 통화방입니다.');
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     } else {
       alert('입장할 통화방의 이름을 입력하세요.');
       setValid(false);

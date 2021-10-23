@@ -4,6 +4,7 @@ import { Settings } from '../Utils/Settings';
 import config from '../../../config.json';
 import { Cookie } from '../Utils/Cookie';
 import { Alert } from './Alert';
+import { TTS } from '../Utils/Sounds';
 
 declare var Vue: any;
 
@@ -55,6 +56,10 @@ export class CreateRoom {
             cla.waitroomVueObject.showWaitroom = true;
             cla.waitroomVueObject.setVideo();
             cla.app.devices.gotDevices(true);
+            TTS.playSound(
+              `단축키 음성 안내를 듣고 싶다면 컨트롤 i를 눌러주세요.`,
+              ''
+            );
           }
         },
         setRandomName: function () {
@@ -220,6 +225,12 @@ export class CreateRoom {
     if (this.waitroomVueObject.isHost) {
       this.createRoomVueObject.showDialog = show;
     } else {
+      setTimeout(() => {
+        TTS.playSound(
+          `단축키 음성 안내를 듣고 싶다면 컨트롤 i를 눌러주세요.`,
+          ''
+        );
+      }, 1000);
       this.waitroomVueObject.showWaitroom = true;
       this.waitroomVueObject.setVideo();
       this.app.devices.gotDevices(true);
