@@ -73,6 +73,7 @@ export class Firebase implements IExchange {
       message: JSON.stringify(data),
     });
     msg.remove();
+    ref.push({ room: this.room });
   }
 
   readMessage(data, cla) {
