@@ -114,13 +114,6 @@ export class Hotkey {
         if (e.which == 66 && isCtrl == true) {
           //su[b]title
           if (cla.app.createRoom.waitroomVueObject.isInWaitroom) {
-            $(document.getElementById('waitroomSubtitleExtractChkbox')).prop(
-              'checked',
-              !$(document.getElementById('waitroomSubtitleExtractChkbox')).prop(
-                'checked'
-              )
-            );
-            cla.app.createRoom.waitroomVueObject.toggleSubtitleExtract();
             return false;
           }
 
@@ -131,14 +124,6 @@ export class Hotkey {
         if (e.which == 76 && isCtrl == true) {
           //[l]ip
           if (cla.app.createRoom.waitroomVueObject.isInWaitroom) {
-            $(document.getElementById('waitroomLipMagnifyChkbox')).prop(
-              'checked',
-              !$(document.getElementById('waitroomLipMagnifyChkbox')).prop(
-                'checked'
-              )
-            );
-
-            cla.app.createRoom.waitroomVueObject.toggleLipMagnify();
             return false;
           }
 
