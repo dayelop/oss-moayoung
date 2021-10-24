@@ -291,15 +291,6 @@
                         v-on:click="closeExtra"
                       ></span>
                     </div>
-                    <div
-                      class="msger-emoji-area"
-                      v-bind:class="{'hidden': !emojiVisible}"
-                    >
-                      <span
-                        class="close fas fa-times"
-                        v-on:click="toogleEmoji"
-                      ></span>
-                    </div>
                     <form
                       class="msger-inputarea"
                       v-on:submit.prevent="sendMessage"
@@ -314,10 +305,6 @@
                         @keydown.enter.exact.prevent
                         @keyup.enter.exact="sendMessage"
                       ></textarea>
-                      <label
-                        class="msger-emoji fas fa-grin-alt"
-                        @click="toogleEmoji"
-                      ></label>
                       <label class="msger-imgupload fas fa-file-image">
                         <input type="file" accept="image/*" @change="addfile" />
                       </label>
