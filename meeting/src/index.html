@@ -572,7 +572,12 @@
         <div class="closeBtn" v-on:click="toggleOptions" title="ctrl+o">
           <span class="optionclose fas fa-times"></span>
         </div>
+        <div class="waitroom-option-name">
+          <p>이름</p>
+          <input v-model="userName" @blur="changeUserName" />
+        </div>
         <div id="waitroomFeatureControl">
+          <p>기능제어</p>
           <div class="switchbox">
             <p>얼굴 벗어남 감지</p>
             <label class="switch" title="ctrl+f">
