@@ -44,6 +44,30 @@ $waitroomOptionWidth: 350px;
 
   #waitroomOptions {
     display: none;
+
+    .waitroom-option-name {
+      margin-bottom: 20px;
+      box-shadow: 0px 1px 3px 0px grey;
+      border-radius: 7px;
+      padding: 10px;
+
+      p {
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      input {
+        width: 97%;
+        height: 34px;
+        font-size: 18px;
+        font-family: 'S-CoreDream-5Medium';
+        font-weight: 100;
+      }
+
+      input:focus {
+        outline: 0;
+      }
+    }
   }
 
   .closeBtn {
@@ -176,9 +200,14 @@ $waitroomOptionWidth: 350px;
   }
 
   #waitroomFeatureControl {
-    box-shadow: 1px 1px 5px 1px grey;
+    box-shadow: 0px 1px 3px 0px grey;
     border-radius: 7px;
     padding: 10px;
+
+    p {
+      font-size: 18px;
+      font-weight: bold;
+    }
 
     h2 {
       color: #0071e3;
@@ -203,8 +232,9 @@ $waitroomOptionWidth: 350px;
       align-items: center;
       p {
         margin-left: 3px;
-        font-size: 18px;
+        font-size: 16px;
         font-weight: bold;
+        color: #5a5a5a;
       }
     }
 

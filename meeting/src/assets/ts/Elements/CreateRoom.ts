@@ -205,6 +205,9 @@ export class CreateRoom {
             !$(document.getElementById('participantAlarm')).prop('checked')
           );
         },
+        changeUserName: function () {
+          cla.app.userinfo.setUserInfo(this.userName);
+        },
       },
     });
   }
