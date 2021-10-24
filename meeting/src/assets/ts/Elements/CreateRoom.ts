@@ -7,7 +7,11 @@ import { Alert } from './Alert';
 import { TTS } from '../Utils/Sounds';
 
 declare var Vue: any;
-
+function Mobile() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
+}
 export class CreateRoom {
   app: App;
   createRoomVueObject: any;
@@ -56,10 +60,12 @@ export class CreateRoom {
             cla.waitroomVueObject.showWaitroom = true;
             cla.waitroomVueObject.setVideo();
             cla.app.devices.gotDevices(true);
-            TTS.playSound(
-              `단축키 음성 안내를 듣고 싶다면 컨트롤 i를 눌러주세요.`,
-              ''
-            );
+            if (!Mobile()) {
+              TTS.playSound(
+                `단축키 음성 안내를 듣고 싶다면 컨트롤 i를 눌러주세요.`,
+                ''
+              );
+            }
           }
         },
         setRandomName: function () {
@@ -271,10 +277,12 @@ export class CreateRoom {
       this.createRoomVueObject.showDialog = show;
     } else {
       setTimeout(() => {
-        TTS.playSound(
-          `단축키 음성 안내를 듣고 싶다면 컨트롤 i를 눌러주세요.`,
-          ''
-        );
+        if (!Mobile()) {
+          TTS.playSound(
+            `단축키 음성 안내를 듣고 싶다면 컨트롤 i를 눌러주세요.`,
+            ''
+          );
+        }
       }, 2500);
       this.waitroomVueObject.showWaitroom = true;
       this.waitroomVueObject.setVideo();
