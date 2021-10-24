@@ -313,9 +313,7 @@ export class App {
                         ) == true &&
                         app.faceDetectionState == 1
                       ) {
-                        speech(
-                          '얼굴인식을 시작합니다. 앵글 범위를 찾기 위해 손을 천천히 흔들어보세요'
-                        );
+                        speech('얼굴인식을 시작합니다.');
                       }
                     }
                   } else {
