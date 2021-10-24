@@ -94,18 +94,7 @@ function Mobile() {
   );
 }
 function faceRelocateVoice() {
-  if (app.faceDetectionState == -99)
-    speech('얼굴 인식 기능이 켜졌습니다. 5초 뒤 시작합니다.');
-  else if (app.faceDetectionState == 1)
-    if (Mobile()) {
-      speech('얼굴인식을 시작합니다. 핸드폰을 움직여주세요');
-    } else {
-      speech(
-        '얼굴인식을 시작합니다. 앵글 범위를 찾기 위해 손을 천천히 흔들어보세요'
-      );
-    }
-  else if (app.faceDetectionState == 0) speech('정상 범위에 들어왔습니다.');
-  else if (app.faceDetectionState == -1) {
+  if (app.faceDetectionState == -1) {
     if (Mobile()) {
       speech('이탈. 핸드폰을 위로 움직이세요.');
     } else {
@@ -190,6 +179,7 @@ export class App {
 
   myHands: Hands;
   isHandIn: boolean = false;
+  isHandDetectionSpeaking: boolean = false;
 
   partnerfaceMesh: FaceMesh;
 
@@ -269,14 +259,86 @@ export class App {
           app.faceDetectionState = -99;
           app.faceDetectionStateCount = 0;
 
-          //얼굴인식 기능 켜자마자 말하는걸로 하는걸로 바꿈
           if (
-            $(document.getElementById('faceDetect')).prop('checked') == true &&
-            app.faceDetectionState == -99
+            ((app.isInWaitroom && app.waitroomCameraOn) ||
+              (!app.isInWaitroom && app.camerastate)) &&
+            $(document.getElementById('faceDetect')).prop('checked') == true
           ) {
-            console.log('Start Face Detection');
-            faceRelocateVoice();
-            app.faceDetectionState = 1;
+            if (app.faceDetectionState == -99) {
+              console.log('Start Face Detection');
+              speech('얼굴 인식 기능이 켜졌습니다. 5초 뒤 시작합니다.');
+              app.faceDetectionState = 1;
+            }
+
+            if (!Mobile()) {
+              app.myHands.onResults(onResultsOnHands);
+            }
+            app.myFaceMesh.onResults(onResultsOnFaceMesh);
+            var delay = 0;
+
+            if (app.fisrtFaceDetection) {
+              //얼굴인식 켜는 순간 interval 설정하고 다른 곳에서는 interval 설정안함
+              //interval내에서 if문으로 처리하기 때문
+              app.fisrtFaceDetection = false;
+              app.interval = setInterval(async () => {
+                if (app.isInWaitroom) {
+                  // 현재 대기방
+                  var face_input = document.getElementById(
+                    'waitroomVideo'
+                  ) as HTMLVideoElement;
+                } else {
+                  var face_input = document.getElementsByClassName(
+                    'input_video'
+                  )[0] as HTMLVideoElement;
+                }
+
+                if (face_input == null) {
+                  app.isInWaitroom = false;
+                } else if (face_input.videoHeight != 0) {
+                  if (app.isStartFaceDetect) {
+                    //처음에 얼굴인식 시작할때 로드를 위해서 1번 send하고 5초 쉼
+                    if (delay == 0) {
+                      console.log('Start 5s Delay');
+                      //5초 쉬기 전에 한번 send하고
+                      app.myHands.initialize();
+                    }
+                    delay += 1; //0.2초마다 interval 실행하기 때문에 delay가 25를 넘는 순간이 5초가 됨
+                    if (delay > 25) {
+                      console.log('Finish 5s Delay');
+                      app.isStartFaceDetect = false;
+                      console.log(app.faceDetectionState);
+                      if (
+                        $(document.getElementById('faceDetect')).prop(
+                          'checked'
+                        ) == true &&
+                        app.faceDetectionState == 1
+                      ) {
+                        speech(
+                          '얼굴인식을 시작합니다. 앵글 범위를 찾기 위해 손을 천천히 흔들어보세요'
+                        );
+                      }
+                    }
+                  } else {
+                    if (
+                      (app.waitroomCameraOn || app.camerastate) &&
+                      $(document.getElementById('faceDetect')).prop(
+                        'checked'
+                      ) == true
+                    ) {
+                      if (!Mobile()) {
+                        console.log('Send Hand Data');
+                        await app.myHands.send({
+                          image: face_input,
+                        });
+                      }
+                      await app.myFaceMesh.send({
+                        image: face_input,
+                      });
+                    }
+                  }
+                }
+              }, 200);
+            }
           }
 
           function onResultsOnHands(results) {
@@ -285,14 +347,7 @@ export class App {
                 true &&
               results.multiHandLandmarks.length > 0
             ) {
-              if (!app.isFaceDetectionSuccess && !app.isHandIn) {
-                app.isHandIn = true;
-                if (app.faceDetectionState !== 1)
-                  window.speechSynthesis.cancel();
-                speech(
-                  '손이 화면에 들어왔습니다. 손의 위치로 얼굴을 이동해주세요'
-                );
-              }
+              app.isHandIn = true;
             } else if (
               $(document.getElementById('faceDetect')).prop('checked') ==
                 true &&
@@ -308,42 +363,56 @@ export class App {
               results.multiFaceLandmarks[0]
             ) {
               app.isFaceDetectionSuccess = true;
-              if (app.isHandIn) {
-                window.speechSynthesis.cancel();
-              }
               if (results.multiFaceLandmarks[0][10].y <= app.faceUp) {
                 console.log('Face Out Direction: Up');
                 if (app.faceDetectionState !== -1) {
-                  if (app.faceDetectionState !== 1)
+                  if (
+                    app.faceDetectionState !== 1 ||
+                    !app.isHandDetectionSpeaking
+                  )
                     window.speechSynthesis.cancel();
                   app.faceDetectionState = -1;
-                  faceRelocateVoice();
+                  speech('이탈. 아래쪽으로 이동하시오.');
+                  app.faceDetectionStateCount = 0;
                 } else app.faceDetectionStateCount++;
               } else if (results.multiFaceLandmarks[0][152].y >= app.faceDown) {
                 console.log('Face Out Direction: Down');
                 if (app.faceDetectionState !== -2) {
-                  if (app.faceDetectionState !== 1)
+                  if (
+                    app.faceDetectionState !== 1 ||
+                    !app.isHandDetectionSpeaking
+                  )
                     window.speechSynthesis.cancel();
                   app.faceDetectionState = -2;
-                  faceRelocateVoice();
+                  speech('이탈. 위쪽으로 이동하시오.');
+                  app.faceDetectionStateCount = 0;
                 } else app.faceDetectionStateCount++;
               } else if (results.multiFaceLandmarks[0][234].x <= app.faceLeft) {
                 console.log('Face Out Direction: Right');
                 if (app.faceDetectionState !== -3) {
-                  if (app.faceDetectionState !== 1)
+                  if (
+                    app.faceDetectionState !== 1 ||
+                    !app.isHandDetectionSpeaking
+                  ) {
                     window.speechSynthesis.cancel();
-                  app.faceDetectionState = -3;
-                  faceRelocateVoice();
+                    app.faceDetectionState = -3;
+                    speech('이탈. 왼쪽으로 이동하시오.');
+                    app.faceDetectionStateCount = 0;
+                  }
                 } else app.faceDetectionStateCount++;
               } else if (
                 results.multiFaceLandmarks[0][454].x >= app.faceRight
               ) {
                 console.log('Face Out Direction: Left');
                 if (app.faceDetectionState !== -4) {
-                  if (app.faceDetectionState !== 1)
+                  if (
+                    app.faceDetectionState !== 1 ||
+                    !app.isHandDetectionSpeaking
+                  )
                     window.speechSynthesis.cancel();
                   app.faceDetectionState = -4;
-                  faceRelocateVoice();
+                  speech('이탈. 오른쪽으로 이동하시오.');
+                  app.faceDetectionStateCount = 0;
                 } else app.faceDetectionStateCount++;
               } else if (
                 results.multiFaceLandmarks[0][10].y > app.faceUp &&
@@ -356,88 +425,60 @@ export class App {
                   if (app.faceDetectionState !== 1)
                     window.speechSynthesis.cancel();
                   app.faceDetectionState = 0;
-                  faceRelocateVoice();
+                  speech('정상 범위에 들어왔습니다.');
+                  app.faceDetectionStateCount = 0;
                 }
               }
+
+              app.isHandDetectionSpeaking = false;
             } else if (
+              ((app.isInWaitroom && app.waitroomCameraOn) ||
+                (!app.isInWaitroom && app.camerastate)) &&
               $(document.getElementById('faceDetect')).prop('checked') ==
                 true &&
               results.multiFaceLandmarks.length <= 0
             ) {
-              app.isFaceDetectionSuccess = false;
-              app.faceDetectionState = -100; //인식이 안되고 있으면 -100으로 표시
-            }
-            if (app.faceDetectionStateCount == 25) {
-              speech('아직 정상 범위에 들어오지 않았습니다');
-              faceRelocateVoice();
-              app.faceDetectionStateCount = -20;
-            }
-          }
-
-          if (!Mobile()) {
-            app.myHands.onResults(onResultsOnHands);
-          }
-          app.myFaceMesh.onResults(onResultsOnFaceMesh);
-          var delay = 0;
-
-          if (app.fisrtFaceDetection) {
-            //얼굴인식 켜는 순간 interval 설정하고 다른 곳에서는 interval 설정안함
-            //interval내에서 if문으로 처리하기 때문
-            app.fisrtFaceDetection = false;
-            app.interval = setInterval(async () => {
-              if (app.isInWaitroom) {
-                // 현재 대기방
-                var face_input = document.getElementById(
-                  'waitroomVideo'
-                ) as HTMLVideoElement;
+              console.log('Face Total Out');
+              if (app.faceDetectionState !== -100) {
+                if (
+                  app.faceDetectionState !== 1 ||
+                  !app.isHandDetectionSpeaking
+                )
+                  window.speechSynthesis.cancel();
+                app.faceDetectionState = -100;
+                app.isHandDetectionSpeaking = false;
+                speech('얼굴이 화면 밖으로 완전히 벗어났습니다.');
+                speech('앵글 범위를 찾기 위해 손을 천천히 흔들어보세요');
+                app.faceDetectionStateCount = -25;
               } else {
-                var face_input = document.getElementsByClassName(
-                  'input_video'
-                )[0] as HTMLVideoElement;
-              }
+                app.faceDetectionStateCount++;
 
-              if (face_input == null) {
-                app.isInWaitroom = false;
-              } else if (face_input.videoHeight != 0) {
-                if (app.isStartFaceDetect) {
-                  //처음에 얼굴인식 시작할때 로드를 위해서 1번 send하고 5초 쉼
-                  if (delay == 0) {
-                    console.log('Start 5s Delay');
-                    //5초 쉬기 전에 한번 send하고
-                    app.myHands.initialize();
-                  }
-                  delay += 1; //0.2초마다 interval 실행하기 때문에 delay가 25를 넘는 순간이 5초가 됨
-                  if (delay > 25) {
-                    console.log('Finish 5s Delay');
-                    app.isStartFaceDetect = false;
-                    if (
-                      $(document.getElementById('faceDetect')).prop(
-                        'checked'
-                      ) == true &&
-                      app.faceDetectionState == 1
-                    ) {
-                      faceRelocateVoice();
-                    }
-                  }
-                } else {
-                  if (
-                    (app.waitroomCameraOn || app.camerastate) &&
-                    $(document.getElementById('faceDetect')).prop('checked') ==
-                      true
-                  ) {
-                    if (!Mobile()) {
-                      console.log('Send Hand Data');
-                      await app.myHands.send({
-                        image: face_input,
-                      });
-                    }
-                    await app.myFaceMesh.send({
-                      image: face_input,
-                    });
+                if (app.isHandIn) {
+                  console.log('Face Total out & Hand in');
+                  if (!app.isHandDetectionSpeaking) {
+                    app.isHandDetectionSpeaking = true;
+                    if (app.faceDetectionState !== 1)
+                      window.speechSynthesis.cancel();
+                    speech(
+                      '손이 화면에 들어왔습니다. 손의 위치로 얼굴을 이동해주세요'
+                    );
+                    setTimeout(function () {
+                      app.isHandDetectionSpeaking = false;
+                    }, 20000);
                   }
                 }
               }
-            }, 200);
+            }
+            if (app.faceDetectionStateCount == 25) {
+              speech('아직 정상 범위에 들어오지 않았습니다');
+              if (app.faceDetectionState == -100) {
+                speech('앵글 범위를 찾기 위해 손을 천천히 흔들어보세요');
+                app.faceDetectionStateCount = -25;
+              } else {
+                faceRelocateVoice();
+                app.faceDetectionStateCount = -20;
+              }
+            }
           }
         },
         isLipMagnify: function () {},
