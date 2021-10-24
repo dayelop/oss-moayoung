@@ -19,6 +19,7 @@
           width: calc(100% + 2px);
           height: calc(100% + 2px);
           margin: -1px;
+          transform: rotateY(180deg);
         }
       }
       .video-info-wrap {
