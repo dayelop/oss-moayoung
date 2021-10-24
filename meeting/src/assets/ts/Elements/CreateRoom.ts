@@ -199,18 +199,6 @@ export class CreateRoom {
 
           cla.app.featureOnOffVueObject.isFaceDetect();
         },
-        toggleSubtitleExtract: function () {
-          $(document.getElementById('subtitleExtract')).prop(
-            'checked',
-            !$(document.getElementById('subtitleExtract')).prop('checked')
-          );
-        },
-        toggleLipMagnify: function () {
-          $(document.getElementById('libMagnify')).prop(
-            'checked',
-            !$(document.getElementById('libMagnify')).prop('checked')
-          );
-        },
         toggleParticipantAlarm: function () {
           $(document.getElementById('participantAlarm')).prop(
             'checked',
