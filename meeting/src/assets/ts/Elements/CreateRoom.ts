@@ -275,7 +275,7 @@ export class CreateRoom {
           `단축키 음성 안내를 듣고 싶다면 컨트롤 i를 눌러주세요.`,
           ''
         );
-      }, 1000);
+      }, 2500);
       this.waitroomVueObject.showWaitroom = true;
       this.waitroomVueObject.setVideo();
       this.app.devices.gotDevices(true);
