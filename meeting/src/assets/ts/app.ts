@@ -165,18 +165,18 @@ export class App {
   firstlipdiv: boolean = true;
   fisrtFaceDetection: boolean = true;
 
+  isInWaitroom: boolean = true;
+  waitroomCameraOn: boolean = true;
+
   myFaceMesh: FaceMesh;
   faceLeft: number;
   faceRight: number;
   faceUp: number;
   faceDown: number;
-  isFaceDetectionSuccess: boolean;
   isStartFaceDetect: boolean;
   isFaceDetectionSet: boolean = false;
   faceDetectionState: any = -99;
   faceDetectionStateCount: any;
-  isInWaitroom: boolean = true;
-  waitroomCameraOn: boolean = true;
 
   myHands: Hands;
   isHandIn: boolean = false;
@@ -292,6 +292,8 @@ export class App {
                 //얼굴인식 세팅이 완료된 상태
                 if (
                   app.isStartFaceDetect &&
+                  ((app.isInWaitroom && app.waitroomCameraOn) ||
+                    (!app.isInWaitroom && app.camerastate)) &&
                   $(document.getElementById('faceDetect')).prop('checked') ==
                     true
                 ) {
@@ -357,7 +359,6 @@ export class App {
                 true &&
               results.multiFaceLandmarks[0]
             ) {
-              app.isFaceDetectionSuccess = true;
               if (results.multiFaceLandmarks[0][10].y <= app.faceUp) {
                 console.log('Face Out Direction: Up');
                 if (app.faceDetectionState !== -1) {
