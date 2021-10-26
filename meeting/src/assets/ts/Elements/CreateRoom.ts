@@ -227,8 +227,6 @@ export class CreateRoom {
           }
         },
         toogleCamera: function () {
-          cla.app.waitroomCameraOn = !cla.app.waitroomCameraOn;
-
           if (
             !cla.app.microphoneOnlyNotChangeable &&
             cla.app.localStream !== undefined
@@ -247,6 +245,8 @@ export class CreateRoom {
           } else {
             new Alert(Translator.get('cannotstartcamera'));
           }
+
+          cla.app.waitroomCameraOn = this.cameraOn;
         },
         toggleOptions: function () {
           $('#waitroom').toggleClass('openWaitroomOption');

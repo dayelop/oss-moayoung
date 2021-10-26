@@ -172,7 +172,8 @@ export class App {
   faceDown: number;
   isFaceDetectionSuccess: boolean;
   isStartFaceDetect: boolean;
-  faceDetectionState: any;
+  isFaceDetectionSet: boolean = false;
+  faceDetectionState: any = -99;
   faceDetectionStateCount: any;
   isInWaitroom: boolean = true;
   waitroomCameraOn: boolean = true;
@@ -256,31 +257,50 @@ export class App {
       },
       methods: {
         isFaceDetect: function () {
-          app.faceDetectionState = -99;
           app.faceDetectionStateCount = 0;
+          app.isStartFaceDetect = true;
 
-          if (
-            ((app.isInWaitroom && app.waitroomCameraOn) ||
-              (!app.isInWaitroom && app.camerastate)) &&
-            $(document.getElementById('faceDetect')).prop('checked') == true
-          ) {
-            if (app.faceDetectionState == -99) {
-              console.log('Start Face Detection');
-              speech('얼굴 인식 기능이 켜졌습니다. 잠시만 기다려주세요.');
-              app.faceDetectionState = 1;
-            }
+          app.myHands.onResults(onResultsOnHands);
+          app.myFaceMesh.onResults(onResultsOnFaceMesh);
 
-            app.myHands.onResults(onResultsOnHands);
-            app.myFaceMesh.onResults(onResultsOnFaceMesh);
-            var delay = 0;
+          if (app.fisrtFaceDetection) {
+            //얼굴인식 켜는 순간 interval 설정하고 다른 곳에서는 interval 설정안함
+            //interval내에서 if문으로 처리하기 때문
+            app.interval = setInterval(async () => {
+              if (
+                ((app.isInWaitroom && app.waitroomCameraOn) ||
+                  (!app.isInWaitroom && app.camerastate)) &&
+                $(document.getElementById('faceDetect')).prop('checked') ==
+                  true &&
+                app.faceDetectionState == -99
+              ) {
+                app.faceDetectionState = 1;
+                console.log('Face Detection On');
+                speech('얼굴 인식 기능이 켜졌습니다. 잠시만 기다려주세요.');
+              }
+              if (app.fisrtFaceDetection) {
+                app.fisrtFaceDetection = false;
+                console.log('Start 5s Delay');
+                app.myHands.initialize();
 
-            if (app.fisrtFaceDetection) {
-              //얼굴인식 켜는 순간 interval 설정하고 다른 곳에서는 interval 설정안함
-              //interval내에서 if문으로 처리하기 때문
-              app.fisrtFaceDetection = false;
-              app.interval = setInterval(async () => {
+                setTimeout(function () {
+                  console.log('Finish 5s Delay');
+                  app.faceDetectionState = 1;
+                  app.isFaceDetectionSet = true;
+                }, 5000);
+              } else if (app.isFaceDetectionSet) {
+                //얼굴인식 세팅이 완료된 상태
+                if (
+                  app.isStartFaceDetect &&
+                  $(document.getElementById('faceDetect')).prop('checked') ==
+                    true
+                ) {
+                  app.isStartFaceDetect = false;
+                  speech('얼굴인식을 시작합니다.');
+                }
+
                 if (app.isInWaitroom) {
-                  // 현재 대기방
+                  // 현재의 방에 따라 비디오 바꿔주기
                   var face_input = document.getElementById(
                     'waitroomVideo'
                   ) as HTMLVideoElement;
@@ -291,51 +311,29 @@ export class App {
                 }
 
                 if (face_input == null) {
+                  // 얼굴인식을 켜고 통화방으로 넘어갈 때 null 이 되는 순간이 생김
                   app.isInWaitroom = false;
+                  window.speechSynthesis.cancel();
                 } else if (face_input.videoHeight != 0) {
-                  if (app.isStartFaceDetect) {
-                    //처음에 얼굴인식 시작할때 로드를 위해서 1번 send하고 5초 쉼
-                    if (delay == 0) {
-                      console.log('Start 5s Delay');
-                      //5초 쉬기 전에 한번 send하고
-                      app.myHands.initialize();
-                    }
-                    delay += 1; //0.2초마다 interval 실행하기 때문에 delay가 25를 넘는 순간이 5초가 됨
-                    if (delay > 25) {
-                      console.log('Finish 5s Delay');
-                      app.isStartFaceDetect = false;
-                      console.log(app.faceDetectionState);
-                      if (
-                        $(document.getElementById('faceDetect')).prop(
-                          'checked'
-                        ) == true &&
-                        app.faceDetectionState == 1
-                      ) {
-                        speech('얼굴인식을 시작합니다.');
-                      }
-                    }
-                  } else {
-                    if (
-                      ((app.isInWaitroom && app.waitroomCameraOn) ||
-                        (!app.isInWaitroom && app.camerastate)) &&
-                      $(document.getElementById('faceDetect')).prop(
-                        'checked'
-                      ) == true
-                    ) {
-                      if (!Mobile()) {
-                        console.log('Send Hand Data');
-                        await app.myHands.send({
-                          image: face_input,
-                        });
-                      }
-                      await app.myFaceMesh.send({
+                  if (
+                    ((app.isInWaitroom && app.waitroomCameraOn) ||
+                      (!app.isInWaitroom && app.camerastate)) &&
+                    $(document.getElementById('faceDetect')).prop('checked') ==
+                      true
+                  ) {
+                    if (!Mobile()) {
+                      console.log('Send Hand Data');
+                      await app.myHands.send({
                         image: face_input,
                       });
                     }
+                    await app.myFaceMesh.send({
+                      image: face_input,
+                    });
                   }
                 }
-              }, 200);
-            }
+              }
+            }, 200);
           }
 
           function onResultsOnHands(results) {
