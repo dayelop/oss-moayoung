@@ -1,11 +1,11 @@
 {
-  "name": "chat",
-  "version": "1.0.12",
-  "author": "Valentin Giselbrecht",
+  "name": "moayoung-meeting",
+  "version": "1.0.0",
+  "author": "Daye Lee",
   "contributors": [],
   "repository": {
     "type": "git",
-    "url": "https://github.com/vgiselbrecht/chat.git"
+    "url": "https://github.com/daaaayeah/oss-moayoung.git"
   },
   "license": "Apache 2.0",
   "devDependencies": {

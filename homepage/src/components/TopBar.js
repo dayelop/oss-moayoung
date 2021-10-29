@@ -1,6 +1,5 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
-import { Link } from 'react-router-dom';
 import { useState } from 'react';
 
 import Hotkey from '../pages/Hotkey';
@@ -73,9 +72,7 @@ function TopBar() {
     <>
       <div css={background}>
         <div css={container}>
-          <Link to="/" css={logo}>
-            모아영
-          </Link>
+          <div css={logo}>모아영</div>
           <div css={menuContainer}>
             <button css={menu} onClick={() => setIsHotkeyOn(!isHotkeyOn)}>
               단축키
