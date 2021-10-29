@@ -227,6 +227,8 @@ export class CreateRoom {
           }
         },
         toogleCamera: function () {
+          var count = 0;
+
           if (
             !cla.app.microphoneOnlyNotChangeable &&
             cla.app.localStream !== undefined
@@ -247,6 +249,21 @@ export class CreateRoom {
           }
 
           cla.app.waitroomCameraOn = this.cameraOn;
+
+          if (this.cameraOn) {
+            cla.app.isVideoLoading = true;
+            cla.app.videoLoadingInterval = setInterval(async () => {
+              window.speechSynthesis.cancel();
+              console.log('Video Loading...');
+              count++;
+              if (count == 15) {
+                clearInterval(cla.app.videoLoadingInterval);
+                cla.app.isVideoLoading = false;
+                console.log('Video Loading Complete');
+                cla.app.faceDetectionState = 1;
+              }
+            }, 200);
+          }
         },
         toggleOptions: function () {
           $('#waitroom').toggleClass('openWaitroomOption');
