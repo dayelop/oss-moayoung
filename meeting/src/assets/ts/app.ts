@@ -298,7 +298,6 @@ export class App {
                     true
                 ) {
                   app.isStartFaceDetect = false;
-                  console.log('들어왔나요');
                   speech('얼굴인식을 시작합니다.');
                 }
 
