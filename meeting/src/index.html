@@ -37,6 +37,7 @@
       var firstlip = true;
       var partnerFaceMesh = new FaceMesh({
         locateFile: (file) => {
+          console.log('Load Lip FaceMesh Model');
           return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
         },
       });
@@ -95,7 +96,7 @@
             }
           }
         }
-
+        var mydivtext = document.getElementById('mydivheader').innerHTML;
         partnerFaceMesh.onResults(onResults);
         if (interval != null) {
           clearInterval(interval);
@@ -104,11 +105,30 @@
           if (firstlip) {
             if (delay == 0) {
               partnerFaceMesh.initialize();
+              document.getElementById('mydivheader').innerHTML =
+                '5초 뒤 시작됩니다.';
             }
-            delay += 1;
-            if (delay > 25) {
+            if (delay == 5) {
+              document.getElementById('mydivheader').innerHTML =
+                '4초 뒤 시작됩니다.';
+            } else if (delay == 10) {
+              document.getElementById('mydivheader').innerHTML =
+                '3초 뒤 시작됩니다.';
+            } else if (delay == 15) {
+              document.getElementById('mydivheader').innerHTML =
+                '2초 뒤 시작됩니다.';
+            } else if (delay == 20) {
+              document.getElementById('mydivheader').innerHTML =
+                '1초 뒤 시작됩니다.';
+            } else if (delay == 25) {
+              document.getElementById('mydivheader').innerHTML =
+                '잠시만 기다려주세요.';
+            } else if (delay > 25) {
+              document.getElementById('mydivheader').innerHTML =
+                '여기를 클릭해 이동하세요.';
               firstlip = false;
             }
+            delay += 1;
           }
           if (!firstlip && videoElement.videoWidth != 0) {
             await partnerFaceMesh.send({ image: videoElement });
@@ -125,7 +145,18 @@
       }
     </script>
     <script>
-      function saveAsFile(filename) {
+      function saveAsFile() {
+        var time = new Date();
+        var timestamp =
+          time.getFullYear() +
+          '-' +
+          (time.getMonth() + 1) +
+          '-' +
+          time.getDate();
+        var roomname = document.getElementById('invite-link-welcome').value;
+        roomname = roomname.split('#')[1];
+
+        var filename = '모아영 ' + timestamp + ' ' + roomname + '.txt';
         var hiddenElement = document.createElement('a');
         var str = $('.subtitles').text();
         hiddenElement.href = 'data:attachment/text,' + encodeURI(str);
@@ -204,7 +235,7 @@
             </div>
             <div id="lips-area" display="none">
               <div id="mydiv">
-                <div id="mydivheader">Click here to move</div>
+                <div id="mydivheader">여기를 클릭해 이동하세요.</div>
                 <div id="lip-area" style="margin: 0px"></div>
               </div>
             </div>
@@ -335,7 +366,7 @@
                 <button
                   class="subtitle-button"
                   type="button"
-                  onclick="saveAsFile('자막.txt');"
+                  onclick="saveAsFile();"
                 >
                   자막 파일 다운로드
                 </button>
