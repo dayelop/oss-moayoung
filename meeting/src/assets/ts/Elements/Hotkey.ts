@@ -106,8 +106,9 @@ export class Hotkey {
             return false;
           }
 
-          console.log('face');
           app.switch_.switchVueObject.toggleFaceDetect();
+          app.featureOnOffVueObject.isFaceDetect();
+
           return false;
         }
 
