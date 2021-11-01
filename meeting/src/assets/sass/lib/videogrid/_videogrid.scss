@@ -19,7 +19,14 @@
           width: calc(100% + 2px);
           height: calc(100% + 2px);
           margin: -1px;
+        }
+
+        #yourVideo {
           transform: rotateY(180deg);
+
+          &.shared {
+            transform: none;
+          }
         }
       }
       .video-info-wrap {
