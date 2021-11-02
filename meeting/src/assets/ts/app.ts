@@ -824,7 +824,7 @@ export class App {
     if ($(document.getElementById('participantAlarm')).prop('checked')) {
       setTimeout(() => {
         TTS.playSound(TTS.newpartnersound, this.partners[partnerId].name);
-      }, 2000);
+      }, 3500);
     }
 
     $('#lip-area').append(
