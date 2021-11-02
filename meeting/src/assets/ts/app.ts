@@ -105,7 +105,6 @@ function faceRelocateVoice() {
     if (Mobile()) {
       speech('이탈. 핸드폰을 아래로 움직이세요.');
     } else {
-      console.log('이거말하나');
       speech('이탈. 위쪽으로 이동하시오.');
     }
   } else if (app.faceDetectionState == -3) {
@@ -324,7 +323,7 @@ export class App {
                       window.speechSynthesis.cancel();
                       console.log('Video Loading...');
                       count++;
-                      if (count == 18) {
+                      if (count == 17) {
                         clearInterval(app.videoLoadingInterval);
                         app.isVideoLoading = false;
                         console.log('Video Loading Complete');
