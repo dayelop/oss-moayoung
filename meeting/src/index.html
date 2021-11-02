@@ -150,10 +150,14 @@
         var filename = '모아영 ' + timestamp + ' ' + roomname + '.txt';
         var hiddenElement = document.createElement('a');
         var str = $('.subtitles').text();
-        hiddenElement.href = 'data:attachment/text,' + encodeURI(str);
-        hiddenElement.target = '_blank';
-        hiddenElement.download = filename;
-        hiddenElement.click();
+        if (!str) {
+          alert('자막이 없습니다. 자동 자막 생성 후 다운로드 해주세요.');
+        } else {
+          hiddenElement.href = 'data:text/plain,' + encodeURI(str);
+          hiddenElement.target = '_blank';
+          hiddenElement.download = filename;
+          hiddenElement.click();
+        }
       }
     </script>
   </head>
