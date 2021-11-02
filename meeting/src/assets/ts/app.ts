@@ -937,7 +937,7 @@ export class App {
 
   hangOut() {
     if (!this.closed) {
-      history.back();
+      location.href = 'https://moayoung-call.web.app/';
 
       this.closed = true;
       this.exchange.sendMessage({ closing: this.yourId });
