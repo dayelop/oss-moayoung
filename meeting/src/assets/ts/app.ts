@@ -174,7 +174,8 @@ export class App {
   faceRight: number;
   faceUp: number;
   faceDown: number;
-  isStartFaceDetect: boolean;
+  isFaceDetectStart: boolean;
+  isFaceDetectStartSpeaking: boolean = false;
   isFaceDetectionSet: boolean = false;
   faceDetectionState: any = -99;
   faceDetectionStateCount: any;
@@ -251,7 +252,7 @@ export class App {
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5,
     });
-    this.isStartFaceDetect = true;
+    this.isFaceDetectStart = true;
 
     this.featureOnOffVueObject = new Vue({
       el: '#settingSwitch',
@@ -261,7 +262,8 @@ export class App {
       methods: {
         isFaceDetect: function () {
           app.faceDetectionStateCount = 0;
-          app.isStartFaceDetect = true;
+          app.isFaceDetectStart = true;
+          app.isFaceDetectStartSpeaking = false;
 
           app.myHands.onResults(onResultsOnHands);
           app.myFaceMesh.onResults(onResultsOnFaceMesh);
@@ -292,16 +294,20 @@ export class App {
               } else if (app.isFaceDetectionSet) {
                 //얼굴인식 세팅이 완료된 상태
                 if (
-                  app.isStartFaceDetect &&
+                  app.isFaceDetectStart &&
                   ((app.isInWaitroom && app.waitroomCameraOn) ||
                     (!app.isInWaitroom && app.camerastate)) &&
                   $(document.getElementById('faceDetect')).prop('checked') ==
                     true
                 ) {
-                  app.isStartFaceDetect = false;
+                  app.isFaceDetectStart = false;
+                  app.isFaceDetectStartSpeaking = true;
                   speech('얼굴인식을 시작합니다.');
+                  setTimeout(function () {
+                    app.isFaceDetectStartSpeaking = false;
+                  }, 5000);
+                  app.faceDetectionState = 1;
                 }
-
                 if (app.isInWaitroom) {
                   // 현재의 방에 따라 비디오 바꿔주기
                   var face_input = document.getElementById(
@@ -379,7 +385,8 @@ export class App {
                 if (app.faceDetectionState !== -1) {
                   if (
                     app.faceDetectionState !== 1 ||
-                    !app.isHandDetectionSpeaking
+                    !app.isHandDetectionSpeaking ||
+                    !app.isFaceDetectStartSpeaking
                   )
                     window.speechSynthesis.cancel();
                   app.faceDetectionState = -1;
@@ -390,7 +397,8 @@ export class App {
                 if (app.faceDetectionState !== -2) {
                   if (
                     app.faceDetectionState !== 1 ||
-                    !app.isHandDetectionSpeaking
+                    !app.isHandDetectionSpeaking ||
+                    !app.isFaceDetectStartSpeaking
                   )
                     window.speechSynthesis.cancel();
                   app.faceDetectionState = -2;
@@ -401,7 +409,8 @@ export class App {
                 if (app.faceDetectionState !== -3) {
                   if (
                     app.faceDetectionState !== 1 ||
-                    !app.isHandDetectionSpeaking
+                    !app.isHandDetectionSpeaking ||
+                    !app.isFaceDetectStartSpeaking
                   ) {
                     window.speechSynthesis.cancel();
                     app.faceDetectionState = -3;
@@ -415,7 +424,8 @@ export class App {
                 if (app.faceDetectionState !== -4) {
                   if (
                     app.faceDetectionState !== 1 ||
-                    !app.isHandDetectionSpeaking
+                    !app.isHandDetectionSpeaking ||
+                    !app.isFaceDetectStartSpeaking
                   )
                     window.speechSynthesis.cancel();
                   app.faceDetectionState = -4;
@@ -429,7 +439,10 @@ export class App {
               ) {
                 console.log('Face in Normal Range');
                 if (app.faceDetectionState !== 0) {
-                  if (app.faceDetectionState !== 1)
+                  if (
+                    app.faceDetectionState !== 1 ||
+                    !app.isFaceDetectStartSpeaking
+                  )
                     window.speechSynthesis.cancel();
                   app.faceDetectionState = 0;
                   faceRelocateVoice();
@@ -448,7 +461,8 @@ export class App {
               if (app.faceDetectionState !== -100) {
                 if (
                   app.faceDetectionState !== 1 ||
-                  !app.isHandDetectionSpeaking
+                  !app.isHandDetectionSpeaking ||
+                  !app.isFaceDetectStartSpeaking
                 )
                   window.speechSynthesis.cancel();
                 app.faceDetectionState = -100;
@@ -468,7 +482,10 @@ export class App {
                     console.log('Face Total out & Hand in');
                     if (!app.isHandDetectionSpeaking) {
                       app.isHandDetectionSpeaking = true;
-                      if (app.faceDetectionState !== 1)
+                      if (
+                        app.faceDetectionState !== 1 ||
+                        !app.isFaceDetectStartSpeaking
+                      )
                         window.speechSynthesis.cancel();
                       speech(
                         '손이 화면에 들어왔습니다. 손의 위치로 얼굴을 이동해주세요'
