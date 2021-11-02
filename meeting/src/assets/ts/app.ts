@@ -94,7 +94,8 @@ function Mobile() {
   );
 }
 function faceRelocateVoice() {
-  if (app.faceDetectionState == -1) {
+  if (app.faceDetectionState == 0) speech('정상 범위에 들어왔습니다.');
+  else if (app.faceDetectionState == -1) {
     if (Mobile()) {
       speech('이탈. 핸드폰을 위로 움직이세요.');
     } else {
@@ -104,6 +105,7 @@ function faceRelocateVoice() {
     if (Mobile()) {
       speech('이탈. 핸드폰을 아래로 움직이세요.');
     } else {
+      console.log('이거말하나');
       speech('이탈. 위쪽으로 이동하시오.');
     }
   } else if (app.faceDetectionState == -3) {
@@ -322,7 +324,7 @@ export class App {
                       window.speechSynthesis.cancel();
                       console.log('Video Loading...');
                       count++;
-                      if (count == 15) {
+                      if (count == 18) {
                         clearInterval(app.videoLoadingInterval);
                         app.isVideoLoading = false;
                         console.log('Video Loading Complete');
@@ -382,8 +384,7 @@ export class App {
                   )
                     window.speechSynthesis.cancel();
                   app.faceDetectionState = -1;
-                  speech('이탈. 아래쪽으로 이동하시오.');
-                  app.faceDetectionStateCount = 0;
+                  faceRelocateVoice();
                 } else app.faceDetectionStateCount++;
               } else if (results.multiFaceLandmarks[0][152].y >= app.faceDown) {
                 console.log('Face Out Direction: Down');
@@ -394,8 +395,7 @@ export class App {
                   )
                     window.speechSynthesis.cancel();
                   app.faceDetectionState = -2;
-                  speech('이탈. 위쪽으로 이동하시오.');
-                  app.faceDetectionStateCount = 0;
+                  faceRelocateVoice();
                 } else app.faceDetectionStateCount++;
               } else if (results.multiFaceLandmarks[0][234].x <= app.faceLeft) {
                 console.log('Face Out Direction: Right');
@@ -406,8 +406,7 @@ export class App {
                   ) {
                     window.speechSynthesis.cancel();
                     app.faceDetectionState = -3;
-                    speech('이탈. 왼쪽으로 이동하시오.');
-                    app.faceDetectionStateCount = 0;
+                    faceRelocateVoice();
                   }
                 } else app.faceDetectionStateCount++;
               } else if (
@@ -421,8 +420,7 @@ export class App {
                   )
                     window.speechSynthesis.cancel();
                   app.faceDetectionState = -4;
-                  speech('이탈. 오른쪽으로 이동하시오.');
-                  app.faceDetectionStateCount = 0;
+                  faceRelocateVoice();
                 } else app.faceDetectionStateCount++;
               } else if (
                 results.multiFaceLandmarks[0][10].y > app.faceUp &&
@@ -435,12 +433,11 @@ export class App {
                   if (app.faceDetectionState !== 1)
                     window.speechSynthesis.cancel();
                   app.faceDetectionState = 0;
-                  speech('정상 범위에 들어왔습니다.');
-                  app.faceDetectionStateCount = 0;
+                  faceRelocateVoice();
                 }
               }
 
-              app.isHandDetectionSpeaking = false;
+              if (!Mobile()) app.isHandDetectionSpeaking = false;
             } else if (
               ((app.isInWaitroom && app.waitroomCameraOn) ||
                 (!app.isInWaitroom && app.camerastate)) &&
@@ -456,25 +453,31 @@ export class App {
                 )
                   window.speechSynthesis.cancel();
                 app.faceDetectionState = -100;
-                app.isHandDetectionSpeaking = false;
                 speech('얼굴이 화면 밖으로 완전히 벗어났습니다.');
-                speech('앵글 범위를 찾기 위해 손을 천천히 흔들어보세요');
+
+                if (!Mobile()) {
+                  app.isHandDetectionSpeaking = false;
+                  speech('정상 범위를 찾기 위해 손을 천천히 흔들어 주세요');
+                } else {
+                  speech('정상 범위를 찾기 위해 핸드폰을 천천히 움직여 주세요');
+                }
                 app.faceDetectionStateCount = -25;
               } else {
                 app.faceDetectionStateCount++;
-
-                if (app.isHandIn) {
-                  console.log('Face Total out & Hand in');
-                  if (!app.isHandDetectionSpeaking) {
-                    app.isHandDetectionSpeaking = true;
-                    if (app.faceDetectionState !== 1)
-                      window.speechSynthesis.cancel();
-                    speech(
-                      '손이 화면에 들어왔습니다. 손의 위치로 얼굴을 이동해주세요'
-                    );
-                    setTimeout(function () {
-                      app.isHandDetectionSpeaking = false;
-                    }, 25000);
+                if (!Mobile()) {
+                  if (app.isHandIn) {
+                    console.log('Face Total out & Hand in');
+                    if (!app.isHandDetectionSpeaking) {
+                      app.isHandDetectionSpeaking = true;
+                      if (app.faceDetectionState !== 1)
+                        window.speechSynthesis.cancel();
+                      speech(
+                        '손이 화면에 들어왔습니다. 손의 위치로 얼굴을 이동해주세요'
+                      );
+                      setTimeout(function () {
+                        app.isHandDetectionSpeaking = false;
+                      }, 25000);
+                    }
                   }
                 }
               }
@@ -482,7 +485,10 @@ export class App {
             if (app.faceDetectionStateCount == 25) {
               speech('아직 정상 범위에 들어오지 않았습니다');
               if (app.faceDetectionState == -100) {
-                speech('앵글 범위를 찾기 위해 손을 천천히 흔들어보세요');
+                if (!Mobile())
+                  speech('정상 범위를 찾기 위해 손을 천천히 흔들어 주세요');
+                else
+                  speech('정상 범위를 찾기 위해 핸드폰을 천천히 움직여 주세요');
                 app.faceDetectionStateCount = -25;
               } else {
                 faceRelocateVoice();
@@ -507,7 +513,7 @@ export class App {
         window.speechSynthesis.cancel();
         console.log('Video Loading...');
         count++;
-        if (count == 15) {
+        if (count == 17) {
           clearInterval(app.videoLoadingInterval);
           app.isVideoLoading = false;
           console.log('Video Loading Complete');
