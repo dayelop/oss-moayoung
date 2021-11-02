@@ -47,15 +47,6 @@
         minTrackingConfidence: 0.5,
       });
       var interval = null;
-      function check(input) {
-        var lips_area = document.getElementById('lips-area');
-
-        if (input.checked == true) {
-          lips_area.style.display = 'inline';
-        } else {
-          lips_area.style.display = 'none';
-        }
-      }
 
       function libSelect() {
         var delay = 0;
@@ -472,8 +463,7 @@
                       <input
                         type="checkbox"
                         id="libMagnify"
-                        onclick="check(this)"
-                        v-on:click="isLipMagnify"
+                        v-on:click="isLipMagnify()"
                       />
                       <span class="slider round"></span>
                     </label>

@@ -129,6 +129,8 @@ export class Hotkey {
           }
 
           app.switch_.switchVueObject.toggleLibMagnify();
+          app.featureOnOffVueObject.isLipMagnify();
+
           return false;
         }
 

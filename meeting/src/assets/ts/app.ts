@@ -492,7 +492,15 @@ export class App {
           }
         },
 
-        isLipMagnify: function () {},
+        isLipMagnify: function () {
+          var lips_area = document.getElementById('lips-area');
+
+          if ($(document.getElementById('libMagnify')).prop('checked')) {
+            lips_area.style.display = 'inline';
+          } else {
+            lips_area.style.display = 'none';
+          }
+        },
       },
     });
   }
