@@ -97,27 +97,27 @@ function faceRelocateVoice() {
   if (app.faceDetectionState == 0) speech('정상 범위에 들어왔습니다.');
   else if (app.faceDetectionState == -1) {
     if (Mobile()) {
-      speech('이탈. 핸드폰을 위로 움직이세요.');
+      speech('이탈. 휴대폰을 위쪽으로 움직이세요.');
     } else {
-      speech('이탈. 아래쪽으로 이동하시오.');
+      speech('이탈. 아래쪽으로 이동하세요.');
     }
   } else if (app.faceDetectionState == -2) {
     if (Mobile()) {
-      speech('이탈. 핸드폰을 아래로 움직이세요.');
+      speech('이탈. 휴대폰을 아래쪽으로 움직이세요.');
     } else {
-      speech('이탈. 위쪽으로 이동하시오.');
+      speech('이탈. 위쪽으로 이동하세요.');
     }
   } else if (app.faceDetectionState == -3) {
     if (Mobile()) {
-      speech('이탈. 핸드폰을 오른쪽으로 움직이세요.');
+      speech('이탈. 휴대폰을 오른쪽으로 움직이세요.');
     } else {
-      speech('이탈. 왼쪽으로 이동하시오.');
+      speech('이탈. 왼쪽으로 이동하세요.');
     }
   } else if (app.faceDetectionState == -4) {
     if (Mobile()) {
-      speech('이탈. 핸드폰을 왼쪽으로 움직이세요.');
+      speech('이탈. 휴대폰을 왼쪽으로 움직이세요.');
     } else {
-      speech('이탈. 오른쪽으로 이동하시오.');
+      speech('이탈. 오른쪽으로 이동하세요.');
     }
   }
 
@@ -279,7 +279,9 @@ export class App {
               ) {
                 app.faceDetectionState = 1;
                 console.log('Face Detection On');
-                speech('얼굴 인식 기능이 켜졌습니다. 잠시만 기다려주세요.');
+                speech(
+                  '얼굴 벗어남 감지 기능이 켜졌습니다. 잠시만 기다려주세요.'
+                );
               }
               if (app.fisrtFaceDetection) {
                 app.fisrtFaceDetection = false;
@@ -302,7 +304,7 @@ export class App {
                 ) {
                   app.isFaceDetectStart = false;
                   app.isFaceDetectStartSpeaking = true;
-                  speech('얼굴인식을 시작합니다.');
+                  speech('얼굴 인식을 시작합니다.');
                   setTimeout(function () {
                     app.isFaceDetectStartSpeaking = false;
                   }, 5000);
@@ -470,9 +472,11 @@ export class App {
 
                 if (!Mobile()) {
                   app.isHandDetectionSpeaking = false;
-                  speech('정상 범위를 찾기 위해 손을 천천히 흔들어 주세요');
+                  speech('정상 범위를 찾기 위해 손을 천천히 흔들어 주세요.');
                 } else {
-                  speech('정상 범위를 찾기 위해 핸드폰을 천천히 움직여 주세요');
+                  speech(
+                    '정상 범위를 찾기 위해 휴대폰을 천천히 움직여 주세요.'
+                  );
                 }
                 app.faceDetectionStateCount = -25;
               } else {
@@ -488,7 +492,7 @@ export class App {
                       )
                         window.speechSynthesis.cancel();
                       speech(
-                        '손이 화면에 들어왔습니다. 손의 위치로 얼굴을 이동해주세요'
+                        '손이 감지되었습니다. 현재 손의 위치로 얼굴을 이동해주세요'
                       );
                       setTimeout(function () {
                         app.isHandDetectionSpeaking = false;
@@ -499,12 +503,14 @@ export class App {
               }
             }
             if (app.faceDetectionStateCount == 25) {
-              speech('아직 정상 범위에 들어오지 않았습니다');
+              speech('아직 정상 범위에 들어오지 않았습니다.');
               if (app.faceDetectionState == -100) {
                 if (!Mobile())
-                  speech('정상 범위를 찾기 위해 손을 천천히 흔들어 주세요');
+                  speech('정상 범위를 찾기 위해 손을 천천히 흔들어 주세요.');
                 else
-                  speech('정상 범위를 찾기 위해 핸드폰을 천천히 움직여 주세요');
+                  speech(
+                    '정상 범위를 찾기 위해 핸드폰을 천천히 움직여 주세요.'
+                  );
                 app.faceDetectionStateCount = -25;
               } else {
                 faceRelocateVoice();

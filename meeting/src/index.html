@@ -151,7 +151,7 @@
         var hiddenElement = document.createElement('a');
         var str = $('.subtitles').text();
         if (!str) {
-          alert('자막이 없습니다. 자동 자막 생성 후 다운로드 해주세요.');
+          alert('아직 생성된 자막이 없습니다!');
         } else {
           hiddenElement.href = 'data:text/plain,' + encodeURI(str);
           hiddenElement.target = '_blank';
