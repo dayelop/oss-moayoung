@@ -31,7 +31,9 @@ Video calling service that encompasses everyone (hereinafter referred to as "moa
 
 ## Using moayoung
 
-- <a href="https://moayoung-call.web.app/">Go to moayoung !</a>
+<a href="https://moayoung-call.web.app/">🏠 Go to moayoung !</a>
+
+<a href="https://github.com/daaaayeah/oss-moayoung/wiki">🔍 Moayoung wiki</a>
 
 <br>
 
