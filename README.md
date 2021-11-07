@@ -10,7 +10,7 @@
 
 </div>
 
-![main](https://user-images.githubusercontent.com/52737532/132761342-cfca0e85-72b9-4242-ae27-93e0e8813b04.PNG)
+![홈페이지](https://user-images.githubusercontent.com/52737532/140634437-1536d01e-f0c6-4001-b519-1f5654a90143.png)
 
 Video calling service that encompasses everyone (hereinafter referred to as "moayoung") is a web-based service that anyone can conveniently use regardless of vision or hearing impairment. moayoung's users can participate in video calls only by accessing the website without a separate software installation process, and various convenience features can relieve visual, hearing, and functional discomfort.
 
