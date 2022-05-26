@@ -13,7 +13,7 @@
     "@types/webrtc": "0.0.26",
     "css-loader": "^5.0.1",
     "file-loader": "^6.2.0",
-    "grunt": "^1.4.1",
+    "grunt": "^1.5.3",
     "grunt-contrib-clean": "~2.0.0",
     "grunt-contrib-watch": "~1.1.0",
     "grunt-replace": "^2.0.2",
